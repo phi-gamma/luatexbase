@@ -1,0 +1,64 @@
+                          The luatexbase generic bundle
+
+
+luatexbase provides basic resource management, similar to the way TeX
+resources are handled by Plain TeX and LaTeX, for new resources introduced by
+LuaTeX.
+
+Each resource is handled in a separate package, and luatexbase.sty merely loads
+all of them.
+
+The resources considered are:
+- registers (\count, \box, etc.)    -> lualatex-regs
+- Lua modules                       -> lualatex-mods
+- \attribute's                      -> lualatex-attr
+- \catcodetable's                   -> lualatex-cctb
+- Lua callbacks                     -> luamcallbacks
+
+WARNING: these packages are subject to change or even be merged or disappear in
+the near future!
+
+Installation
+------------
+
+Here are the recommended installation methods (preferred first).
+(Methods "commented out" are not available right now.)
+
+% 1. If you are using TeX Live 2009 or later, use 'tlmgr install luatexbase'.
+% Alternatively, try your (TeX or Linux) distribution's package management system.
+% 
+% 2. a. Grab luatextra.tds.zip on the CTAN.
+%    b. Unzip it at the root of one or your TDS trees.
+%    c. You may need to update some filename database after this, see your TeX
+% distribution's manual for details.
+
+3. a. Grab the sources from CTAN or github.
+   b. Run 'make install TEXMFROOT=/path/to/texmf'.
+   c. See 2c.
+
+4. Try to figure it out by looking at the Makefile and comments in the sources.
+
+
+Manifest
+--------
+
+Source files:
+        luamcallbacks.dtx
+
+Derived files:
+        luamcallbacks.pdf
+        luamcallbacks-test.tex
+        luamcallbacks.lua
+
+License
+-------
+
+This work and the derived files are under the Creative Commons CC0 license.
+
+See the full text at
+
+http://creativecommons.org/publicdomain/zero/1.0/legalcode
+
+and a FAQ at
+
+http://wiki.creativecommons.org/CC0
