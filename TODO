@@ -1,0 +1,4 @@
+- change lua module names
+- check for name conflicts ('module' used in mods)
+- test
+
