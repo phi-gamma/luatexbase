@@ -8,12 +8,13 @@ general
 - import/update doc
 - fix Makefile: test files are doc, not runfiles
 - make tests cleaner: \begingroup\expandafter\ETC.
+- handle catcodes for Plain
 
 regs
 ----
 
-- fix box & mark allocation (mathcherdef -> chardef)
 - check why only 100 or so \inserts can be allocated
 - issue a warning if etex not loaded
+- handle catcodes for Plain
 
 

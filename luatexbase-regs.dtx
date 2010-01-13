@@ -176,6 +176,44 @@ and the derived files
   \ifnum\count276=32768 \count276=65536 \fi
 %    \end{macrocode}
 %
+%    \verb|\box| registers and \verb|mark|s were previously defined
+%    using \verb|\mathchardef| since it had the biggest range under \eTeX
+%    (15-bit number).  However, this is not enough for \LuaTeX's extended
+%    registers. Fortunately, \verb|chardef|'s range is extended, and now large
+%    enough, so use it.
+%
+%    Take care that the macros remain \verb|\outer| if they previously were
+%    (actually, iff \verb+\globbox+ is). The somewhat tricky lines below,
+%    besides that, are just equivalent to:
+%    \begin{quote}
+%      \verb+\def \globbox    {\et@xglob 4\box    \mathchardef}+\\
+%      \verb+\def \globmarks  {\et@xglob 6\marks  \mathchardef}+
+%    \end{quote}
+%
+%    \begin{macrocode}
+  \begingroup
+    \def\z#1{\endgroup
+      #1\expandafter\def\csname globbox\endcsname
+        {\et@xglob 4\box    \chardef}%
+      #1\expandafter\def\csname globmarks\endcsname
+        {\et@xglob 6\marks  \chardef}}%
+    \edef\x{\meaning\globbox   \string\outer   \relax}%
+    \edef\y{\def\noexpand\y ##1\string\outer##2\relax}%
+    \y{\ifx\relax#1\relax
+      \expandafter\z\expandafter\outer
+    \else
+      \expandafter\z\expandafter\relax
+    \fi}%
+  \expandafter\y\x
+%    \end{macrocode}
+%
+%    \verb+\loc...+ versions are never \verb+\outer+.
+%
+%    \begin{macrocode}
+  \def \locbox     {\et@xloc  4\box    \chardef}
+  \def \locmarks   {\et@xloc  6\marks  \chardef}
+%    \end{macrocode}
+%
 %    Finally, make allocation of \verb|\count|, \verb|\dimen|, \verb|skip| and
 %    \verb|\box| start with numbers $>255$, in order to free the lower numbers
 %    for insertions. Be careful with \verb|\new...| macros which are
@@ -208,7 +246,9 @@ and the derived files
 %    enough for testing purposes.)
 %
 %    \begin{macrocode}
+%<testplain>\catcode 64 11
 %<testplain>\input luatexbase-regs.sty
+%<testplain>\catcode 64 12
 %<testlatex>\RequirePackage{luatexbase-regs}
 %<*testplain,testlatex>
 \def\checkregister#1{%
@@ -225,9 +265,9 @@ and the derived files
 \checkregister{dimen}
 \checkregister{skip}
 \checkregister{muskip}
-%%\checkregister{box}
+\checkregister{box}
 \checkregister{toks}
-%%\checkregister{marks}
+\checkregister{marks}
 
 \count0 1
 \loop \ifnum\count0<100
