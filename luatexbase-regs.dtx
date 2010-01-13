@@ -59,6 +59,12 @@ and the derived files
   \file{luatexbase-regs-latex.tex}{\from{luatexbase-regs.dtx}{latexfile}}%
 }
 
+\generate{%
+  \usedir{doc/luatex/luatexbase}%
+  \file{test-regs-plain.tex}{\from{luatexbase-regs.dtx}{testplain}}%
+  \file{test-regs-latex.tex}{\from{luatexbase-regs.dtx}{testlatex}}%
+}
+
 \obeyspaces
 \Msg{************************************************************************}
 \Msg{*}
@@ -81,6 +87,10 @@ and the derived files
 \ProvidesFile{luatexbase-regs.drv}
   [DATE DESC]
 \documentclass{ltxdoc}
+\makeatletter
+\newcommand\eTeX{$\m@th\varepsilon$-\TeX}
+\newcommand\LuaTeX{Lua\TeX}
+\makeatother
 \EnableCrossrefs
 \CodelineIndex
 \begin{document}
@@ -181,6 +191,50 @@ and the derived files
 %    \begin{macrocode}
 %</latexfile>
 %    \end{macrocode}
+%
+%    \section{Test files}
+%
+%    Here we test only the two main formatis: Plain~\TeX\ (with etex.src
+%    loaded) and \LaTeX, both with the \LuaTeX\ engine. Those correspond to
+%    the \texttt{luatex} and \texttt{lualatex} commands in \TeX\,Live.
+%
+%    We want to make sure we can globally and locally allocate $30000$
+%    registers of each kind, and still globally allocate $100$
+%    \verb+\insert+s. (Those numbers are not optimal, but they should be
+%    enough for testing purposes.)
+%
+%    \begin{macrocode}
+%<testplain>\input luatexbase-regs.sty
+%<testlatex>\RequirePackage{luatexbase-regs}
+%<*testplain,testlatex>
+\def\checkregister#1{%
+  \edef\newregister{\expandafter\noexpand\csname new#1\endcsname}%
+  \edef\locregister{\expandafter\noexpand\csname loc#1\endcsname}%
+  \count0 1
+  \loop
+    \newregister\dummy
+    \locregister\dummy
+  \ifnum\count0<30000
+    \advance\count0 1
+  \repeat}
+\checkregister{count}
+\checkregister{dimen}
+\checkregister{skip}
+\checkregister{muskip}
+%%\checkregister{box}
+\checkregister{toks}
+%%\checkregister{marks}
+
+\count0 1
+\loop \ifnum\count0<100
+  \newinsert\dummy
+  \advance\count0 1
+\repeat
+%</testplain,testlatex>
+%<testplain>\bye
+%<testlatex>\stop
+%    \end{macrocode}
+%
 %
 % \Finale
 \endinput

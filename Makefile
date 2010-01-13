@@ -1,4 +1,4 @@
-# Makefile for luaotfload
+# Makefile for luatexbase
 
 NAME = luatexbase
 DTX = $(wildcard *.dtx)
@@ -6,7 +6,8 @@ DOC = $(patsubst %.dtx, %.pdf, $(DTX))
 
 # Files grouped by generation mode
 UNPACKED_MCB = luamcallbacks-test.tex luamcallbacks.lua
-UNPACKED_REGS = luatexbase-regs.sty luatexbase-regs-latex.tex
+UNPACKED_REGS = luatexbase-regs.sty luatexbase-regs-latex.tex \
+				test-regs-plain.tex test-regs-latex.tex
 UNPACKED = $(UNPACKED_MCB) $(UNPACKED_REGS)
 COMPILED = $(DOC)
 GENERATED = $(COMPILED) $(UNPACKED)
@@ -36,11 +37,13 @@ DO_TEX = tex --interaction=batchmode $< >/dev/null
 DO_PDFLATEX = pdflatex --interaction=batchmode $< >/dev/null
 DO_MAKEINDEX = makeindex -s gind.ist $(subst .dtx,,$<) >/dev/null 2>&1
 
+# Main targets definition
 all: $(GENERATED)
+check: check-regs
 doc: $(COMPILED)
 unpack: $(UNPACKED)
 ctan: $(CTAN_ZIP)
-tds: $(TDS_ZIP)
+tds: check $(TDS_ZIP)
 world: all ctan
 
 %.pdf: %.dtx
@@ -54,6 +57,10 @@ $(UNPACKED_MCB): luamcallbacks.dtx
 
 $(UNPACKED_REGS): luatexbase-regs.dtx
 	$(DO_TEX)
+
+check-regs: $(UNPACKED_REGS)
+	#luatex --interaction=batchmode test-regs-latex.tex >/dev/null
+	lualatex --interaction=batchmode test-regs-latex.tex >/dev/null
 
 $(CTAN_ZIP): $(SOURCE) $(COMPILED) $(TDS_ZIP)
 	@echo "Making $@ for CTAN upload."

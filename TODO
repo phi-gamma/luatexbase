@@ -1,4 +1,18 @@
+general
+-------
+
 - change lua module names
 - check for name conflicts ('module' used in mods)
 - test
+- reload check, declaration, luatex test
+- import/update doc
+- fix Makefile: test files are doc, not runfiles
+
+regs
+----
+
+- fix box & mark allocation (mathcherdef -> chardef)
+- check why only 100 or so \inserts can be allocated
+- make it work with Plain!
+
 
