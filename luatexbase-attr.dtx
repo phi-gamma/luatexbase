@@ -1,0 +1,244 @@
+% \iffalse meta-comment
+%
+% Template : look for attr DATE DESC VERSION !!!
+% and 'derived files' !!!
+%
+% Written in 2009, 2010 by Manuel Pégourié-Gonnard and Élie Roux.
+%     <mpg@elzevir.fr>
+%     <elie.roux@telecom-bretagne.eu>
+%
+% This work is under the CC0 license.
+%
+% This work consists of the main source file luatexbase-attr.dtx
+% and the derived files
+%    luatexbase-attr.sty attr.lua ...
+%
+% Unpacking:
+%    tex luatexbase-attr.dtx
+% Documentation:
+%    pdflatex luatexbase-attr.dtx
+%
+%    The class ltxdoc loads the configuration file ltxdoc.cfg
+%    if available. Here you can specify further options, e.g.
+%    use A4 as paper format:
+%       \PassOptionsToClass{a4paper}{article}
+%
+%<*ignore>
+\begingroup
+  \def\x{LaTeX2e}%
+\expandafter\endgroup
+\ifcase 0\ifx\install y1\fi\expandafter
+         \ifx\csname processbatchFile\endcsname\relax\else1\fi
+         \ifx\fmtname\x\else 1\fi\relax
+\else\csname fi\endcsname
+%</ignore>
+%<*install>
+\input docstrip.tex
+
+\keepsilent
+\askforoverwritefalse
+
+\let\MetaPrefix\relax
+
+\preamble
+This is a generated file.
+
+Written in 2009, 2010 by Manuel Pégourié-Gonnard and Élie Roux.
+    <mpg@elzevir.fr>
+    <elie.roux@telecom-bretagne.eu>
+
+This work is under the CC0 license.
+
+This work consists of the main source file luatexbase-attr.dtx
+and the derived files
+   luatexbase-attr.sty attr.lua ...
+
+\endpreamble
+
+\let\MetaPrefix\DoubleperCent
+
+\generate{%
+  \usedir{tex/luatex/luatexbase}%
+  \file{luatexbase-attr.sty}{\from{luatexbase-attr.dtx}{texpackage}}%
+}
+
+\def\MetaPrefix{-- }
+
+\def\luapostamble{%
+  \MetaPrefix^^J%
+  \MetaPrefix\space End of File `\outFileName'.%
+}
+
+\def\currentpostamble{\luapostamble}%
+
+\generate{%
+  \usedir{tex/luatex/luatexbase}%
+  \file{attr.lua}{\from{luatexbase-attr.dtx}{luamodule}}%
+}
+
+\obeyspaces
+\Msg{************************************************************************}
+\Msg{*}
+\Msg{* To finish the installation you have to move the following}
+\Msg{* files into a directory searched by TeX:}
+\Msg{*}
+\Msg{*     luatexbase-attr.sty attr.lua ...}
+\Msg{*}
+\Msg{* Happy TeXing!}
+\Msg{*}
+\Msg{************************************************************************}
+
+\endbatchfile
+%</install>
+%<*ignore>
+\fi
+%</ignore>
+%<*driver>
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesFile{luatexbase-attr.drv}
+  [DATE DESC]
+\documentclass{ltxdoc}
+\EnableCrossrefs
+\CodelineIndex
+\begin{document}
+  \DocInput{luatexbase-attr.dtx}%
+\end{document}
+%</driver>
+% \fi
+%
+% \CheckSum{}
+%
+% \CharacterTable
+%  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
+%   Lower-case    \a\b\c\d\e\f\g\h\i\j\k\l\m\n\o\p\q\r\s\t\u\v\w\x\y\z
+%   Digits        \0\1\2\3\4\5\6\7\8\9
+%   Exclamation   \!     Double quote  \"     Hash (number) \#
+%   Dollar        \$     Percent       \%     Ampersand     \&
+%   Acute accent  \'     Left paren    \(     Right paren   \)
+%   Asterisk      \*     Plus          \+     Comma         \,
+%   Minus         \-     Point         \.     Solidus       \/
+%   Colon         \:     Semicolon     \;     Less than     \<
+%   Equals        \=     Greater than  \>     Question mark \?
+%   Commercial at \@     Left bracket  \[     Backslash     \\
+%   Right bracket \]     Circumflex    \^     Underscore    \_
+%   Grave accent  \`     Left brace    \{     Vertical bar  \|
+%   Right brace   \}     Tilde         \~}
+%
+% \GetFileInfo{luatexbase-attr.drv}
+%
+% \title{The \textsf{luatexbase-attr} package}
+% \date{DATE}
+% \author{%
+%  Manuel P\'egouri\'e-Gonnard \\ \texttt{mpg@elzevir.fr} \and
+%   \'Elie Roux \\ \texttt{elie.roux@telecom-bretagne.eu}}
+%
+% \maketitle
+%
+% \begin{abstract}
+% \end{abstract}
+%
+% \section{Documentation}
+%
+%    \section{Implementation}
+%
+%    \subsection{\TeX\ package}
+%
+%    \begin{macrocode}
+%<*texpackage>
+%    \end{macrocode}
+%
+%    The most important macro here is \texttt{\string\newluatexattribute} that
+%    allocates a new attribute, and adds it in the \texttt{tex.attributename}
+%    table (see \texttt{luatextra.attributedef\_from\_tex} for more details.
+%    It works just like the other \texttt{\string\new*} macros, we can
+%    allocate up to 65536 different attributes.
+%
+%    \begin{macrocode}
+
+
+\newcount\luatexattdefcounter
+\luatexattdefcounter = 1
+
+\def\newluatexattribute#1{%
+  \ifnum\luatexattdefcounter<65535\relax %
+    \global\advance\luatexattdefcounter by 1\relax %
+    \allocationnumber\luatexattdefcounter %
+    \ifluatex %
+      \global\luatexattributedef#1=\allocationnumber %
+    \fi %
+    \wlog{\string#1=\string\luatexattribute\the\allocationnumber}%
+    \luadirect{%
+      luatextra.attributedef_from_tex([[\noexpand#1]], '\number\allocationnumber')}%
+  \else %
+    \errmessage{No room for a new \string\attribute}%
+  \fi %
+}
+
+%    \end{macrocode}
+%
+%    Two convenient macros, one to set an attribute (basically just a
+%    wrapper), and another one to uset it. Unsetting attributes with this
+%    function is important, as the \texttt{unset} value may change, as it
+%    already has in the 0.37 version.
+%
+%    \begin{macrocode}
+
+\def\setluatexattribute#1#2{%
+  #1=\numexpr#2\relax %
+}
+
+\def\unsetluatexattribute#1{%
+  \ifnum\luatexversion<37\relax %
+    #1=-1\relax %
+  \else %
+    #1=-"7FFFFFFF\relax %
+  \fi %
+}
+
+%    \end{macrocode}
+%
+%    \begin{macrocode}
+%</texpackage>
+%    \end{macrocode}
+%
+%    \subsection{Lua module}
+%
+%    \begin{macrocode}
+%<*luamodule>
+%    \end{macrocode}
+%
+%    Attribute allocation is done mainly in the \texttt{sty} file, but there
+%    is also a lua addition for attribute handling: Lua\TeX\ is by default
+%    unable to tell the attribute number corresponding to an attribute name.
+%    This attribute number is necessary for functions such as
+%    \texttt{node.has\_attribute}, which is used very often. The solution
+%    until now was to give a chosen attribute number to each attribute, and
+%    pray that someone else didn't use it before. With this method it was easy
+%    to know the number of an attribute, as it was chosen. Now with the
+%    \texttt{\string\newluaattribute} macro, it's impossible to know the
+%    number of an attribute. To fix it, when \texttt{\string\newluaattribute}
+%    is called, it calls \texttt{luatextra.attributedef\_from\_tex}. This
+%    function registers the number in the table \texttt{tex.attributenumber}.
+%    For example to get the number of the attribute \texttt{myattribute}
+%    registered with \texttt{\string\newluaattribute\string\myattribute}, you
+%    can simply call \texttt{tex.attributenumber[myattribute]}.
+%
+%    \begin{macrocode}
+
+luatextra.attributes = {}
+
+tex.attributenumber = luatextra.attributes
+
+function luatextra.attributedef_from_tex(name, number)
+    truename = name:gsub('[\\ ]', '')
+    luatextra.attributes[truename] = tonumber(number)
+end
+
+%    \end{macrocode}
+%
+%    \begin{macrocode}
+%</luamodule>
+%    \end{macrocode}
+%
+% \Finale
+\endinput
