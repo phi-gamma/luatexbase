@@ -2,18 +2,20 @@ general
 -------
 
 - change lua module names
-- check for name conflicts ('module' used in mods)
-- test
+- change TeX macros prefixes
+- check for lua name conflicts ('module' used in mods)
+- check for macros starting with \luatex
+- write test files
 - reload check, declaration, luatex test
 - import/update doc
-- fix Makefile: test files are doc, not runfiles
+- fix Makefile: test files are source, not runfiles
 - make tests cleaner: \begingroup\expandafter\ETC.
 - handle catcodes for Plain
 
 regs
 ----
 
-- check why only 100 or so \inserts can be allocated
+- reload check, declaration, luatex test
 - issue a warning if etex not loaded
 - handle catcodes for Plain
 
