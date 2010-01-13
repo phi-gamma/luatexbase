@@ -6,7 +6,7 @@ DOC = $(patsubst %.dtx, %.pdf, $(DTX))
 
 # Files grouped by generation mode
 UNPACKED_MCB = luamcallbacks-test.tex luamcallbacks.lua
-UNPACKED_REGS = luatexbase-regs.sty luatexbase-regs-latex.tex \
+UNPACKED_REGS = luatexbase-regs.sty \
 				test-regs-plain.tex test-regs-latex.tex
 UNPACKED = $(UNPACKED_MCB) $(UNPACKED_REGS)
 COMPILED = $(DOC)
@@ -59,7 +59,7 @@ $(UNPACKED_REGS): luatexbase-regs.dtx
 	$(DO_TEX)
 
 check-regs: $(UNPACKED_REGS)
-	#luatex --interaction=batchmode test-regs-latex.tex >/dev/null
+	luatex --interaction=batchmode test-regs-plain.tex >/dev/null
 	lualatex --interaction=batchmode test-regs-latex.tex >/dev/null
 
 $(CTAN_ZIP): $(SOURCE) $(COMPILED) $(TDS_ZIP)

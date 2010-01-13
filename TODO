@@ -7,12 +7,13 @@ general
 - reload check, declaration, luatex test
 - import/update doc
 - fix Makefile: test files are doc, not runfiles
+- make tests cleaner: \begingroup\expandafter\ETC.
 
 regs
 ----
 
 - fix box & mark allocation (mathcherdef -> chardef)
 - check why only 100 or so \inserts can be allocated
-- make it work with Plain!
+- issue a warning if etex not loaded
 
 

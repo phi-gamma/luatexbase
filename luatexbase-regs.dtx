@@ -56,7 +56,6 @@ and the derived files
 \generate{%
   \usedir{tex/luatex/luatexbase}%
   \file{luatexbase-regs.sty}{\from{luatexbase-regs.dtx}{texpackage}}%
-  \file{luatexbase-regs-latex.tex}{\from{luatexbase-regs.dtx}{latexfile}}%
 }
 
 \generate{%
@@ -140,61 +139,66 @@ and the derived files
 %<*texpackage>
 %    \end{macrocode}
 %
+%    If running \LaTeX, load \texttt{etex.sty}. If not, either
+%    \texttt{etex.src} was loaded at format generation time, or we cannot do
+%    anything.
+%
 %    \begin{macrocode}
-\expandafter\ifx\csname ProvidesPackage\endcsname\relax \else
+\begingroup\expandafter\expandafter\expandafter\endgroup
+\expandafter\ifx\csname RequirePackage\endcsname\relax \else
   \RequirePackage{etex}[1998/03/26]
-%
-%    The \texttt{\string\input} is a hack that modifies some values in the
-%    register attribution scheme of $\varepsilon$-\TeX\ and remaps
-%    \texttt{\string\newcount} to \textsf{etex}'s \texttt{\string\globcount}.
-%    We have to do such a remapping in a separate file that Plain doesn't see,
-%    otherwise it outputs an error if we try to change
-%    \texttt{\string\newcount} (because it is an \texttt{\string\outer}
-%    macro). See below for file contents.
-%
-%    \begin{macrocode}
-  \input luatexbase-regs-latex.tex
 \fi
+%    \end{macrocode}
+%
+%    To the best of my (mpg) knowledge, all Plain-based formats built with
+%    \eTeX-enabled engines in \TeX\,Live load \texttt{etex.src}. However,
+%    let's be careful and check that \texttt{etex.sty} or \texttt{src} is
+%    loaded.
+%
 %    \begin{macrocode}
+\begingroup\expandafter\expandafter\expandafter\endgroup
+\expandafter\ifx\csname et@xins\endcsname\relax
+  %%TODO: issue a warning here
+\else
+%    \end{macrocode}
+%
+%    First, increase the upper bound for all kinds of registers. Copy code to
+%    avoid defining a macro.
+%
+%    \begin{macrocode}
+  \ifnum\count270=32768 \count270=65536 \fi
+  \ifnum\count271=32768 \count271=65536 \fi
+  \ifnum\count272=32768 \count272=65536 \fi
+  \ifnum\count273=32768 \count272=65536 \fi
+  \ifnum\count273=32768 \count273=65536 \fi
+  \ifnum\count274=32768 \count274=65536 \fi
+  \ifnum\count275=32768 \count275=65536 \fi
+  \ifnum\count276=32768 \count276=65536 \fi
+%    \end{macrocode}
+%
+%    Finally, make allocation of \verb|\count|, \verb|\dimen|, \verb|skip| and
+%    \verb|\box| start with numbers $>255$, in order to free the lower numbers
+%    for insertions. Be careful with \verb|\new...| macros which are
+%    \verb|\outer| in Plain, since we're in the middle of an \verb|\if| test.
+%
+%    \begin{macrocode}
+  \expandafter\let\csname newcount\endcsname\globcount
+  \expandafter\let\csname newdimen\endcsname\globdimen
+  \expandafter\let\csname newskip\endcsname\globskip
+  \expandafter\let\csname newbox\endcsname\globbox
+%    \end{macrocode}
+%
+%    That's all folks!
+%
+%    \begin{macrocode}
+\fi
 %</texpackage>
-%    \end{macrocode}
-%
-%    \subsection{Specific \LaTeX\ part}
-%
-%    \begin{macrocode}
-%<*latexfile>
-%    \end{macrocode}
-%
-%    This file is very small, it just changes the maximum values of allowed
-%    registers from 32768 to 65536, and remaps \texttt{\string\newcount} (and
-%    friends) to \textsf{etex}'s \texttt{\string\globcount}.
-%
-%    \begin{macrocode}
-\def\ltxtra@temp#1{%
-\ifnum\count27#1=32768 %
-  \count27#1=65536 %
-\fi
-}%
-\ltxtra@temp0%
-\ltxtra@temp1%
-\ltxtra@temp2%
-\ltxtra@temp3%
-\ltxtra@temp4%
-\ltxtra@temp5%
-\ltxtra@temp6%
-\let\newcount\globcount
-\let\newdimen\globdimen
-\let\newskip\globskip
-\let\newbox\globbox
-%    \end{macrocode}
-%
-%    \begin{macrocode}
-%</latexfile>
 %    \end{macrocode}
 %
 %    \section{Test files}
 %
-%    Here we test only the two main formatis: Plain~\TeX\ (with etex.src
+%    Here we test only the two main formats: Plain~\TeX\ (with
+%    \texttt{etex.src}
 %    loaded) and \LaTeX, both with the \LuaTeX\ engine. Those correspond to
 %    the \texttt{luatex} and \texttt{lualatex} commands in \TeX\,Live.
 %
@@ -227,7 +231,7 @@ and the derived files
 
 \count0 1
 \loop \ifnum\count0<100
-  \newinsert\dummy
+  \csname newinsert\endcsname\dummy
   \advance\count0 1
 \repeat
 %</testplain,testlatex>
