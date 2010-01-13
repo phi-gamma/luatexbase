@@ -11,7 +11,7 @@
 %
 % This work consists of the main source file luatexbase-regs.dtx
 % and the derived files
-%    luatexbase-regs.sty regs.lua ...
+%   luatexbase-regs.pdf luatexbase-regs.sty luatexbase-regs-latex.tex
 %
 % Unpacking:
 %    tex luatexbase-regs.dtx
@@ -38,8 +38,6 @@
 \keepsilent
 \askforoverwritefalse
 
-\let\MetaPrefix\relax
-
 \preamble
 This is a generated file.
 
@@ -51,29 +49,14 @@ This work is under the CC0 license.
 
 This work consists of the main source file luatexbase-regs.dtx
 and the derived files
-   luatexbase-regs.sty regs.lua ...
+   luatexbase-regs.pdf luatexbase-regs.sty luatexbase-regs-latex.tex
 
 \endpreamble
-
-\let\MetaPrefix\DoubleperCent
 
 \generate{%
   \usedir{tex/luatex/luatexbase}%
   \file{luatexbase-regs.sty}{\from{luatexbase-regs.dtx}{texpackage}}%
-}
-
-\def\MetaPrefix{-- }
-
-\def\luapostamble{%
-  \MetaPrefix^^J%
-  \MetaPrefix\space End of File `\outFileName'.%
-}
-
-\def\currentpostamble{\luapostamble}%
-
-\generate{%
-  \usedir{tex/luatex/luatexbase}%
-  \file{regs.lua}{\from{luatexbase-regs.dtx}{luamodule}}%
+  \file{luatexbase-regs-latex.tex}{\from{luatexbase-regs.dtx}{latexfile}}%
 }
 
 \obeyspaces
@@ -82,7 +65,7 @@ and the derived files
 \Msg{* To finish the installation you have to move the following}
 \Msg{* files into a directory searched by TeX:}
 \Msg{*}
-\Msg{*     luatexbase-regs.sty regs.lua ...}
+\Msg{*     luatexbase-regs.sty luatexbase-regs-latex.tex ...}
 \Msg{*}
 \Msg{* Happy TeXing!}
 \Msg{*}
@@ -160,7 +143,7 @@ and the derived files
 %    macro). See below for file contents.
 %
 %    \begin{macrocode}
-  \input luatextra-latex.tex
+  \input luatexbase-regs-latex.tex
 \fi
 %    \begin{macrocode}
 %</texpackage>

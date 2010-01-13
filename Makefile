@@ -6,7 +6,8 @@ DOC = $(patsubst %.dtx, %.pdf, $(DTX))
 
 # Files grouped by generation mode
 UNPACKED_MCB = luamcallbacks-test.tex luamcallbacks.lua
-UNPACKED = $(UNPACKED_MCB)
+UNPACKED_REGS = luatexbase-regs.sty luatexbase-regs-latex.tex
+UNPACKED = $(UNPACKED_MCB) $(UNPACKED_REGS)
 COMPILED = $(DOC)
 GENERATED = $(COMPILED) $(UNPACKED)
 SOURCE = $(DTX) README Makefile
@@ -49,6 +50,9 @@ world: all ctan
 	$(DO_PDFLATEX)
 
 $(UNPACKED_MCB): luamcallbacks.dtx
+	$(DO_TEX)
+
+$(UNPACKED_REGS): luatexbase-regs.dtx
 	$(DO_TEX)
 
 $(CTAN_ZIP): $(SOURCE) $(COMPILED) $(TDS_ZIP)
