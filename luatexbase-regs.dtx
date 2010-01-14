@@ -129,9 +129,42 @@ and the derived files
 % \maketitle
 %
 % \begin{abstract}
+% This package extends the register allocation scheme of Plain~\TeX\ and
+% \LaTeX\ to take advantage of the increased number of registers available in
+% \LuaTeX.
 % \end{abstract}
 %
 % \section{Documentation}
+%
+% Since the Plain~\TeX\ and \LaTeX\ formats are both frozen, they fail to take
+% into account the extended resources provided by newer \TeX-like engines.
+% This package focuses on the allocation scheme for registers. \TeX82 provides
+% $6$ kinds or registers: count, dimen, skip, muskip, box and toks and has
+% $256$ registers of each kind. \eTeX\ and most of its descendants add one
+% kind of register (marks) and offers $2^{15} = 32768$ of each kind. \LuaTeX\
+% provides $2^{16} = 65536$ registers of each kind. (It also provides new
+% register-like resources, but this package addresses only the resources
+% inherited from \eTeX.)
+%
+% More precisely, \textsf{luatexbase-regs} loads the \textsf{etex} package (or
+% makes sure it is preloaded in the format) and then adapts it to the new
+% limits of \LuaTeX. Thus, all macros defined by the \textsf{etex} package are
+% made available (most notably, \verb+\loccount+, \verb+\globcountblk+,
+% \verb+\loccountblk+ and alike). However, if a register of some kind has been
+% locally allocated before this package is loaded, then the number of
+% allocatable registers of this kind will not be extended to $65536$. To avoid
+% this, load \textsf{luatexbase-regs} earlier.
+%
+% The Plain~\TeX\ and \LaTeX\ formats define a new kind of resource:
+% \emph{inserts} which are merely a family (count, dimen, skip, box) of
+% registers with the same number. Inserts allocation begins at $255$ and goes
+% toward $0$. Thus we can make room for more inserts by making allocation of
+% count-, dimen-, skip- and box-registers start from $256$. With real \eTeX,
+% it may be a bad idea since registers with index greater than $256$ have
+% degraded performance due to implementation details, but with \LuaTeX the
+% performance is uniform, so we just do it.
+%
+% \clearpage
 %
 %    \section{Implementation}
 %

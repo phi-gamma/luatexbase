@@ -16,5 +16,6 @@ general
 regs
 ----
 
-- write doc
+- \mathchardef -> \chardef in \et@xgblk and \et@xlblk
+- check more carefully before redfining a macro
 
