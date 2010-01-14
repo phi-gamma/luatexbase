@@ -11,12 +11,10 @@ general
 - fix Makefile: test files are source, not runfiles
 - make tests cleaner: \begingroup\expandafter\ETC.
 - handle catcodes for Plain
+- import/write doc
 
 regs
 ----
 
-- reload check, declaration, luatex test
-- issue a warning if etex not loaded
-- handle catcodes for Plain
-
+- write doc
 

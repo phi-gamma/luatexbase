@@ -135,11 +135,65 @@ and the derived files
 %
 %    \section{Implementation}
 %
-%    \subsection{\TeX\ package}
-%
 %    \begin{macrocode}
 %<*texpackage>
 %    \end{macrocode}
+%
+%    \subsection{Preliminaries}
+%
+%    Reload protection, especially for Plain TeX.
+%
+%    \begin{macrocode}
+                \csname lltxb@regs@loaded\endcsname
+\expandafter\let\csname lltxb@regs@loaded\endcsname\endinput
+%    \end{macrocode}
+%
+%    Package declaration.
+%
+%    \begin{macrocode}
+\begingroup
+  \expandafter\ifx\csname ProvidesPackage\endcsname\relax
+    \def\x#1[#2]{\immediate\write16{Package: #1 #2}}
+  \else
+    \let\x\ProvidesPackage
+  \fi
+\expandafter\endgroup
+\x{luatexbase-regs}[2010/01/14  Registers allocation for LuaTeX  (mpg)]
+%    \end{macrocode}
+%
+%    Make sure \LuaTeX\ is used.
+%
+%    \begin{macrocode}
+\begingroup\expandafter\expandafter\expandafter\endgroup
+\expandafter\ifx\csname RequirePackage\endcsname\relax
+  \input ifluatex.sty
+\else
+  \RequirePackage{ifluatex}
+\fi
+\ifluatex\else
+  \begingroup
+    \expandafter\ifx\csname PackageWarningNoLine\endcsname\relax
+      \def\x#1#2{\begingroup\newlinechar10
+        \immediate\write16{Package #1 warning: #2}\endgroup}
+    \else
+      \let\x\PackageWarningNoLine
+    \fi
+  \expandafter\endgroup
+  \x{luatexbase-regs}{LuaTeX is required for this package.^^J
+    Aborting package loading.}
+  \expandafter\endinput
+\fi
+%    \end{macrocode}
+%
+%    Make sure the catcode of @ is correct, especially for Plain~\TeX.
+%
+%    \begin{macrocode}
+\expandafter\edef\csname lltxb@AtEnd\endcsname{%
+  \catcode64 \the\catcode64\relax}
+\catcode64 11
+%    \end{macrocode}
+%
+%    \subsection{Main content}
 %
 %    If running \LaTeX, load \texttt{etex.sty}. If not, either
 %    \texttt{etex.src} was loaded at format generation time, or we cannot do
@@ -154,13 +208,22 @@ and the derived files
 %
 %    To the best of my (mpg) knowledge, all Plain-based formats built with
 %    \eTeX-enabled engines in \TeX\,Live load \texttt{etex.src}. However,
-%    let's be careful and check that \texttt{etex.sty} or \texttt{src} is
+%    let's be careful and check that \texttt{etex.sty} or \texttt{etex.src} is
 %    loaded.
 %
 %    \begin{macrocode}
 \begingroup\expandafter\expandafter\expandafter\endgroup
 \expandafter\ifx\csname et@xins\endcsname\relax
-  %%TODO: issue a warning here
+  \begingroup
+    \expandafter\ifx\csname PackageWarningNoLine\endcsname\relax
+      \def\x#1#2{\begingroup\newlinechar10
+        \immediate\write16{Package #1 warning: #2}\endgroup}
+    \else
+      \let\x\PackageWarningNoLine
+    \fi
+  \expandafter\endgroup
+  \x{luatexbase-regs}{etex macros not loaded!^^J
+    Registers allocation scheme will not be extended.}
 \else
 %    \end{macrocode}
 %
@@ -226,12 +289,13 @@ and the derived files
   \expandafter\let\csname newdimen\endcsname\globdimen
   \expandafter\let\csname newskip\endcsname\globskip
   \expandafter\let\csname newbox\endcsname\globbox
+\fi
 %    \end{macrocode}
 %
 %    That's all folks!
 %
 %    \begin{macrocode}
-\fi
+\lltxb@AtEnd
 %</texpackage>
 %    \end{macrocode}
 %
@@ -248,9 +312,7 @@ and the derived files
 %    enough for testing purposes.)
 %
 %    \begin{macrocode}
-%<testplain>\catcode 64 11
 %<testplain>\input luatexbase-regs.sty
-%<testplain>\catcode 64 12
 %<testlatex>\RequirePackage{luatexbase-regs}
 %<*testplain,testlatex>
 \def\checkregister#1{%
