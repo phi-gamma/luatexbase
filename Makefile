@@ -6,7 +6,7 @@ DOC = $(patsubst %.dtx, %.pdf, $(DTX))
 DTXSTY = lltxb-dtxstyle.tex
 
 # Files grouped by generation mode
-UNPACKED_MCB = luamcallbacks-test.tex luamcallbacks.lua
+UNPACKED_MCB = test-luamcallbacks.tex luamcallbacks.lua
 UNPACKED_REGS = luatexbase-regs.sty \
 				test-regs-plain.tex test-regs-latex.tex
 UNPACKED = $(UNPACKED_MCB) $(UNPACKED_REGS)
@@ -15,8 +15,8 @@ GENERATED = $(COMPILED) $(UNPACKED)
 SOURCE = $(DTX) $(DTXSTY) README TODO Makefile
 
 # Files grouped by installation location
-RUNFILES = $(UNPACKED)
-DOCFILES = $(DOC) README TODO
+RUNFILES = $(filter-out test-%, $(UNPACKED))
+DOCFILES = $(DOC) $(filter test-%, $(UNPACKED)) README TODO
 SRCFILES = $(DTX) Makefile
 
 # The following definitions should be equivalent
@@ -44,7 +44,7 @@ check: check-regs
 doc: $(COMPILED)
 unpack: $(UNPACKED)
 ctan: $(CTAN_ZIP)
-tds: check $(TDS_ZIP)
+tds: check $(TDS_ZIP) Makefile
 world: all ctan
 
 %.pdf: %.dtx $(DTXSTY)
