@@ -12,11 +12,11 @@ UNPACKED_REGS = luatexbase-regs.sty \
 UNPACKED = $(UNPACKED_MCB) $(UNPACKED_REGS)
 COMPILED = $(DOC)
 GENERATED = $(COMPILED) $(UNPACKED)
-SOURCE = $(DTX) $(DTXSTY) README TODO Makefile
+SOURCE = $(DTX) $(DTXSTY) README TODO Changes Makefile
 
 # Files grouped by installation location
 RUNFILES = $(filter-out test-%, $(UNPACKED))
-DOCFILES = $(DOC) $(filter test-%, $(UNPACKED)) README TODO
+DOCFILES = $(DOC) $(filter test-%, $(UNPACKED)) README TODO Changes
 SRCFILES = $(DTX) Makefile
 
 # The following definitions should be equivalent

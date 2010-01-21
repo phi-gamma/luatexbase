@@ -1,0 +1,11 @@
+                    Changes in the luatexbase package/bundle
+
+
+2010/01/21
+    luatexbase-regs 0.1
+        - add test files for luatex and lualatex
+        - extend registers with Plain-based format too
+        - fix \box and \marks allocation (\mathchardef -> \chardef)
+        - fix \*blk macros (\mathchardef -> \chardef)
+
+Version 0 of the bundle is part of the 2010/01/12 version of luatextra.
