@@ -43,8 +43,8 @@ all: $(GENERATED)
 check: check-regs
 doc: $(COMPILED)
 unpack: $(UNPACKED)
-ctan: $(CTAN_ZIP)
-tds: check $(TDS_ZIP) Makefile
+ctan: check $(CTAN_ZIP)
+tds: $(TDS_ZIP) Makefile
 world: all ctan
 
 %.pdf: %.dtx $(DTXSTY)
