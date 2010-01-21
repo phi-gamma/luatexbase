@@ -49,7 +49,7 @@ world: all ctan
 
 %.pdf: %.dtx $(DTXSTY)
 	$(DO_PDFLATEX)
-	$(DO_MAKEINDEX)
+	$(DO_MAKEINDEX) || true
 	$(DO_PDFLATEX)
 	$(DO_PDFLATEX)
 

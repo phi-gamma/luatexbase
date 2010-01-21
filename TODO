@@ -13,3 +13,13 @@ general
 - handle catcodes for Plain
 - import/write doc
 
+
+Later
+=====
+
+regs
+----
+
+- Should the various allocation macros set something in a Lua table, or should
+  we just wait for it to be implemented in LuaTeX? (The \*blk macros would be
+rather tricky in this respect, but are they really used?)
