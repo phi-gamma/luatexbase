@@ -88,10 +88,7 @@ and the derived files
 \ProvidesFile{luatexbase-regs.drv}
   [DATE DESC]
 \documentclass{ltxdoc}
-\makeatletter
-\newcommand\eTeX{$\m@th\varepsilon$-\TeX}
-\newcommand\LuaTeX{Lua\TeX}
-\makeatother
+\input lltxb-dtxstyle.tex
 \EnableCrossrefs
 \CodelineIndex
 \begin{document}
@@ -120,48 +117,48 @@ and the derived files
 %
 % \GetFileInfo{luatexbase-regs.drv}
 %
-% \title{The \textsf{luatexbase-regs} package}
+% \title{The \pk{luatexbase-regs} package}
 % \date{DATE}
 % \author{%
-%  Manuel P\'egouri\'e-Gonnard \\ \texttt{mpg@elzevir.fr} \and
-%   \'Elie Roux \\ \texttt{elie.roux@telecom-bretagne.eu}}
+%  Manuel P\'egouri\'e-Gonnard \\ \email{mpg@elzevir.fr} \and
+%   \'Elie Roux \\ \email{elie.roux@telecom-bretagne.eu}}
 %
 % \maketitle
 %
 % \begin{abstract}
-% This package extends the register allocation scheme of Plain~\TeX\ and
-% \LaTeX\ to take advantage of the increased number of registers available in
-% \LuaTeX.
+% This package extends the register allocation scheme of \plaintex and
+% \latex to take advantage of the increased number of registers available in
+% \luatex.
 % \end{abstract}
 %
 % \section{Documentation}
 %
-% Since the Plain~\TeX\ and \LaTeX\ formats are both frozen, they fail to take
-% into account the extended resources provided by newer \TeX-like engines.
-% This package focuses on the allocation scheme for registers. \TeX82 provides
+% Since the \plaintex and \latex formats are both frozen, they fail to take
+% into account the extended resources provided by newer \tex-like engines.
+% This package focuses on the allocation scheme for registers. \texe provides
 % $6$ kinds or registers: count, dimen, skip, muskip, box and toks and has
 % $256$ registers of each kind. \eTeX\ and most of its descendants add one
-% kind of register (marks) and offers $2^{15} = 32768$ of each kind. \LuaTeX\
+% kind of register (marks) and offers $2^{15} = 32768$ of each kind. \luatex
 % provides $2^{16} = 65536$ registers of each kind. (It also provides new
 % register-like resources, but this package addresses only the resources
 % inherited from \eTeX.)
 %
-% More precisely, \textsf{luatexbase-regs} loads the \textsf{etex} package (or
+% More precisely, \pk{luatexbase-regs} loads the \pk{etex} package (or
 % makes sure it is preloaded in the format) and then adapts it to the new
-% limits of \LuaTeX. Thus, all macros defined by the \textsf{etex} package are
-% made available (most notably, \verb+\loccount+, \verb+\globcountblk+,
-% \verb+\loccountblk+ and alike). However, if a register of some kind has been
+% limits of \luatex. Thus, all macros defined by the \pk{etex} package are
+% made available (most notably, |\loccount|, |\globcountblk|,
+% |\loccountblk| and alike). However, if a register of some kind has been
 % locally allocated before this package is loaded, then the number of
 % allocatable registers of this kind will not be extended to $65536$. To avoid
-% this, load \textsf{luatexbase-regs} earlier.
+% this, load \pk{luatexbase-regs} earlier.
 %
-% The Plain~\TeX\ and \LaTeX\ formats define a new kind of resource:
+% The \plaintex and \latex formats define a new kind of resource:
 % \emph{inserts} which are merely a family (count, dimen, skip, box) of
 % registers with the same number. Inserts allocation begins at $255$ and goes
 % toward $0$. Thus we can make room for more inserts by making allocation of
-% count-, dimen-, skip- and box-registers start from $256$. With real \eTeX,
+% count-, dimen-, skip- and box-registers start from $256$. With real \etex,
 % it may be a bad idea since registers with index greater than $256$ have
-% degraded performance due to implementation details, but with \LuaTeX the
+% degraded performance due to implementation details, but with \luatex the
 % performance is uniform, so we just do it.
 %
 % \clearpage
@@ -174,7 +171,7 @@ and the derived files
 %
 %    \subsection{Preliminaries}
 %
-%    Reload protection, especially for Plain TeX.
+%    Reload protection, especially for \plaintex.
 %
 %    \begin{macrocode}
                 \csname lltxb@regs@loaded\endcsname
@@ -194,7 +191,7 @@ and the derived files
 \x{luatexbase-regs}[2010/01/14  Registers allocation for LuaTeX  (mpg)]
 %    \end{macrocode}
 %
-%    Make sure \LuaTeX\ is used.
+%    Make sure \luatex is used.
 %
 %    \begin{macrocode}
 \begingroup\expandafter\expandafter\expandafter\endgroup
@@ -218,7 +215,7 @@ and the derived files
 \fi
 %    \end{macrocode}
 %
-%    Make sure the catcode of @ is correct, especially for Plain~\TeX.
+%    Make sure the catcode of @ is correct, especially for \plaintex.
 %
 %    \begin{macrocode}
 \expandafter\edef\csname lltxb@AtEnd\endcsname{%
@@ -228,8 +225,8 @@ and the derived files
 %
 %    \subsection{Main content}
 %
-%    If running \LaTeX, load \texttt{etex.sty}. If not, either
-%    \texttt{etex.src} was loaded at format generation time, or we cannot do
+%    If running \latex, load \file{etex.sty}. If not, either
+%    \file{etex.src} was loaded at format generation time, or we cannot do
 %    anything.
 %
 %    \begin{macrocode}
@@ -240,8 +237,8 @@ and the derived files
 %    \end{macrocode}
 %
 %    To the best of my (mpg) knowledge, all Plain-based formats built with
-%    \eTeX-enabled engines in \TeX\,Live load \texttt{etex.src}. However,
-%    let's be careful and check that \texttt{etex.sty} or \texttt{etex.src} is
+%    \etex-enabled engines in \texlive load \file{etex.src}. However,
+%    let's be careful and check that \file{etex.sty} or \file{etex.src} is
 %    loaded.
 %
 %    \begin{macrocode}
@@ -274,12 +271,12 @@ and the derived files
   \ifnum\count276=32768 \count276=65536 \fi
 %    \end{macrocode}
 %
-%    \verb|\box| registers and \verb|mark|s were previously defined
-%    using \verb|\mathchardef| since it had the biggest range under \eTeX
-%    (15-bit number).  However, this is not enough for \LuaTeX's extended
-%    registers. Fortunately, \verb|chardef|'s range is extended, and now large
-%    enough, so use it everywhere instead of \verb+\mathchardef+. Do this
-%    inside a group and use \verb+\toks0+ to store the list of actions.
+%    |\box| registers and |\mark|s were previously defined
+%    using |\mathchardef| since it had the biggest range under \etex
+%    (15-bit number).  However, this is not enough for \luatex's extended
+%    registers. Fortunately, |\chardef|'s range is extended, and now large
+%    enough, so use it everywhere instead of |\mathchardef|. Do this
+%    inside a group and use |\toks0| to store the list of actions.
 %
 %    \begin{macrocode}
   \begingroup \toks0{}
@@ -290,7 +287,7 @@ and the derived files
 %    Notice that the auxiliary macros will automatically expand to the desired
 %    level when necessary, see below.
 %
-%    First, here are the definitions from \texttt{etex.src}, in a form adapted
+%    First, here are the definitions from \file{etex.src}, in a form adapted
 %    to our needs.
 %
 %    \begin{macrocode}
@@ -319,8 +316,8 @@ and the derived files
         }}
 %    \end{macrocode}
 %
-%    Then, the definitions from \texttt{etex.sty} since they are subtly
-%    different (\verb+\outer+ status, but also optional spaces or \verb+=+
+%    Then, the definitions from \file{etex.sty} since they are subtly
+%    different (|\outer| status, but also optional spaces or |=|
 %    signs).
 %
 %    \begin{macrocode}
@@ -382,10 +379,10 @@ and the derived files
   \the\toks0
 %    \end{macrocode}
 %
-%    Finally, make allocation of \verb|\count|, \verb|\dimen|, \verb|skip| and
-%    \verb|\box| start with numbers $>255$, in order to free the lower numbers
-%    for insertions. Be careful with \verb|\new...| macros which are
-%    \verb|\outer| in Plain, since we're in the middle of an \verb|\if| test.
+%    Finally, make allocation of |\count|, |\dimen|, |skip| and
+%    |\box| start with numbers $>255$, in order to free the lower numbers
+%    for insertions. Be careful with |\new...| macros which are
+%    |\outer| in Plain, since we're in the middle of an |\if| test.
 %
 %    \begin{macrocode}
   \expandafter\let\csname newcount\endcsname\globcount
@@ -404,15 +401,15 @@ and the derived files
 %
 %    \section{Test files}
 %
-%    Here we test only the two main formats: Plain~\TeX\ (with
-%    \texttt{etex.src}
-%    loaded) and \LaTeX, both with the \LuaTeX\ engine. Those correspond to
-%    the \texttt{luatex} and \texttt{lualatex} commands in \TeX\,Live.
+%    Here we test only the two main formats: \plaintex (with \file{etex.src}
+%    loaded) and \latex, both with the \luatex engine. Those correspond to
+%    the \cmdname{luatex} and \cmdname{lualatex} commands in \texlive.
 %
 %    We want to make sure we can globally and locally allocate $30000$
-%    registers of each kind, and still globally allocate $100$
-%    \verb+\insert+s. (Those numbers are not optimal, but they should be
-%    enough for testing purposes.)
+%    registers of each kind, and still globally allocate $100$ |\insert|s.
+%    Next we globally allocate a bloc of $3000$ registers of each kind, and
+%    locally a block of $1000$. (Those numbers are not optimal, but they
+%    should be enough for testing purposes.)
 %
 %    \begin{macrocode}
 %<testplain>\input luatexbase-regs.sty

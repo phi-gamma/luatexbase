@@ -3,6 +3,7 @@
 NAME = luatexbase
 DTX = $(wildcard *.dtx)
 DOC = $(patsubst %.dtx, %.pdf, $(DTX))
+DTXSTY = lltxb-dtxstyle.tex
 
 # Files grouped by generation mode
 UNPACKED_MCB = luamcallbacks-test.tex luamcallbacks.lua
@@ -11,11 +12,11 @@ UNPACKED_REGS = luatexbase-regs.sty \
 UNPACKED = $(UNPACKED_MCB) $(UNPACKED_REGS)
 COMPILED = $(DOC)
 GENERATED = $(COMPILED) $(UNPACKED)
-SOURCE = $(DTX) README Makefile
+SOURCE = $(DTX) $(DTXSTY) README TODO Makefile
 
 # Files grouped by installation location
 RUNFILES = $(UNPACKED)
-DOCFILES = $(DOC) README
+DOCFILES = $(DOC) README TODO
 SRCFILES = $(DTX) Makefile
 
 # The following definitions should be equivalent
@@ -46,7 +47,7 @@ ctan: $(CTAN_ZIP)
 tds: check $(TDS_ZIP)
 world: all ctan
 
-%.pdf: %.dtx
+%.pdf: %.dtx $(DTXSTY)
 	$(DO_PDFLATEX)
 	$(DO_MAKEINDEX)
 	$(DO_PDFLATEX)
@@ -95,7 +96,7 @@ manifest:
 	@for f in $(GENERATED); do echo $$f; done
 
 clean: 
-	@$(RM) -- *.log *.aux *.toc *.idx *.ind *.ilg
+	@$(RM) -- *.log *.aux *.toc *.idx *.ind *.ilg *.out
 
 mrproper: clean
 	@$(RM) -- $(GENERATED) $(ZIPS)

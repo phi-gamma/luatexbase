@@ -1,0 +1,34 @@
+% preamble for dtx documentations of the luatexbase package/bundle.
+
+\usepackage[T1]{fontenc}
+\usepackage{geometry}
+\usepackage{xspace}
+\usepackage[english]{babel}
+\usepackage[colorlinks, bookmarks]{hyperref}
+
+% logos
+\makeatletter
+\newcommand\eTeX{$\m@th\varepsilon$-\TeX}
+\newcommand\LuaTeX{Lua\kern-0.08333em\TeX}
+\renewcommand\PlainTeX{Plain\thinspace\TeX}
+\newcommand\TeXe{\TeX\thinspace82}
+\newcommand\TeXLive{\TeX\thinspace Live}
+\makeatother
+
+% logos for the lazy me (mpg)
+\newcommand\tex{\TeX\xspace}
+\newcommand\latex{\LaTeX\xspace}
+\newcommand\etex{\eTeX\xspace}
+\newcommand\luatex{\LuaTeX\xspace}
+\newcommand\texe{\TeXe\xspace}
+\newcommand\texlive{\TeXLive\xspace}
+\newcommand\plaintex{\PlainTeX\xspace}
+
+% special elements of text
+\newcommand\file{\nolinkurl}
+\newcommand\email[1]{\href{mailto:#1}{#1}}
+\newcommand\pk{\textsf}
+\newcommand\cmdname{\texttt}
+
+% easy verbatim
+\MakeShortVerb\|
