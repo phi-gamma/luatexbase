@@ -278,38 +278,108 @@ and the derived files
 %    using \verb|\mathchardef| since it had the biggest range under \eTeX
 %    (15-bit number).  However, this is not enough for \LuaTeX's extended
 %    registers. Fortunately, \verb|chardef|'s range is extended, and now large
-%    enough, so use it.
-%
-%    Take care that the macros remain \verb|\outer| if they previously were
-%    (actually, iff \verb+\globbox+ is). The somewhat tricky lines below,
-%    besides that, are just equivalent to:
-%    \begin{quote}
-%      \verb+\def \globbox    {\et@xglob 4\box    \mathchardef}+\\
-%      \verb+\def \globmarks  {\et@xglob 6\marks  \mathchardef}+
-%    \end{quote}
+%    enough, so use it everywhere instead of \verb+\mathchardef+. Do this
+%    inside a group and use \verb+\toks0+ to store the list of actions.
 %
 %    \begin{macrocode}
-  \begingroup
-    \def\z#1{\endgroup
-      #1\expandafter\def\csname globbox\endcsname
-        {\et@xglob 4\box    \chardef}%
-      #1\expandafter\def\csname globmarks\endcsname
-        {\et@xglob 6\marks  \chardef}}%
-    \edef\x{\meaning\globbox   \string\outer   \relax}%
-    \edef\y{\def\noexpand\y ##1\string\outer##2\relax}%
-    \y{\ifx\relax#1\relax
-      \expandafter\z\expandafter\outer
-    \else
-      \expandafter\z\expandafter\relax
-    \fi}%
-  \expandafter\y\x
+  \begingroup \toks0{}
+    \def\@namedef #1{\expandafter                  \def\csname#1\endcsname}
+    \def\@outerdef#1{\expandafter\outer\expandafter\def\csname#1\endcsname}
 %    \end{macrocode}
 %
-%    \verb+\loc...+ versions are never \verb+\outer+.
+%    Notice that the auxiliary macros will automatically expand to the desired
+%    level when necessary, see below.
+%
+%    First, here are the definitions from \texttt{etex.src}, in a form adapted
+%    to our needs.
 %
 %    \begin{macrocode}
-  \def \locbox     {\et@xloc  4\box    \chardef}
-  \def \locmarks   {\et@xloc  6\marks  \chardef}
+    \def\def@globbox   #1#2{\@outerdef{#1}{\et@xglob 4 \box    #2}}
+    \def\def@locbox    #1#2{\@namedef {#1}{\et@xloc  4 \box    #2}}
+    \def\def@globmarks #1#2{\@outerdef{#1}{\et@xglob 6 \marks  #2}}
+    \def\def@locmarks  #1#2{\@namedef {#1}{\et@xloc  6 \marks  #2}}
+    \def\def@et@xgblk#1#2{\@namedef{#1}##1##2##3##4%
+      {\et@xchkblk ##1##2{##4}%
+        {\allocationnumber=\count 26##1
+          \global \advance \count 26##1 by ##4%
+          \global #2##3=\allocationnumber
+          \wlog {\string ##3=\string ##2blk{\number ##4}
+            at \the \allocationnumber}%
+          }%
+        }}
+    \def\def@et@xlblk#1#2{\@namedef{#1}##1##2##3##4%
+      {\et@xchkblk ##1##2{##4}%
+        {\advance \count 27##1 by -##4%
+          \allocationnumber=\count 27##1
+          #2##3=\allocationnumber
+          \wlog {\string ##3=\string ##2blk{\number ##4}
+            at \the \allocationnumber \space (local)%
+            }%
+          }%
+        }}
+%    \end{macrocode}
+%
+%    Then, the definitions from \texttt{etex.sty} since they are subtly
+%    different (\verb+\outer+ status, but also optional spaces or \verb+=+
+%    signs).
+%
+%    \begin{macrocode}
+    \def\alt@globbox   #1#2{\@namedef{#1}{\et@xglob 4\box    #2}}
+    \def\alt@locbox    #1#2{\@namedef{#1}{\et@xloc  4\box    #2}}
+    \def\alt@globmarks #1#2{\@namedef{#1}{\et@xglob 6\marks  #2}}
+    \def\alt@locmarks  #1#2{\@namedef{#1}{\et@xloc  6\marks  #2}}
+    \def\alt@et@xgblk#1#2{\@namedef{#1}##1##2##3##4%
+      {\et@xchkblk##1##2{##4}%
+        {\allocationnumber\count26##1%
+          \global\advance\count26##1by##4%
+          \global#2##3\allocationnumber
+          \wlog{\string##3=\string##2blk{\number##4} at
+            \the\allocationnumber}%
+          }%
+        }}
+    \def\alt@et@xlblk#1#2{\@namedef{#1}##1##2##3##4%
+      {\et@xchkblk##1##2{##4}%
+        {\advance\count27##1-##4%
+          \allocationnumber\count27##1%
+          #2##3\allocationnumber
+          \et@xwlog{\string##3=\string##2blk{\number##4} at
+            \the\allocationnumber\space(local)}%
+          }%
+        }}
+%    \end{macrocode}
+%
+%    Now, a macro checking the definitions, and making the appropriate
+%    re-definition.
+%
+%    \begin{macrocode}
+    \def\check@def#1{%
+      \csname def@#1\endcsname{test@#1}\mathchardef
+      \expandafter\ifx\csname test@#1\expandafter\endcsname
+                      \csname #1\endcsname
+        \expandafter\let\csname #1\endcsname\relax
+        \toks0\expandafter{\the\toks0\csname def@#1\endcsname{#1}\chardef}
+      \else
+        \csname alt@#1\endcsname{test@#1}\mathchardef
+        \expandafter\ifx\csname test@#1\expandafter\endcsname
+                        \csname #1\endcsname
+          \toks0\expandafter{\the\toks0\csname alt@#1\endcsname{#1}\chardef}
+        \else
+          \expandafter\show\csname BAD#1\endcsname
+        \fi
+      \fi}
+%    \end{macrocode}
+%
+%    Now, actually do it.
+%
+%    \begin{macrocode}
+    \check@def{globbox}
+    \check@def{locbox}
+    \check@def{globmarks}
+    \check@def{locmarks}
+    \check@def{et@xgblk}
+    \check@def{et@xlblk}
+  \expandafter \endgroup
+  \the\toks0
 %    \end{macrocode}
 %
 %    Finally, make allocation of \verb|\count|, \verb|\dimen|, \verb|skip| and
@@ -371,6 +441,22 @@ and the derived files
   \csname newinsert\endcsname\dummy
   \advance\count0 1
 \repeat
+
+\globcountblk \dummy{3000}
+\globdimenblk \dummy{3000}
+\globskipblk  \dummy{3000}
+\globmuskipblk\dummy{3000}
+\globboxblk   \dummy{3000}
+\globtoksblk  \dummy{3000}
+\globmarksblk \dummy{3000}
+
+\loccountblk  \dummy{1000}
+\locdimenblk  \dummy{1000}
+\locskipblk   \dummy{1000}
+\locmuskipblk \dummy{1000}
+\locboxblk    \dummy{1000}
+\loctoksblk   \dummy{1000}
+\locmarksblk  \dummy{1000}
 %</testplain,testlatex>
 %<testplain>\bye
 %<testlatex>\stop
