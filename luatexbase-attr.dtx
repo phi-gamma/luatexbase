@@ -11,7 +11,8 @@
 %
 % This work consists of the main source file luatexbase-attr.dtx
 % and the derived files
-%    luatexbase-attr.sty luatexbase.attr.lua ...
+%    luatexbase-attr.sty luatexbase.attr.lua
+%   test-regs-plain.tex test-regs-latex.tex
 %
 % Unpacking:
 %    tex luatexbase-attr.dtx
@@ -55,6 +56,12 @@ and the derived files
 \generate{%
   \usedir{tex/luatex/luatexbase}%
   \file{luatexbase-attr.sty}{\from{luatexbase-attr.dtx}{texpackage}}%
+}
+
+\generate{%
+  \usedir{doc/luatex/luatexbase}%
+  \file{test-attr-plain.tex}{\from{luatexbase-attr.dtx}{testplain}}%
+  \file{test-attr-latex.tex}{\from{luatexbase-attr.dtx}{testlatex}}%
 }
 
 \def\MetaPrefix{-- }
@@ -107,15 +114,13 @@ and the derived files
 %   Dollar        \$     Percent       \%     Ampersand     \&
 %   Acute accent  \'     Left paren    \(     Right paren   \)
 %   Asterisk      \*     Plus          \+     Comma         \,
-   Minus         \-     Point         \.     Solidus       \/
+%   Minus         \-     Point         \.     Solidus       \/
 %   Colon         \:     Semicolon     \;     Less than     \<
 %   Equals        \=     Greater than  \>     Question mark \?
 %   Commercial at \@     Left bracket  \[     Backslash     \\
 %   Right bracket \]     Circumflex    \^     Underscore    \_
 %   Grave accent  \`     Left brace    \{     Vertical bar  \|
 %   Right brace   \}     Tilde         \~}
-%
-% \GetFileInfo{luatexbase-attr.drv}
 %
 % \title{The \pk{luatexbase-attr} package}
 % \date{DATE}
@@ -153,10 +158,11 @@ and the derived files
     \ifluatex
       \global\luatexattributedef#1=\allocationnumber
     \fi
-    \wlog{\string#1=\string\luatexattribute\the\allocationnumber}%
+    \unsetluatexattribute#1%
     \begingroup\escapechar\m@ne \expandafter\endgroup
     \directlua{luatextra.attributedef_from_tex(
       '\luatexluaescapestring{\string#1}', '\number\allocationnumber')}%
+    \wlog{\string#1=\string\luatexattribute\the\allocationnumber}%
   \else
     \errmessage{No room for a new \string\attribute}%
   \fi}
@@ -217,6 +223,29 @@ end
 %    \begin{macrocode}
 %</luamodule>
 %    \end{macrocode}
+%
+%    \section{Test files}
+%
+%    The tests done are very basic: we just make sure that the package loads
+%    correctly and the macros don't generate any error, under both LaTeX en
+%    Plain TeX.
+%
+%    \begin{macrocode}
+%<testplain>\input luatexbase-attr.sty
+%<testlatex>\RequirePackage{luatexbase-attr}
+%<*testplain,testlatex>
+\newluatexattribute\testattr
+\setluatexattribute\testattr{1}
+\unsetluatexattribute\testattr
+\begingroup
+\newluatexattribute\anotherattr
+\endgroup
+\setluatexattribute\anotherattr{1}
+%</testplain,testlatex>
+%<testplain>\bye
+%<testlatex>\stop
+%    \end{macrocode}
+%
 %
 % \Finale
 \endinput

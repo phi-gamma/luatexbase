@@ -1,14 +1,14 @@
 general
 -------
 
+- write test files
 - change prefix for internal TeX macros
 - check for lua name conflicts ('module' used in mods)
 - check for macros starting with \luatex
-- write test files
-- reload check, declaration, luatex test
-- handle catcodes for Plain (more comprensive defenses to be added later)
-- import/update doc
 - make TeX tests cleaner: \begingroup\expandafter\ETC.
+- reload check, declaration, luatex test, catcodes for plain
+- import/update doc
+- date & changes entry
 
 
 Later

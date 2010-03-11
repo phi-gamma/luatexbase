@@ -9,7 +9,9 @@ DTXSTY = lltxb-dtxstyle.tex
 UNPACKED_MCB = test-luamcallbacks.tex luamcallbacks.lua
 UNPACKED_REGS = luatexbase-regs.sty \
 				test-regs-plain.tex test-regs-latex.tex
-UNPACKED = $(UNPACKED_MCB) $(UNPACKED_REGS)
+UNPACKED_ATTR = luatexbase-attr.sty luatexbase.attr.lua \
+				test-attr-plain.tex test-attr-latex.tex
+UNPACKED = $(UNPACKED_MCB) $(UNPACKED_REGS) $(UNPACKED_ATTR)
 COMPILED = $(DOC)
 GENERATED = $(COMPILED) $(UNPACKED)
 SOURCE = $(DTX) $(DTXSTY) README TODO Changes Makefile
@@ -59,9 +61,16 @@ $(UNPACKED_MCB): luamcallbacks.dtx
 $(UNPACKED_REGS): luatexbase-regs.dtx
 	$(DO_TEX)
 
+$(UNPACKED_ATTR): luatexbase-attr.dtx
+	$(DO_TEX)
+
 check-regs: $(UNPACKED_REGS)
 	luatex --interaction=batchmode test-regs-plain.tex >/dev/null
 	lualatex --interaction=batchmode test-regs-latex.tex >/dev/null
+
+check-attr: $(UNPACKED_ATTR)
+	luatex --interaction=batchmode test-attr-plain.tex >/dev/null
+	lualatex --interaction=batchmode test-attr-latex.tex >/dev/null
 
 $(CTAN_ZIP): $(SOURCE) $(COMPILED) $(TDS_ZIP)
 	@echo "Making $@ for CTAN upload."
