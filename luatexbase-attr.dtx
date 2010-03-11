@@ -160,7 +160,7 @@ and the derived files
 % definition of |\fooattr| and remember it in a Lua variable. For your
 % convenience, this is automatically done by |\newluatexattribute|: the number
 % is remembered in a dedicated Lua table so that you can get it as
-% |luatextra.attributes.foobar| (mind the absence of backslash here) at any
+% |luatexbase.attributes.foobar| (mind the absence of backslash here) at any
 % time.
 %
 %    \section{Implementation}
@@ -247,7 +247,7 @@ and the derived files
     \fi
     \unsetluatexattribute#1%
     \begingroup\escapechar\m@ne \expandafter\endgroup
-    \directlua{luatextra.attributedef_from_tex(
+    \directlua{luatexbase.attributedef_from_tex(
       '\luatexluaescapestring{\string#1}', '\number\allocationnumber')}%
     \wlog{\string#1=\string\luatexattribute\the\allocationnumber}%
   \else
@@ -284,7 +284,7 @@ and the derived files
 %
 %    \begin{macrocode}
 %<*luamodule>
-module('luatextra', package.seeall)
+module('luatexbase', package.seeall)
 %    \end{macrocode}
 %
 %    Record the allocation number in a Lua table.
@@ -315,13 +315,13 @@ end
 \newluatexattribute\testattr
 \setluatexattribute\testattr{1}
 \unsetluatexattribute\testattr
-\directlua{assert(luatextra.attributes.testattr)}
+\directlua{assert(luatexbase.attributes.testattr)}
 \begingroup
 \escapechar64
 \newluatexattribute\anotherattr
 \endgroup
 \setluatexattribute\anotherattr{1}
-\directlua{assert(luatextra.attributes.anotherattr)}
+\directlua{assert(luatexbase.attributes.anotherattr)}
 %</testplain,testlatex>
 %<testplain>\bye
 %<testlatex>\stop
