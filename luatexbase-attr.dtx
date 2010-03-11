@@ -131,9 +131,40 @@ and the derived files
 % \maketitle
 %
 % \begin{abstract}
+% In addition to the registers existing in \tex and \etex, \luatex introduces
+% a new concept: attributes. This package takes care of attribute allocation
+% just like Plain TeX and LaTeX do for other registers.
 % \end{abstract}
 %
 % \section{Documentation}
+%
+% The main macro defined here is |\newluatexattribute|. It behaves in the same
+% way as |\newcount|. There are also two helper macros: |\setluatexattibute|
+% sets an attribute's value (locally, but you can use |\global| in front of
+% it). |\unsetluatexattribute| unsets an atribute by giving it a special
+% value, depending on \luatex's version; you should always use this macro
+% in order to be sure the correct special value for your version of \luatex is
+% used.
+%
+% Due to the intended use of attributes, it makes no sense to locally
+% allocate an attribute the way you can locally allocate a counter using
+% \file{etex.sty}'s |\loccount|, so no corresponding macro is defined.
+%
+% The various Lua functions for manipulating attributes use a number to
+% designate the attribute. Hence, package writers need a way to know the
+% number of the attribute associated to |\fooattr| assuming it was defined
+% using |\newluatexattribute\fooattr|, something that \luatex currently
+% doesn't support (you can get the current value of the associated attribute
+% as |tex.atrribute.fooattr|, but not the attribute number).
+%
+% There are several ways to work around this. For example, it is possible to
+% extract the number at any time from the |\meaning| of |\foobar|.
+% Alternatively, one could look at |\the\allocationnumber| just after the
+% definition of |\fooattr| and remember it in a Lua variable. For your
+% convenience, this is automatically done by |\newluatexattribute|: the number
+% is remembered in a dedicated Lua table so that you can get it as
+% |luatextra.attributes.foobar| (mind the absence of backslash here) at any
+% time.
 %
 %    \section{Implementation}
 %
@@ -205,10 +236,7 @@ and the derived files
 \directlua{dofile(kpse.find_file('luatexbase.attr.lua', 'lua'))}
 %    \end{macrocode}
 %
-%    The most important macro here is |\newluatexattribute| that allocates a
-%    new attribute, and adds it in the |tex.attributename| table (see
-%    |luatextra.attributedef_from_tex| for more details.  It works just like
-%    the other |\new*| macros, to $65536$ attributes can be allocated.
+%    The allocaton macro.
 %
 %    \begin{macrocode}
 \newcount\lltxb@attribute@alloc
@@ -230,15 +258,9 @@ and the derived files
   \fi}
 %    \end{macrocode}
 %
-%    Two convenient macros, one to set an attribute (basically just a
-%    wrapper), and another one to unset it. Unsetting attributes with this
-%    function is important, as the \texttt{unset} value may change, as it
-%    already has in \luatex $0.37$.
+%    Helper macro |\unsetluatexattribute|: depends on \luatex's version.
 %
 %    \begin{macrocode}
-\def\setluatexattribute#1#2{%
-  #1=\numexpr#2\relax
-}
 \def\unsetluatexattribute#1{%
   \ifnum\luatexversion<37\relax
     #1=-1\relax
@@ -246,6 +268,15 @@ and the derived files
     #1=-"7FFFFFFF\relax
   \fi}
 %    \end{macrocode}
+%
+%    And now the trivial helper macro.
+%
+%    \begin{macrocode}
+\def\setluatexattribute#1#2{%
+  #1=\numexpr#2\relax}
+%    \end{macrocode}
+%
+%    That's all folks!
 %
 %    \begin{macrocode}
 \lltxb@attr@AtEnd
@@ -256,26 +287,12 @@ and the derived files
 %
 %    \begin{macrocode}
 %<*luamodule>
+module('luatextra', package.seeall)
 %    \end{macrocode}
 %
-%    Attribute allocation is done mainly in the \file{.sty} file, but there
-%    is also a Lua addition for attribute handling: \luatex is by default
-%    unable to tell the attribute number corresponding to an attribute name.
-%    This attribute number is necessary for functions such as
-%    |node.has_attribute|, which is used very often. The solution
-%    until now was to give a chosen attribute number to each attribute, and
-%    pray that someone else didn't use it before. With this method it was easy
-%    to know the number of an attribute, as it was chosen. Now with the
-%    |\newluaattribute| macro, it's impossible to know the
-%    number of an attribute. To fix it, when |\newluaattribute|
-%    is called, it calls |luatextra.attributedef_from_tex|. This
-%    function registers the number in the table |tex.attributenumber|.
-%    For example to get the number of the attribute |myattribute|
-%    registered with |\newluaattribute\myattribute|, you
-%    can simply call |tex.attributenumber[myattribute]|.
+%    Record the allocation number in a Lua table.
 %
 %    \begin{macrocode}
-module('luatextra', package.seeall)
 attributes = {}
 tex.attributenumber = attributes
 function attributedef_from_tex(name, number)
