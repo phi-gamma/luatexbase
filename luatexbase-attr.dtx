@@ -1,8 +1,5 @@
 % \iffalse meta-comment
 %
-% Template : look for attr DATE DESC VERSION !!!
-% and 'derived files' !!!
-%
 % Written in 2009, 2010 by Manuel Pégourié-Gonnard and Élie Roux.
 %     <mpg@elzevir.fr>
 %     <elie.roux@telecom-bretagne.eu>
@@ -123,7 +120,7 @@ and the derived files
 %   Right brace   \}     Tilde         \~}
 %
 % \title{The \pk{luatexbase-attr} package}
-% \date{DATE}
+% \date{v0.1 2010-03-11}
 % \author{%
 %  Manuel P\'egouri\'e-Gonnard \\ \email{mpg@elzevir.fr} \and
 %   \'Elie Roux \\ \email{elie.roux@telecom-bretagne.eu}}
@@ -308,7 +305,8 @@ end
 %
 %    The tests done are very basic: we just make sure that the package loads
 %    correctly and the macros don't generate any error, under both LaTeX en
-%    Plain TeX.
+%    Plain TeX. We also check that the attribute's number is remembered well,
+%    independantly of the current value of |\escapechar|.
 %
 %    \begin{macrocode}
 %<testplain>\input luatexbase-attr.sty
@@ -317,10 +315,13 @@ end
 \newluatexattribute\testattr
 \setluatexattribute\testattr{1}
 \unsetluatexattribute\testattr
+\directlua{assert(luatextra.attributes.testattr)}
 \begingroup
+\escapechar64
 \newluatexattribute\anotherattr
 \endgroup
 \setluatexattribute\anotherattr{1}
+\directlua{assert(luatextra.attributes.anotherattr)}
 %</testplain,testlatex>
 %<testplain>\bye
 %<testlatex>\stop

@@ -1,8 +1,10 @@
                     Changes in the luatexbase package/bundle
 
-[on-going]
-    luatexbase-attrs
-        - newly allocated attributes are now unset
+2010/03/11
+    luatexbase-attrs 0.1
+        - add minimal test files for luatex and lualatex
+        - make sure newly allocated attributes are unset
+        - fix sensitivity to the current value of \escapechar
 
 2010/01/21
     luatexbase-regs 0.1
