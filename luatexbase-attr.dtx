@@ -143,6 +143,68 @@ and the derived files
 %<*texpackage>
 %    \end{macrocode}
 %
+%    \subsubsection{Preliminaries}
+%
+%    Reload protection, especially for \plaintex.
+%
+%    \begin{macrocode}
+                \csname lltxb@attr@loaded\endcsname
+\expandafter\let\csname lltxb@attr@loaded\endcsname\endinput
+%    \end{macrocode}
+%
+%    Package declaration.
+%
+%    \begin{macrocode}
+\begingroup
+  \expandafter\ifx\csname ProvidesPackage\endcsname\relax
+    \def\x#1[#2]{\immediate\write16{Package: #1 #2}}
+  \else
+    \let\x\ProvidesPackage
+  \fi
+\expandafter\endgroup
+\x{luatexbase-attr}[2010/03/11 v0.1  Attributes allocation for LuaTeX  (mpg)]
+%    \end{macrocode}
+%
+%    Make sure \luatex is used.
+%
+%    \begin{macrocode}
+\begingroup\expandafter\expandafter\expandafter\endgroup
+\expandafter\ifx\csname RequirePackage\endcsname\relax
+  \input ifluatex.sty
+\else
+  \RequirePackage{ifluatex}
+\fi
+\ifluatex\else
+  \begingroup
+    \expandafter\ifx\csname PackageWarningNoLine\endcsname\relax
+      \def\x#1#2{\begingroup\newlinechar10
+        \immediate\write16{Package #1 warning: #2}\endgroup}
+    \else
+      \let\x\PackageWarningNoLine
+    \fi
+  \expandafter\endgroup
+  \x{luatexbase-attr}{LuaTeX is required for this package.^^J
+    Aborting package loading.}
+  \expandafter\endinput
+\fi
+%    \end{macrocode}
+%
+%    Make sure the catcode of @ is correct, especially for \plaintex.
+%
+%    \begin{macrocode}
+\expandafter\edef\csname lltxb@attr@AtEnd\endcsname{%
+  \catcode64 \the\catcode64\relax}
+\catcode64 11
+%    \end{macrocode}
+%
+%    \subsubsection{Main content}
+%
+%    Load the supporting Lua module.
+%
+%    \begin{macrocode}
+\directlua{dofile(kpse.find_file('luatexbase.attr.lua', 'lua'))}
+%    \end{macrocode}
+%
 %    The most important macro here is |\newluatexattribute| that allocates a
 %    new attribute, and adds it in the |tex.attributename| table (see
 %    |luatextra.attributedef_from_tex| for more details.  It works just like
@@ -186,6 +248,7 @@ and the derived files
 %    \end{macrocode}
 %
 %    \begin{macrocode}
+\lltxb@attr@AtEnd
 %</texpackage>
 %    \end{macrocode}
 %

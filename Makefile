@@ -42,7 +42,7 @@ DO_MAKEINDEX = makeindex -s gind.ist $(subst .dtx,,$<) >/dev/null 2>&1
 
 # Main targets definition
 all: $(GENERATED)
-check: check-regs
+check: check-regs check-attr
 doc: $(COMPILED)
 unpack: $(UNPACKED)
 ctan: check $(CTAN_ZIP)

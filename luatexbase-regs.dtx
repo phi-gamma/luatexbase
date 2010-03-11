@@ -211,7 +211,7 @@ and the derived files
 %    Make sure the catcode of @ is correct, especially for \plaintex.
 %
 %    \begin{macrocode}
-\expandafter\edef\csname lltxb@AtEnd\endcsname{%
+\expandafter\edef\csname lltxb@regs@AtEnd\endcsname{%
   \catcode64 \the\catcode64\relax}
 \catcode64 11
 %    \end{macrocode}
@@ -388,7 +388,7 @@ and the derived files
 %    That's all folks!
 %
 %    \begin{macrocode}
-\lltxb@AtEnd
+\lltxb@regs@AtEnd
 %</texpackage>
 %    \end{macrocode}
 %
