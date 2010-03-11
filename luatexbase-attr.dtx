@@ -291,7 +291,6 @@ module('luatexbase', package.seeall)
 %
 %    \begin{macrocode}
 attributes = {}
-tex.attributenumber = attributes
 function attributedef_from_tex(name, number)
     attributes[name] = tonumber(number)
 end

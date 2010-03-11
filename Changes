@@ -1,5 +1,10 @@
                     Changes in the luatexbase package/bundle
 
+[on-going]
+    luatexbase-attr
+        - use luatexbase as the Lua module name
+        - don't creat tex.attributenumber
+
 2010/03/11
     luatexbase-attrs 0.1
         - add minimal test files for luatex and lualatex

@@ -16,15 +16,3 @@ Later
 =====
 
 - change lua module name(s) (luatexbase or luatexbase.regs etc)
-
-regs
-----
-
-- Should the various allocation macros set something in a Lua table, or should
-  we just wait for it to be implemented in LuaTeX? (The \*blk macros would be
-rather tricky in this respect, but are they really used?)
-
-attr
----
-
-- don't write in the tex table!
