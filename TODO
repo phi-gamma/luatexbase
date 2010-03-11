@@ -1,21 +1,20 @@
 general
 -------
 
-- change lua module names
-- change TeX macros prefixes
+- change prefix for internal TeX macros
 - check for lua name conflicts ('module' used in mods)
 - check for macros starting with \luatex
 - write test files
 - reload check, declaration, luatex test
+- handle catcodes for Plain (more comprensive defenses to be added later)
 - import/update doc
-- fix Makefile: test files are source, not runfiles
-- make tests cleaner: \begingroup\expandafter\ETC.
-- handle catcodes for Plain
-- import/write doc
+- make TeX tests cleaner: \begingroup\expandafter\ETC.
 
 
 Later
 =====
+
+- change lua module name(s) (luatexbase or luatexbase.regs etc)
 
 regs
 ----
@@ -23,3 +22,8 @@ regs
 - Should the various allocation macros set something in a Lua table, or should
   we just wait for it to be implemented in LuaTeX? (The \*blk macros would be
 rather tricky in this respect, but are they really used?)
+
+attr
+---
+
+- don't write in the tex table!

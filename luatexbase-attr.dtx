@@ -144,23 +144,22 @@ and the derived files
 %    the other |\new*| macros, to $65536$ attributes can be allocated.
 %
 %    \begin{macrocode}
-\newcount\luatexattdefcounter
-\luatexattdefcounter = 1
+\newcount\lltxb@attribute@alloc
+\lltxb@attribute@alloc\m@ne
 \def\newluatexattribute#1{%
-  \ifnum\luatexattdefcounter<65535\relax %
-    \global\advance\luatexattdefcounter by 1\relax %
-    \allocationnumber\luatexattdefcounter %
-    \ifluatex %
-      \global\luatexattributedef#1=\allocationnumber %
-    \fi %
+  \ifnum\lltxb@attribute@alloc<65535\relax
+    \global\advance\lltxb@attribute@alloc\@ne
+    \allocationnumber\lltxb@attribute@alloc
+    \ifluatex
+      \global\luatexattributedef#1=\allocationnumber
+    \fi
     \wlog{\string#1=\string\luatexattribute\the\allocationnumber}%
-    \luadirect{%
-      luatextra.attributedef_from_tex([[\noexpand#1]],
-      '\number\allocationnumber')}%
-  \else %
+    \begingroup\escapechar\m@ne \expandafter\endgroup
+    \directlua{luatextra.attributedef_from_tex(
+      '\luatexluaescapestring{\string#1}', '\number\allocationnumber')}%
+  \else
     \errmessage{No room for a new \string\attribute}%
-  \fi %
-}
+  \fi}
 %    \end{macrocode}
 %
 %    Two convenient macros, one to set an attribute (basically just a
@@ -170,15 +169,14 @@ and the derived files
 %
 %    \begin{macrocode}
 \def\setluatexattribute#1#2{%
-  #1=\numexpr#2\relax %
+  #1=\numexpr#2\relax
 }
 \def\unsetluatexattribute#1{%
-  \ifnum\luatexversion<37\relax %
-    #1=-1\relax %
-  \else %
-    #1=-"7FFFFFFF\relax %
-  \fi %
-}
+  \ifnum\luatexversion<37\relax
+    #1=-1\relax
+  \else
+    #1=-"7FFFFFFF\relax
+  \fi}
 %    \end{macrocode}
 %
 %    \begin{macrocode}
@@ -208,11 +206,11 @@ and the derived files
 %    can simply call |tex.attributenumber[myattribute]|.
 %
 %    \begin{macrocode}
-luatextra.attributes = {}
-tex.attributenumber = luatextra.attributes
-function luatextra.attributedef_from_tex(name, number)
-    truename = name:gsub('[\\ ]', '')
-    luatextra.attributes[truename] = tonumber(number)
+module('luatextra', package.seeall)
+attributes = {}
+tex.attributenumber = attributes
+function attributedef_from_tex(name, number)
+    attributes[name] = tonumber(number)
 end
 %    \end{macrocode}
 %

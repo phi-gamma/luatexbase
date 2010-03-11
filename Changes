@@ -1,5 +1,8 @@
                     Changes in the luatexbase package/bundle
 
+[on-going]
+    luatexbase-attrs
+        - newly allocated attributes are now unset
 
 2010/01/21
     luatexbase-regs 0.1
