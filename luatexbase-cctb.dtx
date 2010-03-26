@@ -56,6 +56,12 @@ and the derived files
   \file{luatexbase-cctb.sty}{\from{luatexbase-cctb.dtx}{texpackage}}%
 }
 
+\generate{%
+  \usedir{doc/luatex/luatexbase}%
+  \file{test-cctb-plain.tex}{\from{luatexbase-cctb.dtx}{testplain}}%
+  \file{test-cctb-latex.tex}{\from{luatexbase-cctb.dtx}{testlatex}}%
+}
+
 \def\MetaPrefix{-- }
 
 \def\luapostamble{%
@@ -67,7 +73,7 @@ and the derived files
 
 \generate{%
   \usedir{tex/luatex/luatexbase}%
-  \file{cctb.lua}{\from{luatexbase-cctb.dtx}{luamodule}}%
+  \file{luatexbase.cctb.lua}{\from{luatexbase-cctb.dtx}{luamodule}}%
 }
 
 \obeyspaces
@@ -207,7 +213,7 @@ and the derived files
     \global\advance\luatexcatcodetabledefcounter by 1\relax
     \allocationnumber=\luatexcatcodetabledefcounter
     \global\chardef#1=\allocationnumber
-    \luadirect{%
+    \directlua{%
       luatextra.catcodetabledef_from_tex([[\noexpand#1]], '\number\allocationnumber')}%
     \wlog{\string#1=\string\catcodetable\the\allocationnumber}%
   \else
@@ -271,7 +277,7 @@ and the derived files
 \newluatexcatcodetable\CatcodeTableLaTeX
 \newluatexcatcodetable\CatcodeTableLaTeXAtLetter
 \newluatexcatcodetable\CatcodeTableExpl
-\initluatexcatcodetable\CatcodeTableIniTeX
+\luatexinitcatcodetable\CatcodeTableIniTeX
 
 \expandafter\ifx\csname @firstofone\endcsname\relax
   \long\def\@firstofone#1{#1}%
@@ -296,9 +302,9 @@ and the derived files
       \catcode125=2 % brace right
       \catcode126=13 % tilde
       \catcode127=15 %
-      \saveluatexcatcodetable\CatcodeTableLaTeX
+      \luatexsavecatcodetable\CatcodeTableLaTeX
       \catcode64=11 %
-      \saveluatexcatcodetable\CatcodeTableLaTeXAtLetter
+      \luatexsavecatcodetable\CatcodeTableLaTeXAtLetter
     \endgroup
     \begingroup
       \luatexsetcatcoderange{0}{8}{15}%
@@ -317,7 +323,7 @@ and the derived files
       \catcode125=2 % right brace is end-group character
       \catcode126=10 % tilde is a space char.
       \catcode127=15 %
-      \saveluatexcatcodetable\CatcodeTableExpl
+      \luatexsavecatcodetable\CatcodeTableExpl
     \endgroup
     \@makeother{0}% nul
     \@makeother{13}% carriage return
@@ -326,9 +332,9 @@ and the derived files
     \@makeother{127}%
     \luatexsetcatcoderange{65}{90}{12}% A-Z
     \luatexsetcatcoderange{97}{122}{12}% a-z
-    \saveluatexcatcodetable\CatcodeTableString
+    \luatexsavecatcodetable\CatcodeTableString
     \@makeother{32}% space
-    \saveluatexcatcodetable\CatcodeTableOther
+    \luatexsavecatcodetable\CatcodeTableOther
   \endgroup
 }
 \directlua{luatextra.catcodetable_do_shortcuts()}
@@ -349,6 +355,7 @@ and the derived files
 %    \texttt{\string\newluacatcodetable}.
 %
 %    \begin{macrocode}
+luatextra = luatextra or {}
 luatextra.catcodetables = {}
 tex.catcodetablenumber = luatextra.catcodetables
 function luatextra.catcodetabledef_from_tex(name, number)
@@ -396,6 +403,29 @@ end
 %
 %    \begin{macrocode}
 %</luamodule>
+%    \end{macrocode}
+%
+%    \section{Test files}
+%
+%    The tests done are very basic: we just make sure that the package loads
+%    correctly and the macros don't generate any error, under both LaTeX en
+%    Plain TeX. We also check that the catcodetable's number is remembered well,
+%    independently of the current value of |\escapechar|.
+%
+%    \begin{macrocode}
+%<testplain>\input luatexbase-cctb.sty
+%<testlatex>\RequirePackage{luatexbase-cctb}
+%<*testplain,testlatex>
+\newluatexcatcodetable\testcctb
+\directlua{assert(luatextra.catcodetables.testcctb)}
+\begingroup
+\escapechar64
+\newluatexcatcodetable\anothercctb
+\endgroup
+% \directlua{assert(luatextra.catcodetables.anothercctb)}
+%</testplain,testlatex>
+%<testplain>\bye
+%<testlatex>\stop
 %    \end{macrocode}
 %
 % \Finale
