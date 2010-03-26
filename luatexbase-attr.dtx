@@ -242,9 +242,7 @@ and the derived files
   \ifnum\lltxb@attribute@alloc<65535\relax
     \global\advance\lltxb@attribute@alloc\@ne
     \allocationnumber\lltxb@attribute@alloc
-    \ifluatex
-      \global\luatexattributedef#1=\allocationnumber
-    \fi
+    \global\luatexattributedef#1=\allocationnumber
     \unsetluatexattribute#1%
     \begingroup\escapechar\m@ne \expandafter\endgroup
     \directlua{luatextra.attributedef_from_tex(
