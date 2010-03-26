@@ -215,6 +215,7 @@ and the derived files
     \allocationnumber\lltxb@catcodetable@alloc
     \global\chardef#1\allocationnumber
     \luatexinitcatcodetable\allocationnumber
+    \begingroup\escapechar\m@ne \expandafter\endgroup
     \directlua{luatextra.catcodetabledef_from_tex(
       '\luatexluaescapestring{\string#1}', '\number\allocationnumber')}%
     \wlog{\string#1=\string\luatexcatcodetable\the\allocationnumber}%
@@ -279,14 +280,10 @@ and the derived files
 \newluatexcatcodetable\CatcodeTableLaTeX
 \newluatexcatcodetable\CatcodeTableLaTeXAtLetter
 \newluatexcatcodetable\CatcodeTableExpl
-%% \luatexinitcatcodetable\CatcodeTableIniTeX
-
-\expandafter\ifx\csname @firstofone\endcsname\relax
-  \long\def\@firstofone#1{#1}%
-\fi
 
 \begingroup
   \def\@makeother#1{\catcode#1=12\relax}%
+  \long\def\@firstofone#1{#1}%
   \@firstofone{%
     \luatexcatcodetable\CatcodeTableIniTeX
     \begingroup
@@ -424,7 +421,7 @@ end
 \escapechar64
 \newluatexcatcodetable\anothercctb
 \endgroup
-% \directlua{assert(luatextra.catcodetables.anothercctb)}
+\directlua{assert(luatextra.catcodetables.anothercctb)}
 %</testplain,testlatex>
 %<testplain>\bye
 %<testlatex>\stop
