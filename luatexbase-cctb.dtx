@@ -203,21 +203,23 @@ and the derived files
 \directlua{dofile(kpse.find_file('luatexbase.cctb.lua', 'lua'))}
 %    \end{macrocode}
 %
-%    The allocation macro.
+%    The allocation macro. Allocate tables starting with 1, since table 0 is
+%    reserved for IniTeX catcodes by LuaTeX.
 %
 %    \begin{macrocode}
-\newcount\luatexcatcodetabledefcounter
-\luatexcatcodetabledefcounter = 1
+\newcount\lltxb@catcodetable@alloc
+\lltxb@catcodetable@alloc\z@
 \def\newluatexcatcodetable#1{%
-  \ifnum\luatexcatcodetabledefcounter<1114110\relax % 0x10FFFF is maximal \chardef
-    \global\advance\luatexcatcodetabledefcounter by 1\relax
-    \allocationnumber=\luatexcatcodetabledefcounter
-    \global\chardef#1=\allocationnumber
-    \directlua{%
-      luatextra.catcodetabledef_from_tex([[\noexpand#1]], '\number\allocationnumber')}%
-    \wlog{\string#1=\string\catcodetable\the\allocationnumber}%
+  \ifnum\lltxb@catcodetable@alloc<65535\relax
+    \global\advance\lltxb@catcodetable@alloc\@ne
+    \allocationnumber\lltxb@catcodetable@alloc
+    \global\chardef#1\allocationnumber
+    \luatexinitcatcodetable\allocationnumber
+    \directlua{luatextra.catcodetabledef_from_tex(
+      '\luatexluaescapestring{\string#1}', '\number\allocationnumber')}%
+    \wlog{\string#1=\string\luatexcatcodetable\the\allocationnumber}%
   \else
-    \errmessage{No room for a new \string\catcodetable}%
+    \errmessage{No room for a new \string\luatexcatcodetable}%
   \fi}
 %    \end{macrocode}
 %
@@ -277,7 +279,7 @@ and the derived files
 \newluatexcatcodetable\CatcodeTableLaTeX
 \newluatexcatcodetable\CatcodeTableLaTeXAtLetter
 \newluatexcatcodetable\CatcodeTableExpl
-\luatexinitcatcodetable\CatcodeTableIniTeX
+%% \luatexinitcatcodetable\CatcodeTableIniTeX
 
 \expandafter\ifx\csname @firstofone\endcsname\relax
   \long\def\@firstofone#1{#1}%
