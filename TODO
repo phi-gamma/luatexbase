@@ -13,10 +13,17 @@ general
 - redo module loading in packages once mods is done.
 - adjust preamble to avoid duplicated list of files (refer to DTX instead)
 
+loader
+------
+
+- a.b.c -> a/b/c or a/b.c or a.b.c
+
 Later
 =====
 
 - change lua module name(s) (luatexbase or luatexbase.regs etc)
+- compat with LuaTeX 0.25.4? (Means problems with \directlua, primitive names,
+  kpse.find_file(..., 'lua'), etc.)
 
 regs
 ----

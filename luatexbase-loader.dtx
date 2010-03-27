@@ -1,0 +1,209 @@
+% \iffalse meta-comment
+%
+% Template : look for DATE DESC VERSION !!!
+% and 'derived files' !!!
+%
+% Written in 2009, 2010 by Manuel Pégourié-Gonnard and Élie Roux.
+%     <mpg@elzevir.fr>
+%     <elie.roux@telecom-bretagne.eu>
+%
+% This work is under the CC0 license.
+%
+% This work consists of the main source file luatexbase-loader.dtx
+% and the derived files
+%    luatexbase-loader.sty loader.lua ...
+%
+% Unpacking:
+%    tex luatexbase-loader.dtx
+% Documentation:
+%    pdflatex luatexbase-loader.dtx
+%
+%    The class ltxdoc loads the configuration file ltxdoc.cfg
+%    if available. Here you can specify further options, e.g.
+%    use A4 as paper format:
+%       \PassOptionsToClass{a4paper}{article}
+%
+%<*ignore>
+\begingroup
+  \def\x{LaTeX2e}%
+\expandafter\endgroup
+\ifcase 0\ifx\install y1\fi\expandafter
+         \ifx\csname processbatchFile\endcsname\relax\else1\fi
+         \ifx\fmtname\x\else 1\fi\relax
+\else\csname fi\endcsname
+%</ignore>
+%<*install>
+\input docstrip.tex
+
+\keepsilent
+\askforoverwritefalse
+
+\let\MetaPrefix\relax
+
+\preamble
+This is a generated file.
+
+Written in 2009, 2010 by Manuel Pégourié-Gonnard and Élie Roux.
+    <mpg@elzevir.fr>
+    <elie.roux@telecom-bretagne.eu>
+
+This work is under the CC0 license.
+
+This work consists of the main source file luatexbase-loader.dtx
+and the derived files
+   luatexbase-loader.sty loader.lua ...
+
+\endpreamble
+
+\let\MetaPrefix\DoubleperCent
+
+\generate{%
+  \usedir{tex/luatex/luatexbase}%
+  \file{luatexbase-loader.sty}{\from{luatexbase-loader.dtx}{texpackage}}%
+}
+
+\def\MetaPrefix{-- }
+
+\def\luapostamble{%
+  \MetaPrefix^^J%
+  \MetaPrefix\space End of File `\outFileName'.%
+}
+
+\def\currentpostamble{\luapostamble}%
+
+\generate{%
+  \usedir{tex/luatex/luatexbase}%
+  \file{loader.lua}{\from{luatexbase-loader.dtx}{luamodule}}%
+}
+
+\obeyspaces
+\Msg{************************************************************************}
+\Msg{*}
+\Msg{* To finish the installation you have to move the following}
+\Msg{* files into a directory searched by TeX:}
+\Msg{*}
+\Msg{*     luatexbase-loader.sty loader.lua ...}
+\Msg{*}
+\Msg{* Happy TeXing!}
+\Msg{*}
+\Msg{************************************************************************}
+
+\endbatchfile
+%</install>
+%<*ignore>
+\fi
+%</ignore>
+%<*driver>
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesFile{luatexbase-loader.drv}
+  [DATE DESC]
+\documentclass{ltxdoc}
+\EnableCrossrefs
+\CodelineIndex
+\begin{document}
+  \DocInput{luatexbase-loader.dtx}%
+\end{document}
+%</driver>
+% \fi
+%
+% \CheckSum{0}
+%
+% \CharacterTable
+%  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
+%   Lower-case    \a\b\c\d\e\f\g\h\i\j\k\l\m\n\o\p\q\r\s\t\u\v\w\x\y\z
+%   Digits        \0\1\2\3\4\5\6\7\8\9
+%   Exclamation   \!     Double quote  \"     Hash (number) \#
+%   Dollar        \$     Percent       \%     Ampersand     \&
+%   Acute accent  \'     Left paren    \(     Right paren   \)
+%   Asterisk      \*     Plus          \+     Comma         \,
+%   Minus         \-     Point         \.     Solidus       \/
+%   Colon         \:     Semicolon     \;     Less than     \<
+%   Equals        \=     Greater than  \>     Question mark \?
+%   Commercial at \@     Left bracket  \[     Backslash     \\
+%   Right bracket \]     Circumflex    \^     Underscore    \_
+%   Grave accent  \`     Left brace    \{     Vertical bar  \|
+%   Right brace   \}     Tilde         \~}
+%
+% \GetFileInfo{luatexbase-loader.drv}
+%
+% \title{The \textsf{luatexbase-loader} package}
+% \date{DATE}
+% \author{%
+%  Manuel P\'egouri\'e-Gonnard \\ \texttt{mpg@elzevir.fr} \and
+%   \'Elie Roux \\ \texttt{elie.roux@telecom-bretagne.eu}}
+%
+% \maketitle
+%
+% \begin{abstract}
+% \end{abstract}
+%
+% \section{Documentation}
+%
+%    \section{Implementation}
+%
+%    \subsection{\TeX\ package}
+%
+%    \begin{macrocode}
+%<*texpackage>
+%    \end{macrocode}
+%
+%    \begin{macrocode}
+\directlua{%
+  local file = "luatexbase.loader.lua"
+  local path = assert(kpse.find_file(file, 'tex'),
+    "File '"..file.."' no found")
+  tex.write_nl("("..path..")")
+  dofile(path)}
+%    \end{macrocode}
+%
+%    \begin{macrocode}
+%</texpackage>
+%    \end{macrocode}
+%
+%    \subsection{Lua module}
+%
+%    \begin{macrocode}
+%<*luamodule>
+module('luatextra', package.seeall)
+%    \end{macrocode}
+%
+%    \begin{macrocode}
+local function load_module(mod)
+  local file = kpse.find_file(mod, 'lua')
+  if not file then
+    return "\n\t[luatextra.loader] Search failed"
+  end
+  local loader, error = loadfile(file)
+  if not loader then
+    return "\n\t[luatextra.loader] Loading error:\n\t"..error
+  end
+  texio.write_nl("("..file..")")
+  return loader
+end
+%    \end{macrocode}
+%
+%    \begin{macrocode}
+table.insert(package.loaders, load_module)
+%</luamodule>
+%    \end{macrocode}
+%
+%    \section{Test files}
+%
+%    We just check that the package loads properly, under both LaTeX and Plain
+%    TeX. Anyway, the test files of other modules using this one already are a
+%    test\dots
+%
+%    \begin{macrocode}
+%<testplain>\input luatexbase-loader.sty
+%<testlatex>\RequirePackage{luatexbase-loader}
+%<*testplain,testlatex>
+%    \end{macrocode}
+%
+%    \begin{macrocode}
+%</testplain,testlatex>
+%<testplain>\bye
+%<testlatex>\stop
+%    \end{macrocode}
+%
+% \Finale
+\endinput
