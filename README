@@ -9,10 +9,11 @@ Each resource is handled in a separate package, and luatexbase.sty merely loads
 all of them.
 
 The resources considered are:
-- registers (\count, \box, etc.)    -> lualatex-regs
-- Lua modules                       -> lualatex-mods
-- \attribute's                      -> lualatex-attr
-- \catcodetable's                   -> lualatex-cctb
+- registers (\count, \box, etc.)    -> luatexbase-regs
+- Lua modules                       -> luatexbase-loader
+- Additional functions for modules  -> luatexbase-modutils
+- \attribute's                      -> luatexbase-attr
+- \catcodetable's                   -> luatexbase-cctb
 - Lua callbacks                     -> luamcallbacks
 
 WARNING: these packages are subject to change or even be merged or disappear in
@@ -38,17 +39,6 @@ Here are the recommended installation methods (preferred first).
 
 4. Try to figure it out by looking at the Makefile and comments in the sources.
 
-
-Manifest
---------
-
-Source files:
-        luamcallbacks.dtx
-
-Derived files:
-        luamcallbacks.pdf
-        luamcallbacks-test.tex
-        luamcallbacks.lua
 
 License
 -------
