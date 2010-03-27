@@ -13,11 +13,6 @@ general
 - redo module loading in packages once mods is done.
 - adjust preamble to avoid duplicated list of files (refer to DTX instead)
 
-loader
-------
-
-- a.b.c -> a/b/c or a/b.c or a.b.c
-
 Later
 =====
 
@@ -43,3 +38,9 @@ cctb
 
 - don't write in the tex table!
 - don't define macros starting with \luatex
+
+loader
+------
+
+- a.b.c -> a/b/c or a/b.c or a.b.c? What do to with files under texmf/scripts?
+
