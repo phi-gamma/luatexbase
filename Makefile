@@ -13,7 +13,7 @@ UNPACKED_ATTR = luatexbase-attr.sty luatexbase.attr.lua \
 				test-attr-plain.tex test-attr-latex.tex
 UNPACKED_CCTB = luatexbase-cctb.sty luatexbase.cctb.lua \
 				test-cctb-plain.tex test-cctb-latex.tex
-UNPACKED = $(UNPACKED_MCB) $(UNPACKED_REGS) $(UNPACKED_ATTR)
+UNPACKED = $(UNPACKED_MCB) $(UNPACKED_REGS) $(UNPACKED_ATTR) $(UNPACKED_CCTB)
 COMPILED = $(DOC)
 GENERATED = $(COMPILED) $(UNPACKED)
 SOURCE = $(DTX) $(DTXSTY) README TODO Changes Makefile

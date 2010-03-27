@@ -423,7 +423,7 @@ end
 \ifnum\catcode64=12 \else \ERROR \fi
 %<testlatex>\documentclass{minimal}
 \directlua{%
-  tex.sprint('\string\\hbox{')
+  tex.sprint('\string\\setbox0=\string\\hbox{')
   tex.sprint(luatextra.catcodetables.string, "\string\\undef # _^&")
   tex.sprint('}')
   }
