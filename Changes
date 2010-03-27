@@ -3,7 +3,10 @@
 [on-going]
     luatexbase-attr
         - use luatexbase as the Lua module name
-        - don't creat tex.attributenumber
+        - don't create tex.attributenumber
+    luatexbase-cctb
+        - use luatexbase as the Lua module name
+        - don't create tex.catcodetablenumber
 
 2010/03/26
     luatexbase-cctb 0.1
