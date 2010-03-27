@@ -14,11 +14,6 @@
 % Documentation:
 %    pdflatex luamcallbacks.dtx
 %
-%    The class ltxdoc loads the configuration file ltxdoc.cfg
-%    if available. Here you can specify further options, e.g.
-%    use A4 as paper format:
-%       \PassOptionsToClass{a4paper}{article}
-%
 %<*ignore>
 \begingroup
   \def\x{LaTeX2e}%
@@ -30,10 +25,6 @@
 %</ignore>
 %<*install>
 \input docstrip.tex
-\Msg{************************************************************************}
-\Msg{* Installation}
-\Msg{* Package: luamcallbacks 2009/09/18 v0.93 LuaTeX multiple callbacks.}
-\Msg{************************************************************************}
 
 \keepsilent
 \askforoverwritefalse
@@ -56,12 +47,9 @@ and the derived files
 \let\MetaPrefix\DoubleperCent
 
 \generate{%
-  \usedir{doc/luatex/luatextra}%
+  \usedir{doc/luatex/luatexbase}%
   \file{test-luamcallbacks.tex}{\from{luamcallbacks.dtx}{test}}%
 }
-
-% The following hacks are to generate a lua file with lua comments starting by
-% -- instead of %%
 
 \def\MetaPrefix{-- }
 
@@ -73,7 +61,7 @@ and the derived files
 \def\currentpostamble{\luapostamble}%
 
 \generate{%
-  \usedir{tex/luatex/luatextra}%
+  \usedir{tex/luatex/luatexbase}%
   \file{luamcallbacks.lua}{\from{luamcallbacks.dtx}{lua}}%
 }
 
@@ -95,12 +83,8 @@ and the derived files
 \fi
 %</ignore>
 %<*driver>
-\NeedsTeXFormat{LaTeX2e}
-\ProvidesFile{luamcallbacks.drv}
-  [2009/09/18 v0.93 LuaTeX multiple callbacks package]
 \documentclass{ltxdoc}
-\EnableCrossrefs
-\CodelineIndex
+\input{lltxb-dtxstyle}
 \begin{document}
   \DocInput{luamcallbacks.dtx}%
 \end{document}
@@ -139,6 +123,8 @@ and the derived files
 % \texttt{callback.register}. It also allows to create and call new callbacks.
 % For an introduction on this package (among others), please refer to the
 % document \texttt{luatextra-reference.pdf}.
+% \par\textbf{Warning.} Currently assumes that \textsf{luatexbase-modutils}
+% has been previously loaded. (This is a temporary limitation.)
 % \end{abstract}
 %
 % \section{Documentation}
@@ -803,15 +789,16 @@ end
 %    get a non-empty document.
 %
 %    \begin{macrocode}
-\input luatextra.sty
-
+\input luatexbase-loader.sty
+\input luatexbase-modutils.sty
+\directlua{require "luamcallbacks"}
 This is just a test file.
 %    \end{macrocode}
 %
 %    Then we declare three functions that we will use.
 %
 %    \begin{macrocode}
-\luadirect{
+\directlua{
 local function one(head,...)
     texio.write_nl("I'm number 1")
     return head, true

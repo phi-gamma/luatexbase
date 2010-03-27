@@ -4,6 +4,8 @@ NAME = luatexbase
 DTX = $(wildcard *.dtx)
 DOC = $(patsubst %.dtx, %.pdf, $(DTX))
 DTXSTY = lltxb-dtxstyle.tex
+LOADER_RUN = luatexbase-loader.sty luatexbase.loader.lua
+MOD_RUN = luatexbase-modutils.sty luatexbase.modutils.lua
 
 # Files grouped by generation mode
 UNPACKED_MCB = test-luamcallbacks.tex luamcallbacks.lua
@@ -13,9 +15,9 @@ UNPACKED_ATTR = luatexbase-attr.sty luatexbase.attr.lua \
 				test-attr-plain.tex test-attr-latex.tex
 UNPACKED_CCTB = luatexbase-cctb.sty luatexbase.cctb.lua \
 				test-cctb-plain.tex test-cctb-latex.tex
-UNPACKED_LOADER = luatexbase-loader.sty luatexbase.loader.lua \
+UNPACKED_LOADER = $(LOADER_RUN) \
 				test-loader-plain.tex test-loader-latex.tex
-UNPACKED_MODUTILS = luatexbase-modutils.sty luatexbase.modutils.lua \
+UNPACKED_MODUTILS = $(MOD_RUN) \
 				test-modutils-plain.tex test-modutils-latex.tex
 UNPACKED = $(UNPACKED_MCB) $(UNPACKED_REGS) $(UNPACKED_ATTR) $(UNPACKED_CCTB) \
 		   $(UNPACKED_LOADER) $(UNPACKED_MODUTILS)
@@ -49,7 +51,7 @@ DO_MAKEINDEX = makeindex -s gind.ist $(subst .dtx,,$<) >/dev/null 2>&1
 
 # Main targets definition
 all: $(GENERATED)
-check: check-regs check-attr check-cctb check-loader check-modutils
+check: check-regs check-attr check-cctb check-loader check-modutils check-mcb
 doc: $(COMPILED)
 unpack: $(UNPACKED)
 ctan: check $(CTAN_ZIP)
@@ -99,6 +101,9 @@ check-loader: $(UNPACKED_LOADER)
 check-modutils: $(UNPACKED_MODUTILS)
 	luatex --interaction=batchmode test-modutils-plain.tex >/dev/null
 	lualatex --interaction=batchmode test-modutils-latex.tex >/dev/null
+
+check-mcb: $(UNPACKED_MCB) $(LOADER_RUN) $(MOD_RUN)
+	luatex --interaction=batchmode test-luamcallbacks.tex >/dev/null
 
 $(CTAN_ZIP): $(SOURCE) $(COMPILED) $(TDS_ZIP)
 	@echo "Making $@ for CTAN upload."
