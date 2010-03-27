@@ -18,7 +18,7 @@ UNPACKED_CCTB = luatexbase-cctb.sty luatexbase.cctb.lua \
 UNPACKED_LOADER = $(LOADER_RUN) \
 				test-loader-plain.tex test-loader-latex.tex
 UNPACKED_MODUTILS = $(MOD_RUN) \
-				test-modutils-plain.tex test-modutils-latex.tex
+				test-modutils-plain.tex test-modutils-latex.tex test-modutils.lua
 UNPACKED = $(UNPACKED_MCB) $(UNPACKED_REGS) $(UNPACKED_ATTR) $(UNPACKED_CCTB) \
 		   $(UNPACKED_LOADER) $(UNPACKED_MODUTILS)
 COMPILED = $(DOC)
@@ -138,7 +138,7 @@ manifest:
 	@for f in $(GENERATED); do echo $$f; done
 
 clean: 
-	@$(RM) -- *.log *.aux *.toc *.idx *.ind *.ilg *.out
+	@$(RM) -- *.log *.aux *.toc *.idx *.ind *.ilg *.out test-*.pdf
 
 mrproper: clean
 	@$(RM) -- $(GENERATED) $(ZIPS)
