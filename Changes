@@ -7,6 +7,7 @@
     luatexbase-cctb
         - use luatexbase as the Lua module name
         - don't create tex.catcodetablenumber
+        - rename \luatexsetcatcoderange to \setcatcoderange
 
 2010/03/26
     luatexbase-cctb 0.1

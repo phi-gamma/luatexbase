@@ -142,7 +142,7 @@ and the derived files
 % (once they are allocated), two helper macros are available.
 %
 % \begin{quote}
-% \cs{luatexsetcatcoderange}\marg{from}\marg{to}\marg{value}
+% \cs{setcatcoderange}\marg{from}\marg{to}\marg{value}
 % \end{quote}
 % Set all characters code in the range \meta{from}--\meta{to} to the given
 % catcode \meta{value}.
@@ -292,7 +292,7 @@ and the derived files
 %    Set the catcodes for a range of characters.
 %
 %    \begin{macrocode}
-\def\luatexsetcatcoderange#1#2#3{%
+\def\setcatcoderange#1#2#3{%
   \edef\luaSCR@temp{%
     \noexpand\@tempcnta=\the\@tempcnta
     \noexpand\@tempcntb=\the\@tempcntb
@@ -333,8 +333,8 @@ and the derived files
   \catcode0   12 % nul
   \catcode13  12 % carriage return
   \catcode37  12 % percent
-  \luatexsetcatcoderange{65}{90}{12}% A-Z
-  \luatexsetcatcoderange{97}{122}{12}% a-z
+  \setcatcoderange{65}{90}{12}% A-Z
+  \setcatcoderange{97}{122}{12}% a-z
   \catcode92  12 % backslash
   \catcode127 12 }
 %    \end{macrocode}
@@ -352,7 +352,7 @@ and the derived files
 \newluatexcatcodetable\CatcodeTableLaTeX
 \setluatexcatcodetable\CatcodeTableLaTeX{%
   \luatexcatcodetable\CatcodeTableIniTeX
-  \luatexsetcatcoderange{0}{31}{15}%
+  \setcatcoderange{0}{31}{15}%
   \catcode9   10 % tab
   \catcode12  13 % form feed
   \catcode13  5  % carriage return
