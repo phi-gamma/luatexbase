@@ -6,6 +6,7 @@
         - fix allocation range (1->65535)
         - make sure newly allocated tables are initialised
         - fix sensitivity to the current value of \escapechar
+        - new macro \setluatexcatcodetable
 
 2010/03/11
     luatexbase-attrs 0.1

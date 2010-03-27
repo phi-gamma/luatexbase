@@ -274,72 +274,77 @@ and the derived files
 %    \end{itemize}
 %
 %    \begin{macrocode}
-\newluatexcatcodetable\CatcodeTableIniTeX
-\newluatexcatcodetable\CatcodeTableString
-\newluatexcatcodetable\CatcodeTableOther
-\newluatexcatcodetable\CatcodeTableLaTeX
-\newluatexcatcodetable\CatcodeTableLaTeXAtLetter
-\newluatexcatcodetable\CatcodeTableExpl
-
-\begingroup
-  \def\@makeother#1{\catcode#1=12\relax}%
-  \long\def\@firstofone#1{#1}%
-  \@firstofone{%
-    \luatexcatcodetable\CatcodeTableIniTeX
-    \begingroup
-      \luatexsetcatcoderange{0}{8}{15}%
-      \catcode9=10  % tab
-      \catcode11=15 %
-      \catcode12=13 % form feed
-      \luatexsetcatcoderange{14}{31}{15}%
-      \catcode35=6 % hash
-      \catcode36=3 % dollar
-      \catcode38=4 % ampersand
-      \catcode94=7 % circumflex
-      \catcode95=8 % underscore
-      \catcode123=1 % brace left
-      \catcode125=2 % brace right
-      \catcode126=13 % tilde
-      \catcode127=15 %
-      \luatexsavecatcodetable\CatcodeTableLaTeX
-      \catcode64=11 %
-      \luatexsavecatcodetable\CatcodeTableLaTeXAtLetter
-    \endgroup
-    \begingroup
-      \luatexsetcatcoderange{0}{8}{15}%
-      \catcode9=9 % tab ignored
-      \catcode11=15 %
-      \catcode12=13 % form feed
-      \luatexsetcatcoderange{14}{31}{15}%
-      \catcode32=9 % space is ignored
-      \catcode35=6 % hash mark is macro parameter character
-      \catcode36=3 % dollar (not so sure about the catcode...)
-      \catcode38=4 % ampersand
-      \catcode58=11 % colon letter
-      \catcode94=7 % circumflex is superscript character
-      \catcode95=11 % underscore letter
-      \catcode123=1 % left brace is begin-group character
-      \catcode125=2 % right brace is end-group character
-      \catcode126=10 % tilde is a space char.
-      \catcode127=15 %
-      \luatexsavecatcodetable\CatcodeTableExpl
-    \endgroup
-    \@makeother{0}% nul
-    \@makeother{13}% carriage return
-    \@makeother{37}% percent
-    \@makeother{92}% backslash
-    \@makeother{127}%
-    \luatexsetcatcoderange{65}{90}{12}% A-Z
-    \luatexsetcatcoderange{97}{122}{12}% a-z
-    \luatexsavecatcodetable\CatcodeTableString
-    \@makeother{32}% space
-    \luatexsavecatcodetable\CatcodeTableOther
-  \endgroup
-}
-\directlua{luatextra.catcodetable_do_shortcuts()}
+\def\setluatexcatcodetable#1#2{%
+  \begingroup
+  #2%
+  \luatexsavecatcodetable#1%
+  \endgroup}
 %    \end{macrocode}
 %
 %    \begin{macrocode}
+\newluatexcatcodetable\CatcodeTableIniTeX
+%    \end{macrocode}
+%
+%    \begin{macrocode}
+\newluatexcatcodetable\CatcodeTableString
+\setluatexcatcodetable\CatcodeTableString{%
+  \luatexcatcodetable\CatcodeTableIniTeX
+  \catcode0   12 % nul
+  \catcode13  12 % carriage return
+  \catcode37  12 % percent
+  \luatexsetcatcoderange{65}{90}{12}% A-Z
+  \luatexsetcatcoderange{97}{122}{12}% a-z
+  \catcode92  12 % backslash
+  \catcode127 12 }
+%    \end{macrocode}
+%
+%    \begin{macrocode}
+\newluatexcatcodetable\CatcodeTableOther
+\setluatexcatcodetable\CatcodeTableOther{%
+  \luatexcatcodetable\CatcodeTableString
+  \catcode32 12 }
+%    \end{macrocode}
+%
+%    \begin{macrocode}
+\newluatexcatcodetable\CatcodeTableLaTeX
+\setluatexcatcodetable\CatcodeTableLaTeX{%
+  \luatexcatcodetable\CatcodeTableIniTeX
+  \luatexsetcatcoderange{0}{31}{15}%
+  \catcode9   10 % tab
+  \catcode12  13 % form feed
+  \catcode13  5  % carriage return
+  \catcode35  6  % hash
+  \catcode36  3  % dollar
+  \catcode38  4  % ampersand
+  \catcode94  7  % circumflex
+  \catcode95  8  % underscore
+  \catcode123 1  % brace left
+  \catcode125 2  % brace right
+  \catcode126 13 % tilde
+  \catcode127 15 }
+%    \end{macrocode}
+%
+%    \begin{macrocode}
+\newluatexcatcodetable\CatcodeTableLaTeXAtLetter
+\setluatexcatcodetable\CatcodeTableLaTeXAtLetter{%
+  \luatexcatcodetable\CatcodeTableLaTeX
+  \catcode64=11 }
+%    \end{macrocode}
+%
+%    \begin{macrocode}
+\newluatexcatcodetable\CatcodeTableExpl
+\setluatexcatcodetable\CatcodeTableExpl{%
+  \luatexcatcodetable\CatcodeTableLaTeX
+  \catcode126 10 % tilde is a space char
+  \catcode32  9  % space is ignored
+  \catcode9   9  % tab also ignored
+  \catcode95  11 % underscore letter
+  \catcode58  11 % colon letter
+  }
+%    \end{macrocode}
+%
+%    \begin{macrocode}
+\directlua{luatextra.catcodetable_do_shortcuts()}
 %</texpackage>
 %    \end{macrocode}
 %
@@ -347,6 +352,7 @@ and the derived files
 %
 %    \begin{macrocode}
 %<*luamodule>
+module('luatextra', package.seeall)
 %    \end{macrocode}
 %
 %    In the same way, the table \texttt{tex.catcodetablenumber} contains the
@@ -354,49 +360,28 @@ and the derived files
 %    \texttt{\string\newluacatcodetable}.
 %
 %    \begin{macrocode}
-luatextra = luatextra or {}
 luatextra.catcodetables = {}
 tex.catcodetablenumber = luatextra.catcodetables
 function luatextra.catcodetabledef_from_tex(name, number)
-    truename = name:gsub('[\\ ]', '')
-    luatextra.catcodetables[truename] = tonumber(number)
+    luatextra.catcodetables[name] = tonumber(number)
 end
 %    \end{macrocode}
 %
-%    With this function we create some shortcuts for a
-%    better readability in lua code. This makes
-%    |tex.catcodetablenumber.latex| equivalent to 
+%    With this function we create some shortcuts for a better readability in
+%    lua code. This makes |tex.catcodetablenumber.latex| equivalent to
 %    |tex.catcodetablenumber['CatcodeTableLaTeX']|.
 %
 %    \begin{macrocode}
 function luatextra.catcodetable_do_shortcuts()
-    local cat = tex.catcodetablenumber
-    local val = cat['CatcodeTableLaTeX']
-    if val then
-      cat['latex'] = val
-    end
-    val = cat['CatcodeTableLaTeXAtLetter']
-    if val then
-      cat['latex-package'] = val
-      cat['latex-atletter'] = val
-    end
-    val = cat['CatcodeTableIniTeX']
-    if val then
-      cat['ini'] = val
-    end
-    val = cat['CatcodeTableExpl']
-    if val then
-      cat['expl3'] = val
-      cat['expl'] = val
-    end
-    val = cat['CatcodeTableString']
-    if val then
-      cat['string'] = val
-    end
-    val = cat['CatcodeTableOther']
-    if val then
-      cat['other'] = val
-    end
+    local cat = luatextra.catcodetables
+    cat['latex']                = cat.CatcodeTableLaTeX
+    cat['latex-package']        = cat.CatcodeTableLaTeXAtLetter
+    cat['latex-atletter']       = cat.CatcodeTableLaTeXAtLetter
+    cat['ini']                  = cat.CatcodeTableIniTeX
+    cat['expl3']                = cat.CatcodeTableExpl
+    cat['expl']                 = cat.CatcodeTableExpl
+    cat['string']               = cat.CatcodeTableString
+    cat['other']                = cat.CatcodeTableOther
 end
 %    \end{macrocode}
 %
