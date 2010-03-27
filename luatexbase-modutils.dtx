@@ -9,7 +9,7 @@
 % This work consists of the main source file luatexbase-modutils.dtx
 % and the derived files
 %    luatexbase-modutils.sty modutils.lua
-%    test-modutils-plain.tex test-modutils-latex.tex
+%    test-modutils-plain.tex test-modutils-latex.tex test-modutils.lua
 %
 % Unpacking:
 %    tex luatexbase-modutils.dtx
@@ -72,7 +72,9 @@ and the derived files
 
 \generate{%
   \usedir{tex/luatex/luatexbase}%
-  \file{modutils.lua}{\from{luatexbase-modutils.dtx}{luamodule}}%
+  \file{luatexbase.modutils.lua}{\from{luatexbase-modutils.dtx}{luamodule}}%
+  \usedir{doc/luatex/luatexbase}%
+  \file{test-modutils.lua}{\from{luatexbase-modutils.dtx}{testdummy}}%
 }
 
 \obeyspaces
@@ -204,7 +206,7 @@ and the derived files
 \catcode64 11
 %    \end{macrocode}
 %
-%    \subsubsection{Module handling}
+%    \subsubsection{Main code}
 %
 %    The \texttt{\string\luatexModuleError} macro is called by the lua function
 %    \texttt{luatextra.module\_error}. It is necessary because we can't call
@@ -228,10 +230,10 @@ See the module #1 documentation for explanation.^^J ...^^J}%
 %    \texttt{\string\luaRequireModule} with two mandatory arguments.
 %
 %    \begin{macrocode}
-\def\luatexUseModule#1{\luadirect{luatextra.use_module([[#1]])}}
+\def\luatexUseModule#1{\directlua{luatextra.use_module([[#1]])}}
 
 \expandafter\ifx\csname ProvidesPackage\endcsname\relax
-  \def\luatexRequireModule#1#2{\luadirect{%
+  \def\luatexRequireModule#1#2{\directlua{%
       luatextra.require_module([[#1]], [[#2]])}}
 \else
 %    \end{macrocode}
@@ -242,8 +244,12 @@ See the module #1 documentation for explanation.^^J ...^^J}%
 %    date).
 %
 %    \begin{macrocode}
-  \newcommand\luatexRequireModule[2][0]{\luadirect{luatextra.require_module([[#2]], [[#1]])}}
+  \newcommand\luatexRequireModule[2][0]{\directlua{luatextra.require_module([[#2]], [[#1]])}}
 \fi
+%    \end{macrocode}
+%
+%    \begin{macrocode}
+\directlua{dofile(assert(kpse.find_file('luatexbase.modutils.lua', 'tex')))}
 %    \end{macrocode}
 %
 %    \begin{macrocode}
@@ -518,6 +524,19 @@ end
 %
 %    \section{Test files}
 %
+%    A dummy lua file for tests.
+%
+%    \begin{macrocode}
+%<*testdummy>
+luatextra.provides_module {
+  name        = 'test-modutils',
+  date        = '2000/01/01',
+  version     = 1,
+  description = 'dummy test package',
+}
+%</testdummy>
+%    \end{macrocode}
+%
 %    We just check that the package loads properly, under both LaTeX and Plain
 %    TeX. Anyway, the test files of other modules using this one already are a
 %    test\dots
@@ -526,9 +545,10 @@ end
 %<testplain>\input luatexbase-modutils.sty
 %<testlatex>\RequirePackage{luatexbase-modutils}
 %<*testplain,testlatex>
-%    \end{macrocode}
-%
-%    \begin{macrocode}
+\luatexRequireModule
+%<testlatex>[1970/01/01]
+{test-modutils}
+%<testplain>{1970/01/01}
 %</testplain,testlatex>
 %<testplain>\bye
 %<testlatex>\stop
