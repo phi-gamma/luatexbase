@@ -8,7 +8,8 @@
 %
 % This work consists of the main source file luatexbase-modutils.dtx
 % and the derived files
-%    luatexbase-modutils.sty modutils.lua ...
+%    luatexbase-modutils.sty modutils.lua
+%    test-modutils-plain.tex test-modutils-latex.tex
 %
 % Unpacking:
 %    tex luatexbase-modutils.dtx
@@ -52,6 +53,12 @@ and the derived files
 \generate{%
   \usedir{tex/luatex/luatexbase}%
   \file{luatexbase-modutils.sty}{\from{luatexbase-modutils.dtx}{texpackage}}%
+}
+
+\generate{%
+  \usedir{doc/luatex/luatexbase}%
+  \file{test-modutils-plain.tex}{\from{luatexbase-modutils.dtx}{testplain}}%
+  \file{test-modutils-latex.tex}{\from{luatexbase-modutils.dtx}{testlatex}}%
 }
 
 \def\MetaPrefix{-- }
@@ -507,6 +514,24 @@ end
 %
 %    \begin{macrocode}
 %</luamodule>
+%    \end{macrocode}
+%
+%    \section{Test files}
+%
+%    We just check that the package loads properly, under both LaTeX and Plain
+%    TeX. Anyway, the test files of other modules using this one already are a
+%    test\dots
+%
+%    \begin{macrocode}
+%<testplain>\input luatexbase-modutils.sty
+%<testlatex>\RequirePackage{luatexbase-modutils}
+%<*testplain,testlatex>
+%    \end{macrocode}
+%
+%    \begin{macrocode}
+%</testplain,testlatex>
+%<testplain>\bye
+%<testlatex>\stop
 %    \end{macrocode}
 %
 % \Finale

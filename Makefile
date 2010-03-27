@@ -15,8 +15,10 @@ UNPACKED_CCTB = luatexbase-cctb.sty luatexbase.cctb.lua \
 				test-cctb-plain.tex test-cctb-latex.tex
 UNPACKED_LOADER = luatexbase-loader.sty luatexbase.loader.lua \
 				test-loader-plain.tex test-loader-latex.tex
+UNPACKED_MODUTILS = luatexbase-modutils.sty luatexbase.modutils.lua \
+				test-modutils-plain.tex test-modutils-latex.tex
 UNPACKED = $(UNPACKED_MCB) $(UNPACKED_REGS) $(UNPACKED_ATTR) $(UNPACKED_CCTB) \
-		   $(UNPACKED_LOADER)
+		   $(UNPACKED_LOADER) $(UNPACKED_MODUTILS)
 COMPILED = $(DOC)
 GENERATED = $(COMPILED) $(UNPACKED)
 SOURCE = $(DTX) $(DTXSTY) README TODO Changes Makefile
@@ -47,7 +49,7 @@ DO_MAKEINDEX = makeindex -s gind.ist $(subst .dtx,,$<) >/dev/null 2>&1
 
 # Main targets definition
 all: $(GENERATED)
-check: check-regs check-attr check-cctb check-load
+check: check-regs check-attr check-cctb check-load check-modutils
 doc: $(COMPILED)
 unpack: $(UNPACKED)
 ctan: check $(CTAN_ZIP)
@@ -75,6 +77,9 @@ $(UNPACKED_CCTB): luatexbase-cctb.dtx
 $(UNPACKED_LOADER): luatexbase-loader.dtx
 	$(DO_TEX)
 
+$(UNPACKED_MODUTILS): luatexbase-modutils.dtx
+	$(DO_TEX)
+
 check-regs: $(UNPACKED_REGS)
 	luatex --interaction=batchmode test-regs-plain.tex >/dev/null
 	lualatex --interaction=batchmode test-regs-latex.tex >/dev/null
@@ -90,6 +95,10 @@ check-cctb: $(UNPACKED_CCTB)
 check-loader: $(UNPACKED_LOADER)
 	luatex --interaction=batchmode test-loader-plain.tex >/dev/null
 	lualatex --interaction=batchmode test-loader-latex.tex >/dev/null
+
+check-modutils: $(UNPACKED_MODUTILS)
+	luatex --interaction=batchmode test-modutils-plain.tex >/dev/null
+	lualatex --interaction=batchmode test-modutils-latex.tex >/dev/null
 
 $(CTAN_ZIP): $(SOURCE) $(COMPILED) $(TDS_ZIP)
 	@echo "Making $@ for CTAN upload."
