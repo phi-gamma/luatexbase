@@ -204,7 +204,7 @@ and the derived files
   local file = "luatexbase.loader.lua"
   local path = assert(kpse.find_file(file, 'tex'),
     "File '"..file.."' no found")
-  tex.write_nl("("..path..")")
+  texio.write_nl("("..path..")")
   dofile(path)}
 %    \end{macrocode}
 %
