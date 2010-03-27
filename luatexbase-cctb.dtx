@@ -123,15 +123,69 @@ and the derived files
 % \title{The \pk{luatexbase-cctb} package}
 % \date{v0.1 2010-03-26}
 % \author{%
-%  Manuel P\'egouri\'e-Gonnard \\ \texttt{mpg@elzevir.fr} \and
+%   Manuel P\'egouri\'e-Gonnard \\ \texttt{mpg@elzevir.fr} \and
 %   \'Elie Roux \\ \texttt{elie.roux@telecom-bretagne.eu}}
 %
 % \maketitle
 %
 % \begin{abstract}
+% In addition to the registers existing in \tex and \etex, \luatex introduces
+% a new concept: catcode tables. This package takes care of catcode table
+% allocation just like Plain TeX and LaTeX do for other registers.
 % \end{abstract}
 %
 % \section{Documentation}
+%
+% The main macro defined here is |\newluatexcatcodetable|. It behaves the same
+% as |\newbox|. Additonally, the newly allocated catcode table is initialised
+% to the catcodes of Ini\tex.  In order to help you define the catcode tables
+% (once they are allocated), two helper macros are available.
+%
+% \begin{quote}
+% \cs{luatexsetcatcoderange}\marg{from}\marg{to}\marg{value}
+% \end{quote}
+% Set all characters code in the range \meta{from}--\meta{to} to the given
+% catcode \meta{value}.
+%
+% \begin{quote}
+% \cs{setluatexcatcodetable}\marg{table}\marg{catcode statements}
+% \end{quote}
+% Set a previously allocated \meta{table} to the catcodes given by executing
+% \meta{catcode statements}. Note that \meta{table} must not be the current
+% active catcode table. You may, however, load another catcode table in your
+% \meta{catcode statements}.
+%
+% For your convenience, a few catcode tables are prefined:
+% \begin{itemize}
+% \item |\CatcodeTableIniTeX|: Ini\tex catcodes.
+% \item |\CatcodeTableString|: the catcode regime used by |\string| and
+% |\meaning|: everything has catcode 12, except space (U+0020) that has
+% catcode 10.
+% \item |\CatcodeTableOther|: everything (included space) has catcode 12.
+% \item |\CatcodeTableLaTeX|: basic \LaTeXe\ catcodes.
+% \item |\CatcodeTableLaTeXAtLetter|: same as above, but |@| is a letter.
+% \item |\CatcodeTableExpl|: catcodes used by \latex{}3 with |\ExplSyntaxOn|.
+% Be aware that this does not provide the exact same environment as
+% |\ExplSyntaxOn|: most noticibly, some booleans are not set, and
+% |\endlinechar| is not adjusted (it should be 32).
+% \end{itemize}
+%
+% Various Lua function accept a catcode table number as argument. In order to
+% use them, the package writer needs to know the number of an allocated
+% catcode table. Since |\chardef| is used for the definition of the control
+% sequence, this is rather easy to do. However, for extra ease of use, the
+% numbers are also directly accessible from Lua as the value of the table
+% |luatextra.catcodetables|, whose keys is the name of the control sequence
+% (without any leading backslash). Moreover, nickames are available for the
+% predefined catcode tables:
+% \begin{itemize}
+% \item |CatcodeTableIniTeX| = |ini|,
+% \item |CatcodeTableString| = |string|,
+% \item |CatcodeTableOther| = |other|,
+% \item |CatcodeTableLaTeX| = |latex|,
+% \item |CatcodeTableLaTeXAtLetter| = |latex-atletter| = |latex-package|,
+% \item |CatcodeTableExpl| = |expl| = |expl3|,
+% \end{itemize}
 %
 %    \section{Implementation}
 %
@@ -235,10 +289,7 @@ and the derived files
 \fi
 %    \end{macrocode}
 %
-%    A macro that sets the catcode of a range of characters. The first
-%    parameter is the character number of the first character of the range,
-%    the second parameter is one for the last character, and the third
-%    parameter is the catcode we want them to have.
+%    Set the catcodes for a range of characters.
 %
 %    \begin{macrocode}
 \def\luatexsetcatcoderange#1#2#3{%
@@ -246,32 +297,18 @@ and the derived files
     \noexpand\@tempcnta=\the\@tempcnta
     \noexpand\@tempcntb=\the\@tempcntb
     \noexpand\count@=\the\count@
-    \relax
-  }%
+    \relax}%
   \@tempcnta=#1\relax
   \@tempcntb=#2\relax
   \count@=#3\relax
   \loop\unless\ifnum\@tempcnta>\@tempcntb
     \catcode\@tempcnta=\count@
-    \advance\@tempcnta by 1\relax
+    \advance\@tempcnta\@ne
   \repeat
   \luaSCR@temp}
 %    \end{macrocode}
 %
-%    Finally we create several catcodetables that may be used by the user.
-%    These are:
-%
-%    \begin{itemize}
-%    \item \texttt{\string\CatcodeTableIniTeX}: the base \TeX\ catcodes
-%    \item \texttt{\string\CatcodeTableString}: almost all characters have
-%    catcode 12
-%    \item \texttt{\string\CatcodeTableOther}: all characters have catcode 12
-%    (even space)
-%    \item \texttt{\string\CatcodeTableLaTeX}: the \LaTeX\ classical catcodes
-%    \item \texttt{\string\CatcodeTableLaTeXAtLetter}: the \LaTeX\ classical
-%    catcodes and |@| letter
-%    \item \texttt{\string\CatcodeTableExpl}: the expl3 catcodes
-%    \end{itemize}
+%    Set a catcode table.
 %
 %    \begin{macrocode}
 \def\setluatexcatcodetable#1#2{%
@@ -281,9 +318,13 @@ and the derived files
   \endgroup}
 %    \end{macrocode}
 %
+%    The |IniTeX| catcode table needs no extra initialisation.
+%
 %    \begin{macrocode}
 \newluatexcatcodetable\CatcodeTableIniTeX
 %    \end{macrocode}
+%
+%    The |String| and |Other| catcode tables.
 %
 %    \begin{macrocode}
 \newluatexcatcodetable\CatcodeTableString
@@ -304,6 +345,8 @@ and the derived files
   \luatexcatcodetable\CatcodeTableString
   \catcode32 12 }
 %    \end{macrocode}
+%
+%    Tables for \LaTeXe.
 %
 %    \begin{macrocode}
 \newluatexcatcodetable\CatcodeTableLaTeX
@@ -331,6 +374,8 @@ and the derived files
   \catcode64=11 }
 %    \end{macrocode}
 %
+%    A table for \pk{expl3}.
+%
 %    \begin{macrocode}
 \newluatexcatcodetable\CatcodeTableExpl
 \setluatexcatcodetable\CatcodeTableExpl{%
@@ -342,6 +387,8 @@ and the derived files
   \catcode58  11 % colon letter
   }
 %    \end{macrocode}
+%
+%    Finally do the shortcuts.
 %
 %    \begin{macrocode}
 \directlua{luatextra.catcodetable_do_shortcuts()}
@@ -360,10 +407,10 @@ module('luatextra', package.seeall)
 %    \texttt{\string\newluacatcodetable}.
 %
 %    \begin{macrocode}
-luatextra.catcodetables = {}
-tex.catcodetablenumber = luatextra.catcodetables
-function luatextra.catcodetabledef_from_tex(name, number)
-    luatextra.catcodetables[name] = tonumber(number)
+catcodetables = {}
+tex.catcodetablenumber = catcodetables
+function catcodetabledef_from_tex(name, number)
+    catcodetables[name] = tonumber(number)
 end
 %    \end{macrocode}
 %
@@ -372,7 +419,7 @@ end
 %    |tex.catcodetablenumber['CatcodeTableLaTeX']|.
 %
 %    \begin{macrocode}
-function luatextra.catcodetable_do_shortcuts()
+function catcodetable_do_shortcuts()
     local cat = luatextra.catcodetables
     cat['latex']                = cat.CatcodeTableLaTeX
     cat['latex-package']        = cat.CatcodeTableLaTeXAtLetter

@@ -1,7 +1,7 @@
                     Changes in the luatexbase package/bundle
 
 2010/03/26
-    luatexbase-cctb
+    luatexbase-cctb 0.1
         - add minimal test files for luatex and lualatex
         - fix allocation range (1->65535)
         - make sure newly allocated tables are initialised

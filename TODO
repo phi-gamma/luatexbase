@@ -30,3 +30,9 @@ attr
 ---
 
 - don't write in the tex table!
+
+cctb
+----
+
+- don't write in the tex table!
+- don't define macros starting with \luatex
