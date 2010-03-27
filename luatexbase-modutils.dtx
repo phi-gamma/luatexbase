@@ -206,6 +206,17 @@ and the derived files
 \catcode64 11
 %    \end{macrocode}
 %
+%    Load the package loader.
+%
+%    \begin{macrocode}
+\begingroup\expandafter\expandafter\expandafter\endgroup
+\expandafter\ifx\csname RequirePackage\endcsname\relax
+  \input luatexbase-loader.sty
+\else
+  \RequirePackage{luatexbase-loader}
+\fi
+%    \end{macrocode}
+%
 %    \subsubsection{Main code}
 %
 %    The \texttt{\string\luatexModuleError} macro is called by the lua function
@@ -346,24 +357,6 @@ end
 %
 %    \subsubsection{module loading and providing functions}
 %
-%    A small function to find a lua module file according to its name, with or
-%    without the \texttt{.lua} at the end of the filename.
-%
-%    \begin{macrocode}
-
-function luatextra.find_module_file(name)
-    if string.sub(name, -4) ~= '.lua' then
-        name = name..'.lua'
-    end
-    path = kpse.find_file(name, 'tex')
-    if not path then
-      path = kpse.find_file(name, 'texmfscripts')
-    end
-    return path, name
-end
-
-%    \end{macrocode}
-%
 %    A small patch, for the \texttt{module} function to work in this file. I
 %    can't understand why it doens't otherwise.
 %
@@ -381,31 +374,18 @@ luatextra.module = module
 %    \texttt{luatextra.provides\_module}.
 %
 %    \begin{macrocode}
-
-
 function luatextra.use_module(name)
     if not name or luatextra.modules[name] then
         return
     end
-    local path, filename = luatextra.find_module_file(name)
-    if not path then
-        luatextra.internal_error(format("unable to find lua module %s", name))
-    else
-        if path:sub(1,2) == "./" then
-            path = path:sub(3)
-        end
-        texio.write_nl('('..path)
-        dofile(path)
-        if not luatextra.modules[name] then
-            luatextra.internal_warning(format("You have requested module `%s',\n%s but the file %s does not provide it.", name, luatextra.internal_warning_spaces, filename))
-        end
-        if not package.loaded[name] then
-            luatextra.module(name, package.seeall)
-        end
-        texio.write(')')
+    require(name)
+    if not luatextra.modules[name] then
+        luatextra.internal_warning(format("You have requested module `%s',\n%s but the file %s does not provide it.", name, luatextra.internal_warning_spaces, filename))
+    end
+    if not package.loaded[name] then
+        luatextra.module(name, package.seeall)
     end
 end
-
 %    \end{macrocode}
 %
 %    \end{macro}

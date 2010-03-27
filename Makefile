@@ -98,7 +98,7 @@ check-loader: $(UNPACKED_LOADER)
 	luatex --interaction=batchmode test-loader-plain.tex >/dev/null
 	lualatex --interaction=batchmode test-loader-latex.tex >/dev/null
 
-check-modutils: $(UNPACKED_MODUTILS)
+check-modutils: $(UNPACKED_MODUTILS) $(LOADER_RUN)
 	luatex --interaction=batchmode test-modutils-plain.tex >/dev/null
 	lualatex --interaction=batchmode test-modutils-latex.tex >/dev/null
 
