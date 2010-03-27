@@ -11,7 +11,9 @@ UNPACKED_REGS = luatexbase-regs.sty \
 				test-regs-plain.tex test-regs-latex.tex
 UNPACKED_ATTR = luatexbase-attr.sty luatexbase.attr.lua \
 				test-attr-plain.tex test-attr-latex.tex
-UNPACKED = $(UNPACKED_MCB) $(UNPACKED_REGS) $(UNPACKED_ATTR)
+UNPACKED_CCTB = luatexbase-cctb.sty luatexbase.cctb.lua \
+				test-cctb-plain.tex test-cctb-latex.tex
+UNPACKED = $(UNPACKED_MCB) $(UNPACKED_REGS) $(UNPACKED_ATTR) $(UNPACKED_CCTB)
 COMPILED = $(DOC)
 GENERATED = $(COMPILED) $(UNPACKED)
 SOURCE = $(DTX) $(DTXSTY) README TODO Changes Makefile
@@ -42,7 +44,7 @@ DO_MAKEINDEX = makeindex -s gind.ist $(subst .dtx,,$<) >/dev/null 2>&1
 
 # Main targets definition
 all: $(GENERATED)
-check: check-regs check-attr
+check: check-regs check-attr check-cctb
 doc: $(COMPILED)
 unpack: $(UNPACKED)
 ctan: check $(CTAN_ZIP)
@@ -64,6 +66,9 @@ $(UNPACKED_REGS): luatexbase-regs.dtx
 $(UNPACKED_ATTR): luatexbase-attr.dtx
 	$(DO_TEX)
 
+$(UNPACKED_CCTB): luatexbase-cctb.dtx
+	$(DO_TEX)
+
 check-regs: $(UNPACKED_REGS)
 	luatex --interaction=batchmode test-regs-plain.tex >/dev/null
 	lualatex --interaction=batchmode test-regs-latex.tex >/dev/null
@@ -71,6 +76,10 @@ check-regs: $(UNPACKED_REGS)
 check-attr: $(UNPACKED_ATTR)
 	luatex --interaction=batchmode test-attr-plain.tex >/dev/null
 	lualatex --interaction=batchmode test-attr-latex.tex >/dev/null
+
+check-cctb: $(UNPACKED_CCTB)
+	luatex --interaction=batchmode test-cctb-plain.tex >/dev/null
+	lualatex --interaction=batchmode test-cctb-latex.tex >/dev/null
 
 $(CTAN_ZIP): $(SOURCE) $(COMPILED) $(TDS_ZIP)
 	@echo "Making $@ for CTAN upload."

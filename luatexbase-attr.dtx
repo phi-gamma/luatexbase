@@ -122,7 +122,7 @@ and the derived files
 % \title{The \pk{luatexbase-attr} package}
 % \date{v0.1 2010-03-11}
 % \author{%
-%  Manuel P\'egouri\'e-Gonnard \\ \email{mpg@elzevir.fr} \and
+%   Manuel P\'egouri\'e-Gonnard \\ \email{mpg@elzevir.fr} \and
 %   \'Elie Roux \\ \email{elie.roux@telecom-bretagne.eu}}
 %
 % \maketitle
@@ -242,9 +242,7 @@ and the derived files
   \ifnum\lltxb@attribute@alloc<65535\relax
     \global\advance\lltxb@attribute@alloc\@ne
     \allocationnumber\lltxb@attribute@alloc
-    \ifluatex
-      \global\luatexattributedef#1=\allocationnumber
-    \fi
+    \global\luatexattributedef#1=\allocationnumber
     \unsetluatexattribute#1%
     \begingroup\escapechar\m@ne \expandafter\endgroup
     \directlua{luatexbase.attributedef_from_tex(
@@ -305,7 +303,7 @@ end
 %    The tests done are very basic: we just make sure that the package loads
 %    correctly and the macros don't generate any error, under both LaTeX en
 %    Plain TeX. We also check that the attribute's number is remembered well,
-%    independantly of the current value of |\escapechar|.
+%    independently of the current value of |\escapechar|.
 %
 %    \begin{macrocode}
 %<testplain>\input luatexbase-attr.sty

@@ -11,8 +11,23 @@ general
 - date & changes entry
 
 - redo module loading in packages once mods is done.
+- adjust preamble to avoid duplicated list of files (refer to DTX instead)
 
 Later
 =====
 
 - change lua module name(s) (luatexbase or luatexbase.regs etc)
+
+regs
+----
+
+- Should the various allocation macros set something in a Lua table, or should
+  we just wait for it to be implemented in LuaTeX? (The \*blk macros would be
+rather tricky in this respect, but are they really used?) Well, is there any
+actual need for this?
+
+cctb
+----
+
+- don't write in the tex table!
+- don't define macros starting with \luatex
