@@ -1,8 +1,5 @@
 % \iffalse meta-comment
 %
-% Template : look for DATE DESC VERSION !!!
-% and 'derived files' !!!
-%
 % Written in 2009, 2010 by Manuel Pégourié-Gonnard and Élie Roux.
 %     <mpg@elzevir.fr>
 %     <elie.roux@telecom-bretagne.eu>
@@ -11,17 +8,13 @@
 %
 % This work consists of the main source file luatexbase-loader.dtx
 % and the derived files
-%    luatexbase-loader.sty loader.lua ...
+%    luatexbase-loader.sty luatexbase.loader.lua
+%    test-loader-plain.tex test-loader-latex.tex
 %
 % Unpacking:
 %    tex luatexbase-loader.dtx
 % Documentation:
 %    pdflatex luatexbase-loader.dtx
-%
-%    The class ltxdoc loads the configuration file ltxdoc.cfg
-%    if available. Here you can specify further options, e.g.
-%    use A4 as paper format:
-%       \PassOptionsToClass{a4paper}{article}
 %
 %<*ignore>
 \begingroup
@@ -51,7 +44,8 @@ This work is under the CC0 license.
 
 This work consists of the main source file luatexbase-loader.dtx
 and the derived files
-   luatexbase-loader.sty loader.lua ...
+   luatexbase-loader.sty luatexbase.loader.lua
+   test-loader-plain.tex test-loader-latex.tex
 
 \endpreamble
 
@@ -60,6 +54,12 @@ and the derived files
 \generate{%
   \usedir{tex/luatex/luatexbase}%
   \file{luatexbase-loader.sty}{\from{luatexbase-loader.dtx}{texpackage}}%
+}
+
+\generate{%
+  \usedir{doc/luatex/luatexbase}%
+  \file{test-loader-plain.tex}{\from{luatexbase-loader.dtx}{testplain}}%
+  \file{test-loader-latex.tex}{\from{luatexbase-loader.dtx}{testlatex}}%
 }
 
 \def\MetaPrefix{-- }
@@ -73,7 +73,7 @@ and the derived files
 
 \generate{%
   \usedir{tex/luatex/luatexbase}%
-  \file{loader.lua}{\from{luatexbase-loader.dtx}{luamodule}}%
+  \file{luatexbase.loader.lua}{\from{luatexbase-loader.dtx}{luamodule}}%
 }
 
 \obeyspaces
@@ -94,12 +94,8 @@ and the derived files
 \fi
 %</ignore>
 %<*driver>
-\NeedsTeXFormat{LaTeX2e}
-\ProvidesFile{luatexbase-loader.drv}
-  [DATE DESC]
 \documentclass{ltxdoc}
-\EnableCrossrefs
-\CodelineIndex
+\input{lltxb-dtxstyle}
 \begin{document}
   \DocInput{luatexbase-loader.dtx}%
 \end{document}
@@ -124,10 +120,8 @@ and the derived files
 %   Grave accent  \`     Left brace    \{     Vertical bar  \|
 %   Right brace   \}     Tilde         \~}
 %
-% \GetFileInfo{luatexbase-loader.drv}
-%
 % \title{The \textsf{luatexbase-loader} package}
-% \date{DATE}
+% \date{v0.1 2010-03-27}
 % \author{%
 %  Manuel P\'egouri\'e-Gonnard \\ \texttt{mpg@elzevir.fr} \and
 %   \'Elie Roux \\ \texttt{elie.roux@telecom-bretagne.eu}}
@@ -141,11 +135,69 @@ and the derived files
 %
 %    \section{Implementation}
 %
-%    \subsection{\TeX\ package}
+%    \subsection{\tex package}
 %
 %    \begin{macrocode}
 %<*texpackage>
 %    \end{macrocode}
+%
+%    \subsubsection{Preliminaries}
+%
+%    Reload protection, especially for \plaintex.
+%
+%    \begin{macrocode}
+                \csname lltxb@loader@loaded\endcsname
+\expandafter\let\csname lltxb@loader@loaded\endcsname\endinput
+%    \end{macrocode}
+%
+%    Package declaration.
+%
+%    \begin{macrocode}
+\begingroup
+  \expandafter\ifx\csname ProvidesPackage\endcsname\relax
+    \def\x#1[#2]{\immediate\write16{Package: #1 #2}}
+  \else
+    \let\x\ProvidesPackage
+  \fi
+\expandafter\endgroup
+\x{luatexbase-loader}[2010/03/26 v0.1  Lua module loader for LuaTeX  (mpg)]
+%    \end{macrocode}
+%
+%    Make sure \luatex is used.
+%
+%    \begin{macrocode}
+\begingroup\expandafter\expandafter\expandafter\endgroup
+\expandafter\ifx\csname RequirePackage\endcsname\relax
+  \input ifluatex.sty
+\else
+  \RequirePackage{ifluatex}
+\fi
+\ifluatex\else
+  \begingroup
+    \expandafter\ifx\csname PackageWarningNoLine\endcsname\relax
+      \def\x#1#2{\begingroup\newlinechar10
+        \immediate\write16{Package #1 warning: #2}\endgroup}
+    \else
+      \let\x\PackageWarningNoLine
+    \fi
+  \expandafter\endgroup
+  \x{luatexbase-loader}{LuaTeX is required for this package.^^J
+    Aborting package loading.}
+  \expandafter\endinput
+\fi
+%    \end{macrocode}
+%
+%    Make sure the catcode of @ is correct, especially for \plaintex.
+%
+%    \begin{macrocode}
+\expandafter\edef\csname lltxb@loader@AtEnd\endcsname{%
+  \catcode64 \the\catcode64\relax}
+\catcode64 11
+%    \end{macrocode}
+%
+%    \subsubsection{Main content}
+%
+%    Load the supporting Lua module.
 %
 %    \begin{macrocode}
 \directlua{%
@@ -156,7 +208,10 @@ and the derived files
   dofile(path)}
 %    \end{macrocode}
 %
+%    That's all, folks!
+%
 %    \begin{macrocode}
+\lltxb@loader@AtEnd
 %</texpackage>
 %    \end{macrocode}
 %
