@@ -86,11 +86,11 @@ check-regs: $(UNPACKED_REGS)
 	luatex --interaction=batchmode test-regs-plain.tex >/dev/null
 	lualatex --interaction=batchmode test-regs-latex.tex >/dev/null
 
-check-attr: $(UNPACKED_ATTR)
+check-attr: $(UNPACKED_ATTR) $(LOADER_RUN)
 	luatex --interaction=batchmode test-attr-plain.tex >/dev/null
 	lualatex --interaction=batchmode test-attr-latex.tex >/dev/null
 
-check-cctb: $(UNPACKED_CCTB)
+check-cctb: $(UNPACKED_CCTB) $(LOADER_RUN)
 	luatex --interaction=batchmode test-cctb-plain.tex >/dev/null
 	lualatex --interaction=batchmode test-cctb-latex.tex >/dev/null
 

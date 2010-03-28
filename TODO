@@ -1,8 +1,6 @@
 general
 -------
 
-- redo module loading in packages once mods is done.
-- adjust preamble to avoid duplicated list of files (refer to DTX instead)
 - add catcode defenses
 - adjust original luatextra package
 
@@ -37,6 +35,7 @@ loader
 ------
 
 - a.b.c -> a/b/c or a/b.c or a.b.c? What do to with files under texmf/scripts?
+- adujst names of the modules afterwards
 - write doc
 
 modutils

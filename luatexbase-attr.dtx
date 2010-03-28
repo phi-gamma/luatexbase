@@ -34,17 +34,11 @@
 \let\MetaPrefix\relax
 
 \preamble
-This is a generated file.
 
-Written in 2009, 2010 by Manuel Pégourié-Gonnard and Élie Roux.
-    <mpg@elzevir.fr>
-    <elie.roux@telecom-bretagne.eu>
+Written in 2009, 2010 by Manuel Pegourie-Gonnard and Elie Roux.
 
 This work is under the CC0 license.
-
-This work consists of the main source file luatexbase-attr.dtx
-and the derived files
-   luatexbase-attr.sty luatexbase.attr.lua ...
+See source file '\inFileName' for details.
 
 \endpreamble
 
@@ -81,7 +75,7 @@ and the derived files
 \Msg{* To finish the installation you have to move the following}
 \Msg{* files into a directory searched by TeX:}
 \Msg{*}
-\Msg{*     luatexbase-attr.sty luatexbase.attr.lua ...}
+\Msg{*     luatexbase-attr.sty luatexbase.attr.lua}
 \Msg{*}
 \Msg{* Happy TeXing!}
 \Msg{*}
@@ -230,7 +224,13 @@ and the derived files
 %    Load the supporting Lua module.
 %
 %    \begin{macrocode}
-\directlua{dofile(kpse.find_file('luatexbase.attr.lua', 'lua'))}
+\begingroup\expandafter\expandafter\expandafter\endgroup
+\expandafter\ifx\csname RequirePackage\endcsname\relax
+  \input luatexbase-loader.sty
+\else
+  \RequirePackage{luatexbase-loader}
+\fi
+\directlua{require('luatexbase.attr.lua')}
 %    \end{macrocode}
 %
 %    The allocaton macro.
