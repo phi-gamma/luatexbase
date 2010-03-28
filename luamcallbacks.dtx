@@ -44,7 +44,8 @@ See source file '\inFileName' for details.
 
 \generate{%
   \usedir{doc/luatex/luatexbase}%
-  \file{test-luamcallbacks.tex}{\from{luamcallbacks.dtx}{test}}%
+  \file{test-callbacks-plain.tex}{\from{luamcallbacks.dtx}{testplain}}%
+  \file{test-callbacks-latex.tex}{\from{luamcallbacks.dtx}{testlatex}}%
 }
 
 \def\MetaPrefix{-- }
@@ -773,67 +774,41 @@ end
 %</lua>
 % \fi
 %
-% \iffalse
-%<*test>
-% \fi
+%    \section{Test files}
 %
-% \section{Test file}
-%
-%    The test file is made to run in plainTeX, but is trivial to adapt for
-%    LaTeX.  First we input the package, and we typeset a small sentence to
-%    get a non-empty document.
+%    A few basic tests for Plain and LaTeX.
 %
 %    \begin{macrocode}
-\input luatexbase-loader.sty
-\input luatexbase-modutils.sty
-\directlua{require "luamcallbacks"}
-This is just a test file.
-%    \end{macrocode}
-%
-%    Then we declare three functions that we will use.
-%
-%    \begin{macrocode}
+%<testplain>\input luatexbase-modutils.sty
+%<testlatex>\RequirePackage{luatexbase-modutils}
+%<*testplain,testlatex>
 \directlua{
-local function one(head,...)
-    texio.write_nl("I'm number 1")
-    return head, true
-end
+  require "luamcallbacks"
+  local function one(head,...)
+      texio.write_nl("I'm number 1")
+      return head, true
+  end
 
-local function two(head,...)
-    texio.write_nl("I'm number 2")
-    return head, true
-end
+  local function two(head,...)
+      texio.write_nl("I'm number 2")
+      return head, true
+  end
 
-local function three(head,...)
-    texio.write_nl("I'm number 3")
-    return head, true
-end
-%    \end{macrocode}
-%
-%    Then we add the three functions to the hpack\_filter callback
-%
-%    \begin{macrocode}
-callback.add("hpack_filter",one,"my example function one",1)
-callback.add("hpack_filter",two,"my example function two",2)
-callback.add("hpack_filter",three,"my example function three",1)
-%    \end{macrocode}
-%
-%    We remove the function three from the callback.
-%
-%    \begin{macrocode}
-callback.remove("hpack_filter","my example function three")
-%    \end{macrocode}
-%
-%    And we remove a non-declared function to the callback, which will
-%    generate an error.
-%
-%    \begin{macrocode}
+  local function three(head,...)
+      texio.write_nl("I'm number 3")
+      return head, true
+  end
+
+  callback.add("hpack_filter",one,"my example function one",1)
+  callback.add("hpack_filter",two,"my example function two",2)
+  callback.add("hpack_filter",three,"my example function three",1)
+
+  callback.remove("hpack_filter","my example function three")
 }
-
-\bye
+%</testplain,testlatex>
+%<testplain>\bye
+%<testlatex>\stop
 %    \end{macrocode}
-% \iffalse
-%</test>
-% \fi
+%
 % \Finale
 \endinput

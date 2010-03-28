@@ -8,7 +8,8 @@ LOADER_RUN = luatexbase-loader.sty luatexbase.loader.lua
 MOD_RUN = luatexbase-modutils.sty luatexbase.modutils.lua
 
 # Files grouped by generation mode
-UNPACKED_MCB = test-luamcallbacks.tex luamcallbacks.lua
+UNPACKED_MCB = luamcallbacks.lua \
+			   test-callbacks-latex.tex test-callbacks-plain.tex
 UNPACKED_REGS = luatexbase-regs.sty \
 				test-regs-plain.tex test-regs-latex.tex
 UNPACKED_ATTR = luatexbase-attr.sty luatexbase.attr.lua \
@@ -103,7 +104,8 @@ check-modutils: $(UNPACKED_MODUTILS) $(LOADER_RUN)
 	lualatex --interaction=batchmode test-modutils-latex.tex >/dev/null
 
 check-mcb: $(UNPACKED_MCB) $(LOADER_RUN) $(MOD_RUN)
-	luatex --interaction=batchmode test-luamcallbacks.tex >/dev/null
+	luatex --interaction=batchmode test-callbacks-plain.tex >/dev/null
+	lualatex --interaction=batchmode test-callbacks-latex.tex >/dev/null
 
 $(CTAN_ZIP): $(SOURCE) $(COMPILED) $(TDS_ZIP)
 	@echo "Making $@ for CTAN upload."
