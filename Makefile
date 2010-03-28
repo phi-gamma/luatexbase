@@ -5,7 +5,7 @@ DTX = $(wildcard *.dtx)
 DOC = $(patsubst %.dtx, %.pdf, $(DTX))
 DTXSTY = lltxb-dtxstyle.tex
 LOADER_RUN = luatexbase-loader.sty luatexbase.loader.lua
-MOD_RUN = luatexbase-modutils.sty modutils.lua
+MOD_RUN = luatexbase-modutils.sty luatexbase.modutils.lua
 
 # Files grouped by generation mode
 UNPACKED_MCB = luamcallbacks.lua \
@@ -64,6 +64,9 @@ world: all ctan
 	$(DO_MAKEINDEX) || true
 	$(DO_PDFLATEX)
 	$(DO_PDFLATEX)
+
+luatexbase.%.lua: %.lua
+	ln -s $< $@
 
 $(UNPACKED_MCB): luamcallbacks.dtx
 	$(DO_TEX)

@@ -2,7 +2,6 @@ general
 -------
 
 - check for user macros starting with \luatex
-- problems for testing since the loader changed. review Makefile
 
 compat
 ------
