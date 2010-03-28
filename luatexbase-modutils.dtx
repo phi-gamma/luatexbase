@@ -283,7 +283,7 @@ See the module #1 documentation for explanation.^^J ...^^J}%
 %    \end{macrocode}
 %
 %    \begin{macrocode}
-\directlua{dofile(assert(kpse.find_file('modutils.lua', 'tex')))}
+\directlua{require('luatexbase.modutils')}
 %    \end{macrocode}
 %
 %    \begin{macrocode}
