@@ -135,8 +135,8 @@ See source file '\inFileName' for details.
 % \texttt{\string\luatexUseModule} and \texttt{\string\luatexRequireModule}
 % that act like them, but for lua files. The functions \texttt{module} and
 % \texttt{require} should not be used, in profit of the lua functions
-% \texttt{luatextra.provides\_module} and \texttt{luatextra.use\_module} or
-% \texttt{luatextra.require\_module}.
+% \texttt{luatexbase.provides\_module} and \texttt{luatexbase.use\_module} or
+% \texttt{luatexbase.require\_module}.
 %
 %    \section{Implementation}
 %
@@ -243,7 +243,7 @@ See source file '\inFileName' for details.
 %    \subsubsection{Main code}
 %
 %    The \texttt{\string\luatexModuleError} macro is called by the lua function
-%    \texttt{luatextra.module\_error}. It is necessary because we can't call
+%    \texttt{luatexbase.module\_error}. It is necessary because we can't call
 %    directly \texttt{\string\errmessage} in lua.
 %
 %    \begin{macrocode}
@@ -259,16 +259,16 @@ See the module #1 documentation for explanation.^^J ...^^J}%
 %
 %    Then we define
 %    \texttt{\string\luatexUseModule} that simply calls
-%    \texttt{luatextra.use\_module}.
+%    \texttt{luatexbase.use\_module}.
 %    If the package is loaded with Plain, we define
 %    \texttt{\string\luaRequireModule} with two mandatory arguments.
 %
 %    \begin{macrocode}
-\def\luatexUseModule#1{\directlua{luatextra.use_module([[#1]])}}
+\def\luatexUseModule#1{\directlua{luatexbase.use_module([[#1]])}}
 
 \expandafter\ifx\csname ProvidesPackage\endcsname\relax
   \def\luatexRequireModule#1#2{\directlua{%
-      luatextra.require_module([[#1]], [[#2]])}}
+      luatexbase.require_module([[#1]], [[#2]])}}
 \else
 %    \end{macrocode}
 %
@@ -278,7 +278,7 @@ See the module #1 documentation for explanation.^^J ...^^J}%
 %    date).
 %
 %    \begin{macrocode}
-  \newcommand\luatexRequireModule[2][0]{\directlua{luatextra.require_module([[#2]], [[#1]])}}
+  \newcommand\luatexRequireModule[2][0]{\directlua{luatexbase.require_module([[#2]], [[#1]])}}
 \fi
 %    \end{macrocode}
 %
@@ -300,28 +300,37 @@ See the module #1 documentation for explanation.^^J ...^^J}%
 %    Initialisation borrowed from luatextra
 %
 %    \begin{macrocode}
-module("luatextra", package.seeall)
+module("luatexbase", package.seeall)
 
 local format = string.format
 
-luatextra.modules = luatextra.modules or {}
+luatexbase.modules = luatexbase.modules or {}
 %    \end{macrocode}
 %
-%    Here we define the warning and error functions specific to
-%    \texttt{luatextra}.
+%    A small patch, for the \texttt{module} function to work in this file. I
+%    can't understand why it doens't otherwise.
 %
 %    \begin{macrocode}
 
-luatextra.internal_warning_spaces = "                   "
+luatexbase.module = module
 
-function luatextra.internal_warning(msg)
+%    \end{macrocode}
+%
+%    Here we define the warning and error functions specific to
+%    \texttt{luatexbase}.
+%
+%    \begin{macrocode}
+
+internal_warning_spaces = "                   "
+
+function internal_warning(msg)
     if not msg then return end
     texio.write_nl(format("\nLuaTeXtra Warning: %s\n\n", msg))
 end
 
-luatextra.internal_error_spaces = "                 "
+internal_error_spaces = "                 "
 
-function luatextra.internal_error(msg)
+function internal_error(msg)
     if not msg then return end
     tex.sprint(format("\\immediate\\write16{}\\errmessage{LuaTeXtra error: %s^^J^^J}", msg))
 end
@@ -338,7 +347,7 @@ end
 %
 %    \begin{macrocode}
 
-function luatextra.module_error(package, msg, helpmsg)
+function module_error(package, msg, helpmsg)
     if not package or not msg then
         return
     end
@@ -348,28 +357,28 @@ function luatextra.module_error(package, msg, helpmsg)
     tex.sprint(format("\\luatexModuleError{%s}{%s}", package, msg))
 end
 
-function luatextra.module_warning(modulename, msg)
+function module_warning(modulename, msg)
     if not modulename or not msg then
         return
     end
     texio.write_nl(format("\nModule %s Warning: %s\n\n", modulename, msg))
 end
 
-function luatextra.module_log(modulename, msg)
+function module_log(modulename, msg)
     if not modulename or not msg then
         return
     end
     texio.write_nl('log', format("%s: %s", modulename, msg))
 end
 
-function luatextra.module_term(modulename, msg)
+function module_term(modulename, msg)
     if not modulename or not msg then
         return
     end
     texio.write_nl('term', format("%s: %s", modulename, msg))
 end
 
-function luatextra.module_info(modulename, msg)
+function module_info(modulename, msg)
     if not modulename or not msg then
         return
     end
@@ -380,33 +389,24 @@ end
 %
 %    \subsubsection{module loading and providing functions}
 %
-%    A small patch, for the \texttt{module} function to work in this file. I
-%    can't understand why it doens't otherwise.
-%
-%    \begin{macrocode}
-
-luatextra.module = module
-
-%    \end{macrocode}
-%
-%    \begin{macro}{luatextra.use module}
+%    \begin{macro}{use module}
 %
 %    This macro is the one used to simply load a lua module file. It does not
 %    reload it if it's already loaded, and prints the filename in the terminal
 %    and the log. A lua module must call the macro
-%    \texttt{luatextra.provides\_module}.
+%    \texttt{provides\_module}.
 %
 %    \begin{macrocode}
-function luatextra.use_module(name)
-    if not name or luatextra.modules[name] then
+function use_module(name)
+    if not name or modules[name] then
         return
     end
     require(name)
-    if not luatextra.modules[name] then
-        luatextra.internal_warning(format("You have requested module `%s',\n%s but the file %s does not provide it.", name, luatextra.internal_warning_spaces, filename))
+    if not modules[name] then
+        internal_warning(format("You have requested module `%s',\n%s but the file %s does not provide it.", name, internal_warning_spaces, filename))
     end
     if not package.loaded[name] then
-        luatextra.module(name, package.seeall)
+        module(name, package.seeall)
     end
 end
 %    \end{macrocode}
@@ -415,17 +415,17 @@ end
 %
 %    Some internal functions to convert a date into a number, and to determine
 %    if a string is a date. It is useful for
-%    \texttt{luatextra.require\_package} to understand if a user asks a
+%    \texttt{require\_package} to understand if a user asks a
 %    version with a date or a version number.
 %
 %    \begin{macrocode}
 
-function luatextra.datetonumber(date)
+function datetonumber(date)
     numbers = string.gsub(date, "(%d+)/(%d+)/(%d+)", "%1%2%3")
     return tonumber(numbers)
 end
 
-function luatextra.isdate(date)
+function isdate(date)
     for _, _ in string.gmatch(date, "%d+/%d+/%d+") do
         return true
     end
@@ -434,47 +434,47 @@ end
 
 local date, number = 1, 2
 
-function luatextra.versiontonumber(version)
-    if luatextra.isdate(version) then
-        return {type = date, version = luatextra.datetonumber(version), orig = version}
+function versiontonumber(version)
+    if isdate(version) then
+        return {type = date, version = datetonumber(version), orig = version}
     else
         return {type = number, version = tonumber(version), orig = version}
     end
 end
 
-luatextra.requiredversions = {}
+requiredversions = {}
 
 %    \end{macrocode}
 %
-%    \begin{macro}{luatextra.require module}
+%    \begin{macro}{require module}
 %
-%    This function is like the \texttt{luatextra.use\_module} function, but
+%    This function is like the \texttt{use\_module} function, but
 %    can accept a second argument that checks for the version of the module.
 %    The version can be a number or a date (format yyyy/mm/dd).
 %
 %    \begin{macrocode}
 
-function luatextra.require_module(name, version)
+function require_module(name, version)
     if not name then
         return
     end
     if not version then
-        return luatextra.use_module(name)
+        return use_module(name)
     end
-    luaversion = luatextra.versiontonumber(version)
-    if luatextra.modules[name] then
+    luaversion = versiontonumber(version)
+    if modules[name] then
         if luaversion.type == date then
-            if luatextra.datetonumber(luatextra.modules[name].date) < luaversion.version then
-                luatextra.internal_error(format("found module `%s' loaded in version %s, but version %s was required", name, luatextra.modules[name].date, version))
+            if datetonumber(modules[name].date) < luaversion.version then
+                internal_error(format("found module `%s' loaded in version %s, but version %s was required", name, modules[name].date, version))
             end
         else
-            if luatextra.modules[name].version < luaversion.version then
-                luatextra.internal_error(format("found module `%s' loaded in version %.02f, but version %s was required", name, luatextra.modules[name].version, version))
+            if modules[name].version < luaversion.version then
+                internal_error(format("found module `%s' loaded in version %.02f, but version %s was required", name, modules[name].version, version))
             end
         end
     else
-        luatextra.requiredversions[name] = luaversion
-        luatextra.use_module(name)
+        requiredversions[name] = luaversion
+        use_module(name)
     end
 end
 
@@ -482,7 +482,7 @@ end
 %
 %    \end{macro}
 %
-%    \begin{macro}{luatextra.provides module}
+%    \begin{macro}{provides module}
 %
 %    This macro is the one that must be called in the module files. It takes a
 %    table as argument. You can put any information you want in this table,
@@ -496,24 +496,24 @@ end
 %
 %    \begin{macrocode}
 
-function luatextra.provides_module(mod)
+function provides_module(mod)
     if not mod then
-        luatextra.internal_error('cannot provide nil module')
+        internal_error('cannot provide nil module')
         return
     end
     if not mod.version or not mod.name or not mod.date or not mod.description then
-        luatextra.internal_error('invalid module registered, fields name, version, date and description are mandatory')
+        internal_error('invalid module registered, fields name, version, date and description are mandatory')
         return
     end
-    requiredversion = luatextra.requiredversions[mod.name]
+    requiredversion = requiredversions[mod.name]
     if requiredversion then
-        if requiredversion.type == date and requiredversion.version > luatextra.datetonumber(mod.date) then
-            luatextra.internal_error(format("loading module %s in version %s, but version %s was required", mod.name, mod.date, requiredversion.orig))
+        if requiredversion.type == date and requiredversion.version > datetonumber(mod.date) then
+            internal_error(format("loading module %s in version %s, but version %s was required", mod.name, mod.date, requiredversion.orig))
         elseif requiredversion.type == number and requiredversion.version > mod.version then
-            luatextra.internal_error(format("loading module %s in version %.02f, but version %s was required", mod.name, mod.version, requiredversion.orig))
+            internal_error(format("loading module %s in version %.02f, but version %s was required", mod.name, mod.version, requiredversion.orig))
         end
     end
-    luatextra.modules[mod.name] = module
+    modules[mod.name] = module
     texio.write_nl('log', format("Lua module: %s %s v%.02f %s\n", mod.name, mod.date, mod.version, mod.description))
 end
 
@@ -531,7 +531,7 @@ end
 %
 %    \begin{macrocode}
 %<*testdummy>
-luatextra.provides_module {
+luatexbase.provides_module {
   name        = 'test-modutils',
   date        = '2000/01/01',
   version     = 1,
