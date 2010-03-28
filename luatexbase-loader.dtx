@@ -122,9 +122,32 @@ See source file '\inFileName' for details.
 % \maketitle
 %
 % \begin{abstract}
+% Lua modules are loaded using the |require()| function which, similarly to
+% \tex's |\input|, takes care of locating the file and load it, but also makes
+% a few supplementary checks, for example to avoid loading the same module
+% twice. This package adapts the way the files are searched in order to
+% accomodate the TDS as well as usual Lua naming conventions.
+%
+% For higher-level functions related to Lua modules, see
+% \href{file:luatexbase-modutils.pdf}{\pk{luatexbase-modutils}}, which also
+% loads the present package.
 % \end{abstract}
 %
 % \section{Documentation}
+%
+% Starting with \luatex 0.45.0, |require()| uses Kpathsea for file searching
+% when the library is initalised (which is always the case in \tex mode, unless
+% explicitly disabled by the user). However, it does not respect the Lua
+% convention that |require("foo.bar")| should look for |foo/bar.lua|.
+%
+% This package implements such behaviour. More precisely, it looks for file
+% |foo/bar| using Kpathsea with the format |lua| (that is, search along
+% |LUAINPUTS| and try the following extensions:  |.luc|, |.luctex|, |.texluc|,
+% |.lua|, |.luatex|, |.texlua|). If this search fails, it falls back to
+% |foo.bar|.
+%
+% It also implements this behaviour with older versions of \luatex (or it soon
+% will).
 %
 %    \section{Implementation}
 %
@@ -219,7 +242,9 @@ See source file '\inFileName' for details.
 %
 %    \subsubsection{Main content}
 %
-%    Load the supporting Lua module.
+%    Load the supporting Lua module. This one doesn't follow the usual naming
+%    conventions, since it won't be loaded with the usual functions for
+%    obvious bootstraping reasons.
 %
 %    \begin{macrocode}
 \directlua{%
@@ -243,6 +268,8 @@ See source file '\inFileName' for details.
 %<*luamodule>
 module('luatexbase', package.seeall)
 %    \end{macrocode}
+%
+%    Find the full path corresponding to a mudole name.
 %
 %    \begin{macrocode}
 local function find_module_file(mod)
