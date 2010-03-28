@@ -135,7 +135,7 @@ See source file '\inFileName' for details.
 % (once they are allocated), two helper macros are available.
 %
 % \begin{quote}
-% \cs{luatexsetcatcoderange}\marg{from}\marg{to}\marg{value}
+% \cs{setcatcoderange}\marg{from}\marg{to}\marg{value}
 % \end{quote}
 % Set all characters code in the range \meta{from}--\meta{to} to the given
 % catcode \meta{value}.
@@ -168,7 +168,7 @@ See source file '\inFileName' for details.
 % catcode table. Since |\chardef| is used for the definition of the control
 % sequence, this is rather easy to do. However, for extra ease of use, the
 % numbers are also directly accessible from Lua as the value of the table
-% |luatextra.catcodetables|, whose keys is the name of the control sequence
+% |luatexbase.catcodetables|, whose keys is the name of the control sequence
 % (without any leading backslash). Moreover, nickames are available for the
 % predefined catcode tables:
 % \begin{itemize}
@@ -298,7 +298,7 @@ See source file '\inFileName' for details.
     \global\chardef#1\allocationnumber
     \luatexinitcatcodetable\allocationnumber
     \begingroup\escapechar\m@ne \expandafter\endgroup
-    \directlua{luatextra.catcodetabledef_from_tex(
+    \directlua{luatexbase.catcodetabledef_from_tex(
       '\luatexluaescapestring{\string#1}', '\number\allocationnumber')}%
     \wlog{\string#1=\string\luatexcatcodetable\the\allocationnumber}%
   \else
@@ -320,7 +320,7 @@ See source file '\inFileName' for details.
 %    Set the catcodes for a range of characters.
 %
 %    \begin{macrocode}
-\def\luatexsetcatcoderange#1#2#3{%
+\def\setcatcoderange#1#2#3{%
   \edef\luaSCR@temp{%
     \noexpand\@tempcnta=\the\@tempcnta
     \noexpand\@tempcntb=\the\@tempcntb
@@ -361,8 +361,8 @@ See source file '\inFileName' for details.
   \catcode0   12 % nul
   \catcode13  12 % carriage return
   \catcode37  12 % percent
-  \luatexsetcatcoderange{65}{90}{12}% A-Z
-  \luatexsetcatcoderange{97}{122}{12}% a-z
+  \setcatcoderange{65}{90}{12}% A-Z
+  \setcatcoderange{97}{122}{12}% a-z
   \catcode92  12 % backslash
   \catcode127 12 }
 %    \end{macrocode}
@@ -380,7 +380,7 @@ See source file '\inFileName' for details.
 \newluatexcatcodetable\CatcodeTableLaTeX
 \setluatexcatcodetable\CatcodeTableLaTeX{%
   \luatexcatcodetable\CatcodeTableIniTeX
-  \luatexsetcatcoderange{0}{31}{15}%
+  \setcatcoderange{0}{31}{15}%
   \catcode9   10 % tab
   \catcode12  13 % form feed
   \catcode13  5  % carriage return
@@ -433,28 +433,26 @@ See source file '\inFileName' for details.
 %
 %    \begin{macrocode}
 %<*luamodule>
-module('luatextra', package.seeall)
+module('luatexbase', package.seeall)
 %    \end{macrocode}
 %
-%    In the same way, the table \texttt{tex.catcodetablenumber} contains the
-%    numbers of the catcodetables registered with
-%    \texttt{\string\newluacatcodetable}.
+%    The number associated to a CS name is remembered in the |catcodetables|
+%    table.
 %
 %    \begin{macrocode}
 catcodetables = {}
-tex.catcodetablenumber = catcodetables
 function catcodetabledef_from_tex(name, number)
     catcodetables[name] = tonumber(number)
 end
 %    \end{macrocode}
 %
-%    With this function we create some shortcuts for a better readability in
-%    lua code. This makes |tex.catcodetablenumber.latex| equivalent to
-%    |tex.catcodetablenumber['CatcodeTableLaTeX']|.
+%    The next function creates some shortcuts for better readability in lua
+%    code. This makes |luatexbase.catcodetables.latex| equivalent to
+%    |luatexbase.catcodetables.CatcodeTableLaTeX|.
 %
 %    \begin{macrocode}
 function catcodetable_do_shortcuts()
-    local cat = luatextra.catcodetables
+    local cat = catcodetables
     cat['latex']                = cat.CatcodeTableLaTeX
     cat['latex-package']        = cat.CatcodeTableLaTeXAtLetter
     cat['latex-atletter']       = cat.CatcodeTableLaTeXAtLetter
@@ -481,7 +479,7 @@ end
 %<testlatex>\RequirePackage{luatexbase-cctb}
 %<*testplain,testlatex>
 \newluatexcatcodetable\testcctb
-\directlua{assert(luatextra.catcodetables.testcctb)}
+\directlua{assert(luatexbase.catcodetables.testcctb)}
 %    \end{macrocode}
 %
 %    Also check that the catcodetable's number is remembered well,
@@ -492,7 +490,7 @@ end
 \escapechar64
 \newluatexcatcodetable\anothercctb
 \endgroup
-\directlua{assert(luatextra.catcodetables.anothercctb)}
+\directlua{assert(luatexbase.catcodetables.anothercctb)}
 %    \end{macrocode}
 %
 %    Now, play a little bit with predefined tables.
@@ -505,7 +503,7 @@ end
 %<testlatex>\documentclass{minimal}
 \directlua{%
   tex.sprint('\string\\setbox0=\string\\hbox{')
-  tex.sprint(luatextra.catcodetables.string, "\string\\undef # _^&")
+  tex.sprint(luatexbase.catcodetables.string, "\string\\undef # _^&")
   tex.sprint('}')
   }
 %    \end{macrocode}

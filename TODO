@@ -1,21 +1,11 @@
-Later
-=====
+general
+-------
 
 - check for user macros starting with \luatex
 - change lua module name(s) (luatexbase or luatexbase.regs etc)
+- check for macros starting with \luatex
 - compat with LuaTeX 0.25.4? (Means problems with \directlua, primitive names,
   kpse.find_file(..., 'lua'), etc.) Maybe do a compat package?
-
-attr
-----
-
-- don't write in the tex table!
-
-cctb
-----
-
-- don't write in the tex table!
-- don't define macros starting with \luatex
 
 loader
 ------

@@ -1,5 +1,14 @@
                     Changes in the luatexbase package/bundle
 
+[on-going]
+    luatexbase-attr
+        - use luatexbase as the Lua module name
+        - don't create tex.attributenumber
+    luatexbase-cctb
+        - use luatexbase as the Lua module name
+        - don't create tex.catcodetablenumber
+        - rename \luatexsetcatcoderange to \setcatcoderange
+
 2010/03/28
     luatexbase-*
         - add catcode defenses
