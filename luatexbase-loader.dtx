@@ -241,18 +241,18 @@ See source file '\inFileName' for details.
 %
 %    \begin{macrocode}
 %<*luamodule>
-module('luatextra', package.seeall)
+module('luatexbase', package.seeall)
 %    \end{macrocode}
 %
 %    \begin{macrocode}
 local function load_module(mod)
   local file = kpse.find_file(mod, 'lua')
   if not file then
-    return "\n\t[luatextra.loader] Search failed"
+    return "\n\t[luatexbase.loader] Search failed"
   end
   local loader, error = loadfile(file)
   if not loader then
-    return "\n\t[luatextra.loader] Loading error:\n\t"..error
+    return "\n\t[luatexbase.loader] Loading error:\n\t"..error
   end
   texio.write_nl("("..file..")")
   return loader
