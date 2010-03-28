@@ -1,5 +1,18 @@
                     Changes in the luatexbase package/bundle
 
+2010/03/28
+    luatexbase-*
+        - add catcode defenses
+
+2010/03/27
+    luatexbase-loader 0.1
+        - add very minimal test files for luatex and lualatex
+    luatexbase-modutils 0.1
+        - add minimal test files for luatex and lualatex
+        - use require() (with luatexbase-loader) for loading
+    luatexbase-attr, luatexbase-cctb, luamcallbacks (test file)
+        - use luatexbase-loader
+
 2010/03/26
     luatexbase-cctb 0.1
         - add minimal test files for luatex and lualatex

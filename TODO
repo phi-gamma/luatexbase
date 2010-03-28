@@ -23,6 +23,7 @@ loader
 - a.b.c -> a/b/c or a/b.c or a.b.c? What do to with files under texmf/scripts?
 - adujst names of the modules afterwards
 - write doc
+- make a real test using a fake texmf tree as TEXMFHOME?
 
 modutils
 --------
