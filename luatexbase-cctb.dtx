@@ -127,6 +127,8 @@ See source file '\inFileName' for details.
 % allocation just like Plain TeX and LaTeX do for other registers.
 % \end{abstract}
 %
+% \tableofcontents
+%
 % \section{Documentation}
 %
 % The main macro defined here is |\newluatexcatcodetable|. It behaves the same
@@ -271,9 +273,7 @@ See source file '\inFileName' for details.
 \fi
 %    \end{macrocode}
 %
-%    \subsubsection{Main content}
-%
-%    Load the supporting Lua module.
+%    \subsubsection{Load supporting Lua module}
 %
 %    \begin{macrocode}
 \begingroup\expandafter\expandafter\expandafter\endgroup
@@ -284,6 +284,8 @@ See source file '\inFileName' for details.
 \fi
 \directlua{require('luatexbase.cctb.lua')}
 %    \end{macrocode}
+%
+%    \subsubsection{User macros}
 %
 %    The allocation macro. Allocate tables starting with 1, since table 0 is
 %    reserved for IniTeX catcodes by LuaTeX.
@@ -345,6 +347,8 @@ See source file '\inFileName' for details.
   \luatexsavecatcodetable#1%
   \endgroup}
 %    \end{macrocode}
+%
+%    \subsubsection{Predefined tables}
 %
 %    The |IniTeX| catcode table needs no extra initialisation.
 %

@@ -127,6 +127,8 @@ See source file '\inFileName' for details.
 % just like Plain TeX and LaTeX do for other registers.
 % \end{abstract}
 %
+% \tableofcontents
+%
 % \section{Documentation}
 %
 % The main macro defined here is |\newluatexattribute|. It behaves in the same
@@ -248,9 +250,7 @@ See source file '\inFileName' for details.
 \fi
 %    \end{macrocode}
 %
-%    \subsubsection{Main content}
-%
-%    Load the supporting Lua module.
+%    \subsubsection{Load supporting Lua module}
 %
 %    \begin{macrocode}
 \begingroup\expandafter\expandafter\expandafter\endgroup
@@ -261,6 +261,8 @@ See source file '\inFileName' for details.
 \fi
 \directlua{require('luatexbase.attr.lua')}
 %    \end{macrocode}
+%
+%    \subsection{User macros}
 %
 %    The allocaton macro.
 %

@@ -32,5 +32,10 @@
 \newcommand\pk{\textsf}
 \newcommand\cmdname{\texttt}
 
+% for hyperref
+\pdfstringdefDisableCommands{%
+  \def\cs#1{\@backslashchar #1}%
+  }
+
 % easy verbatim
 \MakeShortVerb\|

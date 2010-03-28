@@ -117,6 +117,8 @@ See source file '\inFileName' for details.
 % \luatex.
 % \end{abstract}
 %
+% \tableofcontents
+%
 % \section{Documentation}
 %
 % Since the \plaintex and \latex formats are both frozen, they fail to take
@@ -146,8 +148,6 @@ See source file '\inFileName' for details.
 % it may be a bad idea since registers with index greater than $256$ have
 % degraded performance due to implementation details, but with \luatex the
 % performance is uniform, so we just do it.
-%
-% \clearpage
 %
 %    \section{Implementation}
 %
@@ -238,7 +238,7 @@ See source file '\inFileName' for details.
 \fi
 %    \end{macrocode}
 %
-%    \subsection{Main content}
+%    \subsection{Ensure etex.sty is loaded}
 %
 %    If running \latex, load \file{etex.sty}. If not, either
 %    \file{etex.src} was loaded at format generation time, or we cannot do
@@ -272,6 +272,8 @@ See source file '\inFileName' for details.
 \else
 %    \end{macrocode}
 %
+%    \subsection{Adapt range}
+%
 %    First, increase the upper bound for all kinds of registers. Copy code to
 %    avoid defining a macro.
 %
@@ -285,6 +287,8 @@ See source file '\inFileName' for details.
   \ifnum\count275=32768 \count275=65536 \fi
   \ifnum\count276=32768 \count276=65536 \fi
 %    \end{macrocode}
+%
+%    \subsection{Patch macros that used \cs{mathchardef}}
 %
 %    |\box| registers and |\mark|s were previously defined
 %    using |\mathchardef| since it had the biggest range under \etex
@@ -393,6 +397,8 @@ See source file '\inFileName' for details.
   \expandafter \endgroup
   \the\toks0
 %    \end{macrocode}
+%
+%    \subsection{Make room for inserts}
 %
 %    Finally, make allocation of |\count|, |\dimen|, |skip| and
 %    |\box| start with numbers $>255$, in order to free the lower numbers
