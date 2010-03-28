@@ -5,16 +5,18 @@ luatexbase provides basic resource management, similar to the way TeX
 resources are handled by Plain TeX and LaTeX, for new resources introduced by
 LuaTeX.
 
-Each resource is handled in a separate package, and luatexbase.sty merely loads
-all of them.
+Each resource is handled in a separate package.
 
 The resources considered are:
 - registers (\count, \box, etc.)    -> luatexbase-regs
-- Lua modules                       -> luatexbase-loader
-- Additional functions for modules  -> luatexbase-modutils
+- Lua module loading                -> luatexbase-loader
 - \attribute's                      -> luatexbase-attr
 - \catcodetable's                   -> luatexbase-cctb
 - Lua callbacks                     -> luamcallbacks
+
+Additional convenience packages:
+- Lua module declaration            -> luatexbase-modutils
+- compatibility helpers             -> luatexbase-compat
 
 WARNING: these packages are subject to change or even be merged or disappear in
 the near future!

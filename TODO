@@ -1,24 +1,18 @@
 general
 -------
 
-- write test files
-- change prefix for internal TeX macros
-- check for lua name conflicts ('module' used in mods)
-- check for macros starting with \luatex
-- make TeX tests cleaner: \begingroup\expandafter\ETC.
-- reload check, declaration, luatex test, catcodes for plain
-- import/update doc
-- date & changes entry
-
 - redo module loading in packages once mods is done.
 - adjust preamble to avoid duplicated list of files (refer to DTX instead)
+- add catcode defenses
+- adjust original luatextra package
 
 Later
 =====
 
+- check for user macros starting with \luatex
 - change lua module name(s) (luatexbase or luatexbase.regs etc)
 - compat with LuaTeX 0.25.4? (Means problems with \directlua, primitive names,
-  kpse.find_file(..., 'lua'), etc.)
+  kpse.find_file(..., 'lua'), etc.) Maybe do a compat package?
 
 regs
 ----
@@ -29,7 +23,7 @@ rather tricky in this respect, but are they really used?) Well, is there any
 actual need for this?
 
 attr
----
+----
 
 - don't write in the tex table!
 
@@ -43,4 +37,15 @@ loader
 ------
 
 - a.b.c -> a/b/c or a/b.c or a.b.c? What do to with files under texmf/scripts?
+- write doc
+
+modutils
+--------
+
+Review extensively.
+
+mcallbacks
+----------
+
+Review extensively.
 
