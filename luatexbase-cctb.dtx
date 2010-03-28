@@ -8,7 +8,7 @@
 %
 % This work consists of the main source file luatexbase-cctb.dtx
 % and the derived files
-%    luatexbase-cctb.sty luatexbase.cctb.lua
+%    luatexbase-cctb.sty cctb.lua
 %    test-cctb-plain.tex test-cctb-latex.tex
 %
 % Unpacking:
@@ -66,7 +66,7 @@ See source file '\inFileName' for details.
 
 \generate{%
   \usedir{tex/luatex/luatexbase}%
-  \file{luatexbase.cctb.lua}{\from{luatexbase-cctb.dtx}{luamodule}}%
+  \file{cctb.lua}{\from{luatexbase-cctb.dtx}{luamodule}}%
 }
 
 \obeyspaces
@@ -75,7 +75,7 @@ See source file '\inFileName' for details.
 \Msg{* To finish the installation you have to move the following}
 \Msg{* files into a directory searched by TeX:}
 \Msg{*}
-\Msg{*     luatexbase-cctb.sty luatexbase.cctb.lua}
+\Msg{*     luatexbase-cctb.sty cctb.lua}
 \Msg{*}
 \Msg{* Happy TeXing!}
 \Msg{*}
@@ -282,7 +282,7 @@ See source file '\inFileName' for details.
 \else
   \RequirePackage{luatexbase-loader}
 \fi
-\directlua{require('luatexbase.cctb.lua')}
+\directlua{require('cctb.lua')}
 %    \end{macrocode}
 %
 %    \subsubsection{User macros}

@@ -5,16 +5,16 @@ DTX = $(wildcard *.dtx)
 DOC = $(patsubst %.dtx, %.pdf, $(DTX))
 DTXSTY = lltxb-dtxstyle.tex
 LOADER_RUN = luatexbase-loader.sty luatexbase.loader.lua
-MOD_RUN = luatexbase-modutils.sty luatexbase.modutils.lua
+MOD_RUN = luatexbase-modutils.sty modutils.lua
 
 # Files grouped by generation mode
 UNPACKED_MCB = luamcallbacks.lua \
 			   test-callbacks-latex.tex test-callbacks-plain.tex
 UNPACKED_REGS = luatexbase-regs.sty \
 				test-regs-plain.tex test-regs-latex.tex
-UNPACKED_ATTR = luatexbase-attr.sty luatexbase.attr.lua \
+UNPACKED_ATTR = luatexbase-attr.sty attr.lua \
 				test-attr-plain.tex test-attr-latex.tex
-UNPACKED_CCTB = luatexbase-cctb.sty luatexbase.cctb.lua \
+UNPACKED_CCTB = luatexbase-cctb.sty cctb.lua \
 				test-cctb-plain.tex test-cctb-latex.tex
 UNPACKED_LOADER = $(LOADER_RUN) \
 				test-loader-plain.tex test-loader-latex.tex
