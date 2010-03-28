@@ -13,10 +13,11 @@ compat
 loader
 ------
 
-- a.b.c -> a/b/c or a/b.c or a.b.c? What do to with files under texmf/scripts?
-- adujst names of the modules afterwards
+- adujst names of the other modules
 - write doc
 - make a real test using a fake texmf tree as TEXMFHOME?
+- ensure compatibility with older versions of LuaTeX (no 'lua' type for
+  kpse.find_file).
 
 modutils
 --------

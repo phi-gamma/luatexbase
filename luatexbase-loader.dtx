@@ -245,8 +245,15 @@ module('luatexbase', package.seeall)
 %    \end{macrocode}
 %
 %    \begin{macrocode}
+local function find_module_file(mod)
+  return kpse.find_file(mod:gsub('%.', '/'), 'lua')
+    or kpse.find_file(mod, 'lua')
+end
+%    \end{macrocode}
+%
+%    \begin{macrocode}
 local function load_module(mod)
-  local file = kpse.find_file(mod, 'lua')
+  local file = find_module_file(file)
   if not file then
     return "\n\t[luatexbase.loader] Search failed"
   end
