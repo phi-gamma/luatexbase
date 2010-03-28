@@ -151,8 +151,7 @@ See source file '\inFileName' for details.
 % addition to the default Lua\TeX\ callbacks.
 %
 % This package contains only a \texttt{.lua} file, that can be called by
-% another lua script. For example, this script is called in
-% \textsf{luatextra}.
+% another lua script.
 %
 %\subsubsection*{Limitations}
 %
@@ -200,7 +199,7 @@ luamcallbacks.module = {
     license       = "CC0",
 }
 
-luatextra.provides_module(luamcallbacks.module)
+luatexbase.provides_module(luamcallbacks.module)
 
 %    \end{macrocode}
 %
@@ -323,19 +322,19 @@ luamcallbacks.internalregister = luamcallbacks.internalregister or callback.regi
 local callbacktypes = luamcallbacks.callbacktypes
 
 luamcallbacks.log = luamcallbacks.log or function(...)
-  luatextra.module_log('luamcallbacks', format(...))
+  luatexbase.module_log('luamcallbacks', format(...))
 end
 
 luamcallbacks.info = luamcallbacks.info or function(...)
-  luatextra.module_info('luamcallbacks', format(...))
+  luatexbase.module_info('luamcallbacks', format(...))
 end
 
 luamcallbacks.warning = luamcallbacks.warning or function(...)
-  luatextra.module_warning('luamcallbacks', format(...))
+  luatexbase.module_warning('luamcallbacks', format(...))
 end
 
 luamcallbacks.error = luamcallbacks.error or function(...)
-  luatextra.module_error('luamcallbacks', format(...))
+  luatexbase.module_error('luamcallbacks', format(...))
 end
 
 %    \end{macrocode}

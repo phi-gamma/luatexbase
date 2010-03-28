@@ -2,7 +2,6 @@ general
 -------
 
 - check for user macros starting with \luatex
-- change lua module name(s) (luatexbase or luatexbase.regs etc)
 
 compat
 ------
