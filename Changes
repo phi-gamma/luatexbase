@@ -4,15 +4,22 @@
     all
         - use luatexbase as the Lua module name
         - change the filename of the lua module (suppress luatexbase.)
+        - load luatexbase-compat
+    luatexbase-compat
+        - new
     luatexbase-attr
         - don't create tex.attributenumber
+        - load luatexbase-compat
     luatexbase-cctb
         - don't create tex.catcodetablenumber
         - rename \luatexsetcatcoderange to \setcatcoderange
+        - load lua-compat
     luamcallbacks
         - test file now for plain and latex
     luatexbase-loader
-        - require"foo.bar" now looks for foo/bar then foo.bar
+        - require"foo.bar" now looks for foo/bar then foo.bar, see doc for
+          details
+        - works with luatex 0.25.4
 
 2010/03/28
     luatexbase-*

@@ -129,7 +129,7 @@ See source file '\inFileName' for details.
 % \tex's |\input|, takes care of locating the file and load it, but also makes
 % a few supplementary checks, for example to avoid loading the same module
 % twice. This package adapts the way the files are searched in order to
-% accomodate the TDS as well as usual Lua naming conventions.
+% accommodate the TDS as well as usual Lua naming conventions.
 %
 % For higher-level functions related to Lua modules, see
 % \href{file:luatexbase-modutils.pdf}{\pk{luatexbase-modutils}}, which also
@@ -139,18 +139,30 @@ See source file '\inFileName' for details.
 % \section{Documentation}
 %
 % Starting with \luatex 0.45.0, |require()| uses Kpathsea for file searching
-% when the library is initalised (which is always the case in \tex mode, unless
-% explicitly disabled by the user). However, it does not respect the Lua
-% convention that |require("foo.bar")| should look for |foo/bar.lua|.
+% when the library is initialised (which is always the case in \tex mode,
+% unless explicitly disabled by the user). However, it does not respect the
+% Lua convention that |require("foo.bar")| should look for |foo/bar.lua|.
+% \footnote{Support for that has been added in rev 3558 of \luatex, currently
+% unreleased but probably part of \luatex 0.54.} This package implements such
+% behaviour. 
 %
-% This package implements such behaviour. More precisely, it looks for file
+% More precisely, it implements a new kpse searcher that looks for file
 % |foo/bar| using Kpathsea with the format |lua| (that is, search along
 % |LUAINPUTS| and try the following extensions:  |.luc|, |.luctex|, |.texluc|,
 % |.lua|, |.luatex|, |.texlua|). If this search fails, it falls back to
 % |foo.bar|.
 %
-% It also implements this behaviour with older versions of \luatex (or it soon
-% will).
+% Also, older versions of \luatex, such as 0.25.4 (\texlive 2008), don't know
+% about the |lua| format for kpse searching. So, an emulator for this function
+% is provided. The emulator is not perfect, in particular it may find more
+% results than the normal |lua| format search. In order to ensure more
+% homogeneous results across versions, this emulator is used as a fall-back
+% when the real |lua| format search doesn't find any result.
+%
+% Finally, a combined version of this new kpse searcher and the original
+% function at |package.loaders[2]| (using first the new loader, then the old
+% one if the new doesn't return any result) is installed as
+% |package.loaders[2]|.
 %
 %    \section{Implementation}
 %
