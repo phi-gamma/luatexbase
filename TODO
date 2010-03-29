@@ -5,9 +5,8 @@ modutils
     \luatexUseModule
     \luatexRequireModule
     \luatexModuleError
-- Make more Lua objects local.
-- logic (see what LaTeX2e does)
 - syntax of public TeX macros and Lua functions
+- review logic (see what LaTeX2e does)
 - General review of code and comments.
 - Update user documentation.
 

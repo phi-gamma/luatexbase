@@ -249,14 +249,12 @@ See source file '\inFileName' for details.
 %    directly \texttt{\string\errmessage} in lua.
 %
 %    \begin{macrocode}
-
 \def\luatexModuleError#1#2{%
   \errorcontextlines=0\relax
   \immediate\write16{}%
   \errmessage{Module #1 error: #2^^J^^J%
 See the module #1 documentation for explanation.^^J ...^^J}%
 }
-
 %    \end{macrocode}
 %
 %    Then we define
@@ -267,7 +265,6 @@ See the module #1 documentation for explanation.^^J ...^^J}%
 %
 %    \begin{macrocode}
 \def\luatexUseModule#1{\luatexbase@directlua{luatexbase.use_module([[#1]])}}
-
 \expandafter\ifx\csname ProvidesPackage\endcsname\relax
   \def\luatexRequireModule#1#2{\luatexbase@directlua{%
       luatexbase.require_module([[#1]], [[#2]])}}
@@ -298,38 +295,31 @@ See the module #1 documentation for explanation.^^J ...^^J}%
 %
 %    \begin{macrocode}
 %<*luamodule>
+module("luatexbase", package.seeall)
 %    \end{macrocode}
 %
 %    Initialisation borrowed from luatextra
 %
 %    \begin{macrocode}
-module("luatexbase", package.seeall)
-
 local format = string.format
-
-luatexbase.modules = luatexbase.modules or {}
+local modules = modules or {}
 %    \end{macrocode}
 %
 %    Here we define the warning and error functions specific to
 %    \texttt{luatexbase}.
 %
 %    \begin{macrocode}
-
-internal_warning_spaces = "                   "
-
-function internal_warning(msg)
+local internal_warning_spaces = "                   "
+local internal_error_spaces = "                 "
+local function internal_warning(msg)
     if not msg then return end
     texio.write_nl(format("\nLuaTeXtra Warning: %s\n\n", msg))
 end
-
-internal_error_spaces = "                 "
-
-function internal_error(msg)
+local function internal_error(msg)
     if not msg then return end
     tex.sprint(format(
     "\\immediate\\write16{}\\errmessage{LuaTeXtra error: %s^^J^^J}", msg))
 end
-
 %    \end{macrocode}
 %
 %    \subsubsection{Error, warning and info function for modules}
@@ -341,7 +331,6 @@ end
 %    to be used by lua module writers.
 %
 %    \begin{macrocode}
-
 function module_error(package, msg, helpmsg)
     if not package or not msg then
         return
@@ -351,40 +340,33 @@ function module_error(package, msg, helpmsg)
     end
     tex.sprint(format("\\luatexModuleError{%s}{%s}", package, msg))
 end
-
 function module_warning(modulename, msg)
     if not modulename or not msg then
         return
     end
     texio.write_nl(format("\nModule %s Warning: %s\n\n", modulename, msg))
 end
-
-function module_log(modulename, msg)
-    if not modulename or not msg then
-        return
-    end
-    texio.write_nl('log', format("%s: %s", modulename, msg))
-end
-
-function module_term(modulename, msg)
-    if not modulename or not msg then
-        return
-    end
-    texio.write_nl('term', format("%s: %s", modulename, msg))
-end
-
 function module_info(modulename, msg)
     if not modulename or not msg then
         return
     end
     texio.write_nl(format("%s: %s\n", modulename, msg))
 end
-
+function module_log(modulename, msg)
+    if not modulename or not msg then
+        return
+    end
+    texio.write_nl('log', format("%s: %s", modulename, msg))
+end
+function module_term(modulename, msg)
+    if not modulename or not msg then
+        return
+    end
+    texio.write_nl('term', format("%s: %s", modulename, msg))
+end
 %    \end{macrocode}
 %
 %    \subsubsection{module loading and providing functions}
-%
-%    \begin{macro}{use module}
 %
 %    This macro is the one used to simply load a lua module file. It does not
 %    reload it if it's already loaded, and prints the filename in the terminal
@@ -405,49 +387,38 @@ function use_module(name)
 end
 %    \end{macrocode}
 %
-%    \end{macro}
-%
 %    Some internal functions to convert a date into a number, and to determine
 %    if a string is a date. It is useful for
 %    \texttt{require\_package} to understand if a user asks a
 %    version with a date or a version number.
 %
 %    \begin{macrocode}
-
-function datetonumber(date)
+local function datetonumber(date)
     numbers = string.gsub(date, "(%d+)/(%d+)/(%d+)", "%1%2%3")
     return tonumber(numbers)
 end
-
-function isdate(date)
+local function isdate(date)
     for _, _ in string.gmatch(date, "%d+/%d+/%d+") do
         return true
     end
     return false
 end
-
 local date, number = 1, 2
-
-function versiontonumber(version)
+local function versiontonumber(version)
     if isdate(version) then
         return {type = date, version = datetonumber(version), orig = version}
     else
         return {type = number, version = tonumber(version), orig = version}
     end
 end
-
-requiredversions = {}
-
+local requiredversions = {}
 %    \end{macrocode}
-%
-%    \begin{macro}{require module}
 %
 %    This function is like the \texttt{use\_module} function, but
 %    can accept a second argument that checks for the version of the module.
 %    The version can be a number or a date (format yyyy/mm/dd).
 %
 %    \begin{macrocode}
-
 function require_module(name, version)
     if not name then
         return
@@ -477,12 +448,7 @@ function require_module(name, version)
         use_module(name)
     end
 end
-
 %    \end{macrocode}
-%
-%    \end{macro}
-%
-%    \begin{macro}{provides module}
 %
 %    This macro is the one that must be called in the module files. It takes a
 %    table as argument. You can put any information you want in this table,
@@ -495,7 +461,6 @@ end
 %    does for informations about packages.
 %
 %    \begin{macrocode}
-
 function provides_module(mod)
     if not mod then
         internal_error('cannot provide nil module')
@@ -526,8 +491,6 @@ function provides_module(mod)
     mod.name, mod.date, mod.version, mod.description))
 end
 %    \end{macrocode}
-%
-%    \end{macro}
 %
 %    \begin{macrocode}
 %</luamodule>
