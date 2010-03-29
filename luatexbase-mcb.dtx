@@ -193,20 +193,15 @@ luatexbase.provides_module({
 %    keys and a table of the registered functions a values.
 %
 %    \begin{macrocode}
-
 callbacklist = callbacklist or { }
-
 %    \end{macrocode}
 %
 %    A table with the default functions of the created callbacks. See
 %    \texttt{create} for further informations.
 %
 %    \begin{macrocode}
-
 lua_callbacks_defaults = { }
-
 local format = string.format
-
 %    \end{macrocode}
 %
 %    There are 4 types of callback:
@@ -221,80 +216,74 @@ local format = string.format
 %    \end{itemize}
 %
 %    \begin{macrocode}
-
 local list = 1
 local data = 2
 local first = 3
 local simple = 4
-
 %    \end{macrocode}
 %
 %    \texttt{callbacktypes} is the list that contains the callbacks as keys
 %    and the type (list or data) as values.
 %
 %    \begin{macrocode}
-
 callbacktypes = callbacktypes or {
-buildpage_filter = simple,
-token_filter = first,
-pre_output_filter = list,
-hpack_filter = list,
-process_input_buffer = data,
-mlist_to_hlist = list,
-vpack_filter = list,
-define_font = first,
-open_read_file = first,
-linebreak_filter = list,
-post_linebreak_filter = list,
-pre_linebreak_filter = list,
-start_page_number = simple,
-stop_page_number = simple,
-start_run = simple,
-show_error_hook = simple,
-stop_run = simple,
-hyphenate = simple,
-ligaturing = simple,
-kerning = data,
-find_write_file = first,
-find_read_file = first,
-find_vf_file = data,
-find_map_file = data,
-find_format_file = data,
-find_opentype_file = data,
-find_output_file = data,
-find_truetype_file = data,
-find_type1_file = data,
-find_data_file = data,
-find_pk_file = data,
-find_font_file = data,
-find_image_file = data,
-find_ocp_file = data,
-find_sfd_file = data,
-find_enc_file = data,
-read_sfd_file = first,
-read_map_file = first,
-read_pk_file = first,
-read_enc_file = first,
-read_vf_file = first,
-read_ocp_file = first,
-read_opentype_file = first,
-read_truetype_file = first,
-read_font_file = first,
-read_type1_file = first,
-read_data_file = first,
+  buildpage_filter = simple,
+  token_filter = first,
+  pre_output_filter = list,
+  hpack_filter = list,
+  process_input_buffer = data,
+  mlist_to_hlist = list,
+  vpack_filter = list,
+  define_font = first,
+  open_read_file = first,
+  linebreak_filter = list,
+  post_linebreak_filter = list,
+  pre_linebreak_filter = list,
+  start_page_number = simple,
+  stop_page_number = simple,
+  start_run = simple,
+  show_error_hook = simple,
+  stop_run = simple,
+  hyphenate = simple,
+  ligaturing = simple,
+  kerning = data,
+  find_write_file = first,
+  find_read_file = first,
+  find_vf_file = data,
+  find_map_file = data,
+  find_format_file = data,
+  find_opentype_file = data,
+  find_output_file = data,
+  find_truetype_file = data,
+  find_type1_file = data,
+  find_data_file = data,
+  find_pk_file = data,
+  find_font_file = data,
+  find_image_file = data,
+  find_ocp_file = data,
+  find_sfd_file = data,
+  find_enc_file = data,
+  read_sfd_file = first,
+  read_map_file = first,
+  read_pk_file = first,
+  read_enc_file = first,
+  read_vf_file = first,
+  read_ocp_file = first,
+  read_opentype_file = first,
+  read_truetype_file = first,
+  read_font_file = first,
+  read_type1_file = first,
+  read_data_file = first,
 }
-
 %    \end{macrocode}
 %
 %    In Lua\TeX\ version 0.43, a new callback called |process_output_buffer|
 %    appeared, so we enable it.
 %
 %    \begin{macrocode}
-
 if tex.luatexversion > 42 then
     callbacktypes["process_output_buffer"] = data
 end
-
 %    \end{macrocode}
 %
 %    As we overwrite \texttt{callback.register}, we save it as
@@ -302,27 +291,19 @@ end
 %    functions to write the errors or the logs.
 %
 %    \begin{macrocode}
-
 internalregister = internalregister or callback.register
-
-local callbacktypes = callbacktypes
-
 log = log or function(...)
   luatexbase.module_log('luamcallbacks', format(...))
 end
-
 info = info or function(...)
   luatexbase.module_info('luamcallbacks', format(...))
 end
-
 warning = warning or function(...)
   luatexbase.module_warning('luamcallbacks', format(...))
 end
-
 error = error or function(...)
   luatexbase.module_error('luamcallbacks', format(...))
 end
-
 %    \end{macrocode}
 %
 %    A simple function we'll use later to understand the arguments of the
@@ -330,7 +311,6 @@ end
 %    corresponding to the string or nil.
 %
 %    \begin{macrocode}
-
 function str_to_type(str)
     if str == 'list' then
         return list
@@ -344,10 +324,7 @@ function str_to_type(str)
         return nil
     end
 end
-
 %    \end{macrocode}
-%
-%    \begin{macro}{create}
 %
 %    This first function creates a new callback. The signature is
 %    \texttt{create(name, ctype, default)} where \texttt{name} is the name of
@@ -361,7 +338,6 @@ end
 %    callback must also call it, see next function.
 %
 %    \begin{macrocode}
-
 function create(name, ctype, default)
     if not name then
         error(format("unable to call callback, no proper name passed", name))
@@ -384,18 +360,12 @@ function create(name, ctype, default)
     lua_callbacks_defaults[name] = default
     callbacktypes[name] = ctype
 end
-
 %    \end{macrocode}
-%
-%    \end{macro}
-%
-%    \begin{macro}{call}
 %
 %    This function calls a callback. It can only call a callback created by
 %    the \texttt{create} function.
 %
 %    \begin{macrocode}
-
 function call(name, ...)
     if not name then
         error(format("unable to call callback, no proper name passed", name))
@@ -424,12 +394,7 @@ function call(name, ...)
     end
     return f(...)
 end
-
 %    \end{macrocode}
-%
-%    \end{macro}
-%
-%    \begin{macro}{add}
 %
 %    The main function. The signature is \texttt{add (name,
 %    func, description, priority)} with \texttt{name} being the name of the
@@ -451,7 +416,6 @@ end
 %    to their function themself. Most of the time, the priority is not needed.
 %
 %    \begin{macrocode}
-
 function add (name,func,description,priority)
     if type(func) ~= "function" then
         error("unable to add function, no proper function passed")
@@ -513,12 +477,7 @@ function add (name,func,description,priority)
       format("inserting function '%s' at position %s in callback list for '%s'",
       description,priority,name))
 end
-
 %    \end{macrocode}
-%
-%    \end{macro}
-%
-%    \begin{macro}{get priority}
 %
 %    This function tells if a function has already been registered in a
 %    callback, and gives its current priority. The arguments are the name of
@@ -526,7 +485,6 @@ end
 %    registered, it gives its priority, and if not it returns false.
 %
 %    \begin{macrocode}
-
 function get_priority (name, description)
     if not name or name == "" or not callbacktypes[name] or not description then
         return 0
@@ -540,12 +498,7 @@ function get_priority (name, description)
     end
     return 0
 end
-
 %    \end{macrocode}
-%
-%    \end{macro}
-%
-%    \begin{macro}{remove}
 %
 %    The function that removes a function from a callback. The signature is
 %    \texttt{mcallbacks.remove (name, description)} with \texttt{name} being
@@ -553,7 +506,6 @@ end
 %    \texttt{mcallbacks.add}.
 %
 %    \begin{macrocode}
-
 function remove (name, description)
     if not name or name == "" then
         error("unable to remove function, no proper callback name passed")
@@ -592,17 +544,11 @@ function remove (name, description)
     warning(
       format("unable to remove function '%s' from '%s'",description,name))
 end
-
 %    \end{macrocode}
-%
-%    \end{macro}
-%
-%    \begin{macro}{reset}
 %
 %    This function removes all the functions registered in a callback.
 %
 %    \begin{macrocode}
-
 function reset (name)
     if not name or name == "" then
         error("unable to reset, no proper callback name passed")
@@ -622,19 +568,13 @@ function reset (name)
         callbacklist[name] = nil
     end
 end
-
 %    \end{macrocode}
-%
-%    \end{macro}
 %
 %     This function and the following ones are only internal. This one is the
 %     handler for the first type of callbacks: the ones that take a list head
 %     and return true, false, or a new list head.
 %
-%    \begin{macro}{listhandler}
-%
 %    \begin{macrocode}
-
 function listhandler (name)
     return function(head,...)
         local l = callbacklist[name]
@@ -665,17 +605,11 @@ function listhandler (name)
         end
     end
 end
-
 %    \end{macrocode}
-%
-%    \end{macro}
 %
 %     The handler for callbacks taking datas and returning modified ones.
 %
-%    \begin{macro}{datahandler}
-%
 %    \begin{macrocode}
-
 function datahandler (name)
     return function(data,...)
         local l = callbacklist[name]
@@ -687,19 +621,13 @@ function datahandler (name)
         return data
     end
 end
-
 %    \end{macrocode}
-%
-%    \end{macro}
 %
 %     This function is for the handlers that don't support more than one
 %     functions in them. In this case we only call the first function of the
 %     list.
 %
-%    \begin{macro}{firsthandler}
-%
 %    \begin{macrocode}
-
 function firsthandler (name)
     return function(...)
         local l = callbacklist[name]
@@ -711,17 +639,11 @@ function firsthandler (name)
         end
     end
 end
-
 %    \end{macrocode}
-%
-%    \end{macro}
 %
 %     Handler for simple functions that don't return anything.
 %
-%    \begin{macro}{simplehandler}
-%
 %    \begin{macrocode}
-
 function simplehandler (name)
     return function(...)
         local l = callbacklist[name]
@@ -732,16 +654,12 @@ function simplehandler (name)
         end
     end
 end
-
 %    \end{macrocode}
-%
-%    \end{macro}
 %
 %    Finally we add some functions to the \texttt{callback} module, and we
 %    overwrite \texttt{callback.register} so that it outputs an error.
 %
 %    \begin{macrocode}
-
 callback.add = add
 callback.remove = remove
 callback.reset = reset
@@ -752,12 +670,11 @@ callback.get_priority = get_priority
 callback.register = function (...)
 error("function callback.register has been deleted by luamcallbacks, please use callback.add instead.")
 end
-
 %    \end{macrocode}
 %
-% \iffalse
+%    \begin{macrocode}
 %</lua>
-% \fi
+%    \end{macrocode}
 %
 %    \section{Test files}
 %
