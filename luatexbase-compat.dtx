@@ -207,10 +207,25 @@ See source file '\inFileName' for details.
 \fi
 %    \end{macrocode}
 %
-%    \subsection{Actually do stuff}
+%    \subsection{\cs{directlua} abstraction}
 %
+%    Define |\luatexbase@directlua| to be either |\directlua0| or
+%    |\directlua|, depending on the version of \luatex.
 %
 %    \begin{macrocode}
+\begingroup
+\expandafter\ifx\csname newcommand\endcsname\relax
+  \toks0{\long\def\luatexbase@directlua}%
+\else
+  \toks0{\newcommand\luatexbase@directlua}%
+\fi
+\ifnum\luatexversion<36
+  \toks0\expandafter{\the\toks0{\directlua0}}%
+\else
+  \toks0\expandafter{\the\toks0{\directlua}}%
+\fi
+\expandafter\endgroup
+\the\toks0
 %    \end{macrocode}
 %
 %    That's all folks!
@@ -228,6 +243,8 @@ See source file '\inFileName' for details.
 %<testplain>\input luatexbase-compat.sty
 %<testlatex>\RequirePackage{luatexbase-compat}
 %<*testplain,testlatex>
+\catcode64 11
+\luatexbase@directlua{local answer = 42}
 %</testplain,testlatex>
 %<testplain>\bye
 %<testlatex>\stop

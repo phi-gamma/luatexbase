@@ -6,7 +6,6 @@ general
 compat
 ------
 
-- \luadirect abstraction to \directlua
 - \EnsureLuaTeXPrimitive
 - use it in other packages, and test them with various versions
 
@@ -14,6 +13,7 @@ loader
 ------
 
 - make a real test using a fake texmf tree as TEXMFHOME?
+- anyway, give it some real testing with luatex < 0.43!
 - ensure compatibility with older versions of LuaTeX (no 'lua' type for
   kpse.find_file).
 - Make a decision about the behaviour (discuss this with Heiko & all)
