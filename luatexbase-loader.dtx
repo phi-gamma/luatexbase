@@ -291,7 +291,7 @@ end
 %
 %    \begin{macrocode}
 local function load_module(mod)
-  local file = find_module_file(file)
+  local file = find_module_file(mod)
   if not file then
     return "\n\t[luatexbase.loader] Search failed"
   end
