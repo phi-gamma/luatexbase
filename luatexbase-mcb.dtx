@@ -320,7 +320,6 @@ callbacklist = callbacklist or { }
 %
 %    \begin{macrocode}
 lua_callbacks_defaults = { }
-local format = string.format
 %    \end{macrocode}
 %
 %    There are 4 types of callback:
@@ -413,16 +412,16 @@ end
 %    \begin{macrocode}
 internalregister = internalregister or callback.register
 log = log or function(...)
-  luatexbase.module_log('luamcallbacks', format(...))
+  luatexbase.module_log('luamcallbacks', string.format(...))
 end
 info = info or function(...)
-  luatexbase.module_info('luamcallbacks', format(...))
+  luatexbase.module_info('luamcallbacks', string.format(...))
 end
 warning = warning or function(...)
-  luatexbase.module_warning('luamcallbacks', format(...))
+  luatexbase.module_warning('luamcallbacks', string.format(...))
 end
 err = err or function(...)
-  luatexbase.module_error('luamcallbacks', format(...))
+  luatexbase.module_error('luamcallbacks', string.format(...))
 end
 %    \end{macrocode}
 %
@@ -460,20 +459,21 @@ end
 %    \begin{macrocode}
 function create(name, ctype, default)
     if not name then
-        err(format("unable to call callback, no proper name passed", name))
+        err("unable to call callback, no proper name passed", name)
         return nil
     end
     if not ctype or not default then
-        err(format("unable to create callback '%s', callbacktype or default function not specified", name))
+        err("unable to create callback '%s': "
+        .."callbacktype or default function not specified", name)
         return nil
     end
     if callbacktypes[name] then
-        err(format("unable to create callback '%s', callback already exists", name))
+        err("unable to create callback '%s', callback already exists", name)
         return nil
     end
     local temp = str_to_type(ctype)
     if not temp then
-        err(format("unable to create callback '%s', type '%s' undefined", name, ctype))
+        err("unable to create callback '%s', type '%s' undefined", name, ctype)
         return nil
     end
     ctype = temp
@@ -488,11 +488,11 @@ end
 %    \begin{macrocode}
 function call(name, ...)
     if not name then
-        err(format("unable to call callback, no proper name passed", name))
+        err("unable to call callback, no proper name passed", name)
         return nil
     end
     if not lua_callbacks_defaults[name] then
-        err(format("unable to call lua callback '%s', unknown callback", name))
+        err("unable to call lua callback '%s', unknown callback", name)
         return nil
     end
     local l = callbacklist[name]
@@ -545,21 +545,17 @@ function add (name,func,description,priority)
         err("unable to add function, no proper callback name passed")
         return
     elseif not callbacktypes[name] then
-        err(
-          format("unable to add function, '%s' is not a valid callback",
-          name))
+        err("unable to add function, '%s' is not a valid callback", name)
         return
     end
     if not description or description == "" then
-        err(
-          format("unable to add function to '%s', no proper description passed",
-          name))
+        err("unable to add function to '%s', no proper description passed",
+          name)
         return
     end
     if get_priority(name, description) ~= 0 then
-        warning(
-          format("function '%s' already registered in callback '%s'",
-          description, name))
+        warning("function '%s' already registered in callback '%s'",
+          description, name)
     end
     local l = callbacklist[name]
     if not l then
@@ -590,12 +586,12 @@ function add (name,func,description,priority)
         priority = 1
     end
     if callbacktypes[name] == first and (priority ~= 1 or #l ~= 0) then
-        warning(format("several callbacks registered in callback '%s', only the first function will be active.", name))
+        warning("several callbacks registered in callback '%s', "
+        .."only the first function will be active.", name)
     end
     table.insert(l,priority,f)
-    log(
-      format("inserting function '%s' at position %s in callback list for '%s'",
-      description,priority,name))
+    log("inserting function '%s' at position %s in callback list for '%s'",
+      description, priority, name)
 end
 %    \end{macrocode}
 %
@@ -606,7 +602,9 @@ end
 %
 %    \begin{macrocode}
 function get_priority (name, description)
-    if not name or name == "" or not callbacktypes[name] or not description then
+    if not name or name == ""
+            or not callbacktypes[name]
+            or not description then
         return 0
     end
     local l = callbacklist[name]
@@ -631,27 +629,24 @@ function remove (name, description)
         err("unable to remove function, no proper callback name passed")
         return
     elseif not callbacktypes[name] then
-        err(
-          format("unable to remove function, '%s' is not a valid callback",
-          name))
+        err("unable to remove function, '%s' is not a valid callback", name)
         return
     end
     if not description or description == "" then
         err(
-          format("unable to remove function from '%s', no proper description passed",
-          name))
+          "unable to remove function from '%s', no proper description passed",
+          name)
         return
     end
     local l = callbacklist[name]
     if not l then
-        err(format("no callback list for '%s'",name))
+        err("no callback list for '%s'",name)
         return
     end
     for k,v in ipairs(l) do
         if v.description == description then
             table.remove(l,k)
-            log(
-              format("removing function '%s' from '%s'",description,name))
+            log("removing function '%s' from '%s'",description,name)
             if not next(l) then
               callbacklist[name] = nil
               if not lua_callbacks_defaults[name] then
@@ -661,8 +656,7 @@ function remove (name, description)
             return
         end
     end
-    warning(
-      format("unable to remove function '%s' from '%s'",description,name))
+    warning("unable to remove function '%s' from '%s'",description,name)
 end
 %    \end{macrocode}
 %
@@ -674,9 +668,7 @@ function reset (name)
         err("unable to reset, no proper callback name passed")
         return
     elseif not callbacktypes[name] then
-        err(
-          format("reset error, '%s' is not a valid callback",
-          name))
+        err("reset error, '%s' is not a valid callback", name)
         return
     end
     if not lua_callbacks_defaults[name] then
@@ -684,7 +676,7 @@ function reset (name)
     end
     local l = callbacklist[name]
     if l then
-        log(format("resetting callback list '%s'",name))
+        log("resetting callback list '%s'",name)
         callbacklist[name] = nil
     end
 end
@@ -701,7 +693,7 @@ function listhandler (name)
         if l then
             local done = true
             for _, f in ipairs(l) do
-                -- the returned value can be either true or a new head plus true
+                -- the returned value is either true or a new head plus true
                 rtv1, rtv2 = f.func(head,...)
                 if type(rtv1) == 'boolean' then
                     done = rtv1
@@ -714,9 +706,8 @@ function listhandler (name)
                     head = rtv2
                 end
                 if done == false then
-                    err(format(
-                      "function \"%s\" returned false in callback '%s'", 
-                      f.description, name))
+                    err("function \"%s\" returned false in callback '%s'",
+                      f.description, name)
                 end
             end
             return head, done
@@ -788,7 +779,8 @@ callback.call = call
 callback.get_priority = get_priority
 
 callback.register = function (...)
-err("function callback.register has been deleted by luamcallbacks, please use callback.add instead.")
+err("function callback.register has been deleted by luamcallbacks, "
+.."please use callback.add instead.")
 end
 %    \end{macrocode}
 %
