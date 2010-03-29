@@ -241,7 +241,7 @@ See source file '\inFileName' for details.
     \let\x\ProvidesPackage
   \fi
 \expandafter\endgroup
-\x{luatexbase-mcb}[2010/09/11 v0.93  Callbacks hanndling for LuaTeX  (mpg)]
+\x{luatexbase-mcb}[2010/09/11 v0.93  Callback management for LuaTeX  (mpg)]
 %    \end{macrocode}
 %
 %    Make sure \luatex is used.
@@ -456,243 +456,6 @@ local function str_to_type(str)
 end
 %    \end{macrocode}
 %
-%    This first function creates a new callback. The signature is
-%    \texttt{create(name, ctype, default)} where \texttt{name} is the name of
-%    the new callback to create, \texttt{ctype} is the type of callback, and
-%    \texttt{default} is the default function to call if no function is
-%    registered in this callback.
-%
-%    The created callback will behave the same way Lua\TeX\ callbacks do, you
-%    can add and remove functions in it. The difference is that the callback
-%    is not automatically called, the package developer creating a new
-%    callback must also call it, see next function.
-%
-%    \begin{macrocode}
-local function create(name, ctype, default)
-    if not name then
-        err("unable to call callback, no proper name passed", name)
-        return nil
-    end
-    if not ctype or not default then
-        err("unable to create callback '%s': "
-        .."callbacktype or default function not specified", name)
-        return nil
-    end
-    if callbacktypes[name] then
-        err("unable to create callback '%s', callback already exists", name)
-        return nil
-    end
-    local temp = str_to_type(ctype)
-    if not temp then
-        err("unable to create callback '%s', type '%s' undefined", name, ctype)
-        return nil
-    end
-    ctype = temp
-    lua_callbacks_defaults[name] = default
-    callbacktypes[name] = ctype
-end
-%    \end{macrocode}
-%
-%    This function calls a callback. It can only call a callback created by
-%    the \texttt{create} function.
-%
-%    \begin{macrocode}
-local function call(name, ...)
-    if not name then
-        err("unable to call callback, no proper name passed", name)
-        return nil
-    end
-    if not lua_callbacks_defaults[name] then
-        err("unable to call lua callback '%s', unknown callback", name)
-        return nil
-    end
-    local l = callbacklist[name]
-    local f
-    if not l then
-        f = lua_callbacks_defaults[name]
-    else
-        if callbacktypes[name] == list then
-            f = listhandler(name)
-        elseif callbacktypes[name] == data then
-            f = datahandler(name)
-        elseif callbacktypes[name] == simple then
-            f = simplehandler(name)
-        elseif callbacktypes[name] == first then
-            f = firsthandler(name)
-        else
-            err("unknown callback type")
-        end
-    end
-    return f(...)
-end
-%    \end{macrocode}
-%
-%    The main function. The signature is \texttt{add (name,
-%    func, description, priority)} with \texttt{name} being the name of the
-%    callback in which the function is added; \texttt{func} is the added
-%    function; \texttt{description} is a small character string describing the
-%    function, and \texttt{priority} an optional argument describing the
-%    priority the function will have.
-%
-%    The functions for a callbacks are added in a list (in
-%    \texttt{callbacklist\\.callbackname}). If they have no
-%    priority or a high priority number, they will be added at the end of the
-%    list, and will be called after the others. If they have a low priority
-%    number, the will be added at the beginning of the list and will be called
-%    before the others.
-%
-%    Something that must be made clear, is that there is absolutely no
-%    solution for packages conflicts: if two packages want the top priority on
-%    a certain callback, they will have to decide the priority they will give
-%    to their function themselves. Most of the time, the priority is not needed.
-%
-%    \begin{macrocode}
-local function add (name,func,description,priority)
-    if type(func) ~= "function" then
-        err("unable to add function, no proper function passed")
-        return
-    end
-    if not name or name == "" then
-        err("unable to add function, no proper callback name passed")
-        return
-    elseif not callbacktypes[name] then
-        err("unable to add function, '%s' is not a valid callback", name)
-        return
-    end
-    if not description or description == "" then
-        err("unable to add function to '%s', no proper description passed",
-          name)
-        return
-    end
-    if get_priority(name, description) ~= 0 then
-        warning("function '%s' already registered in callback '%s'",
-          description, name)
-    end
-    local l = callbacklist[name]
-    if not l then
-        l = {}
-        callbacklist[name] = l
-        if not lua_callbacks_defaults[name] then
-            if callbacktypes[name] == list then
-                internalregister(name, listhandler(name))
-            elseif callbacktypes[name] == data then
-                internalregister(name, datahandler(name))
-            elseif callbacktypes[name] == simple then
-                internalregister(name, simplehandler(name))
-            elseif callbacktypes[name] == first then
-                internalregister(name, firsthandler(name))
-            else
-                err("unknown callback type")
-            end
-        end
-    end
-    local f = {
-        func = func,
-        description = description,
-    }
-    priority = tonumber(priority)
-    if not priority or priority > #l then
-        priority = #l+1
-    elseif priority < 1 then
-        priority = 1
-    end
-    if callbacktypes[name] == first and (priority ~= 1 or #l ~= 0) then
-        warning("several callbacks registered in callback '%s', "
-        .."only the first function will be active.", name)
-    end
-    table.insert(l,priority,f)
-    log("inserting function '%s' at position %s in callback list for '%s'",
-      description, priority, name)
-end
-%    \end{macrocode}
-%
-%    This function tells if a function has already been registered in a
-%    callback, and gives its current priority. The arguments are the name of
-%    the callback and the description of the function. If it has already been
-%    registered, it gives its priority, and if not it returns false.
-%
-%    \begin{macrocode}
-function get_priority (name, description)
-    if not name or name == ""
-            or not callbacktypes[name]
-            or not description then
-        return 0
-    end
-    local l = callbacklist[name]
-    if not l then return 0 end
-    for p, f in pairs(l) do
-        if f.description == description then
-            return p
-        end
-    end
-    return 0
-end
-%    \end{macrocode}
-%
-%    The function that removes a function from a callback. The signature is
-%    \texttt{mcallbacks.remove (name, description)} with \texttt{name} being
-%    the name of callbacks, and description the description passed to
-%    \texttt{mcallbacks.add}.
-%
-%    \begin{macrocode}
-local function remove (name, description)
-    if not name or name == "" then
-        err("unable to remove function, no proper callback name passed")
-        return
-    elseif not callbacktypes[name] then
-        err("unable to remove function, '%s' is not a valid callback", name)
-        return
-    end
-    if not description or description == "" then
-        err(
-          "unable to remove function from '%s', no proper description passed",
-          name)
-        return
-    end
-    local l = callbacklist[name]
-    if not l then
-        err("no callback list for '%s'",name)
-        return
-    end
-    for k,v in ipairs(l) do
-        if v.description == description then
-            table.remove(l,k)
-            log("removing function '%s' from '%s'",description,name)
-            if not next(l) then
-              callbacklist[name] = nil
-              if not lua_callbacks_defaults[name] then
-                internalregister(name, nil)
-              end
-            end
-            return
-        end
-    end
-    warning("unable to remove function '%s' from '%s'",description,name)
-end
-%    \end{macrocode}
-%
-%    This function removes all the functions registered in a callback.
-%
-%    \begin{macrocode}
-local function reset (name)
-    if not name or name == "" then
-        err("unable to reset, no proper callback name passed")
-        return
-    elseif not callbacktypes[name] then
-        err("reset error, '%s' is not a valid callback", name)
-        return
-    end
-    if not lua_callbacks_defaults[name] then
-        internalregister(name, nil)
-    end
-    local l = callbacklist[name]
-    if l then
-        log("resetting callback list '%s'",name)
-        callbacklist[name] = nil
-    end
-end
-%    \end{macrocode}
-%
 %     This function and the following ones are only internal. This one is the
 %     handler for the first type of callbacks: the ones that take a list head
 %     and return true, false, or a new list head.
@@ -776,6 +539,245 @@ local function simplehandler (name)
             end
         end
     end
+end
+%    \end{macrocode}
+%
+%    \subsubsection{Public functions}
+%
+%    The main function. The signature is \texttt{add (name,
+%    func, description, priority)} with \texttt{name} being the name of the
+%    callback in which the function is added; \texttt{func} is the added
+%    function; \texttt{description} is a small character string describing the
+%    function, and \texttt{priority} an optional argument describing the
+%    priority the function will have.
+%
+%    The functions for a callbacks are added in a list (in
+%    \texttt{callbacklist\\.callbackname}). If they have no
+%    priority or a high priority number, they will be added at the end of the
+%    list, and will be called after the others. If they have a low priority
+%    number, the will be added at the beginning of the list and will be called
+%    before the others.
+%
+%    Something that must be made clear, is that there is absolutely no
+%    solution for packages conflicts: if two packages want the top priority on
+%    a certain callback, they will have to decide the priority they will give
+%    to their function themselves. Most of the time, the priority is not needed.
+%
+%    \begin{macrocode}
+function add (name,func,description,priority)
+    if type(func) ~= "function" then
+        err("unable to add function, no proper function passed")
+        return
+    end
+    if not name or name == "" then
+        err("unable to add function, no proper callback name passed")
+        return
+    elseif not callbacktypes[name] then
+        err("unable to add function, '%s' is not a valid callback", name)
+        return
+    end
+    if not description or description == "" then
+        err("unable to add function to '%s', no proper description passed",
+          name)
+        return
+    end
+    if get_priority(name, description) ~= 0 then
+        warning("function '%s' already registered in callback '%s'",
+          description, name)
+    end
+    local l = callbacklist[name]
+    if not l then
+        l = {}
+        callbacklist[name] = l
+        if not lua_callbacks_defaults[name] then
+            if callbacktypes[name] == list then
+                internalregister(name, listhandler(name))
+            elseif callbacktypes[name] == data then
+                internalregister(name, datahandler(name))
+            elseif callbacktypes[name] == simple then
+                internalregister(name, simplehandler(name))
+            elseif callbacktypes[name] == first then
+                internalregister(name, firsthandler(name))
+            else
+                err("unknown callback type")
+            end
+        end
+    end
+    local f = {
+        func = func,
+        description = description,
+    }
+    priority = tonumber(priority)
+    if not priority or priority > #l then
+        priority = #l+1
+    elseif priority < 1 then
+        priority = 1
+    end
+    if callbacktypes[name] == first and (priority ~= 1 or #l ~= 0) then
+        warning("several callbacks registered in callback '%s', "
+        .."only the first function will be active.", name)
+    end
+    table.insert(l,priority,f)
+    log("inserting function '%s' at position %s in callback list for '%s'",
+      description, priority, name)
+end
+%    \end{macrocode}
+%
+%    The function that removes a function from a callback. The signature is
+%    \texttt{mcallbacks.remove (name, description)} with \texttt{name} being
+%    the name of callbacks, and description the description passed to
+%    \texttt{mcallbacks.add}.
+%
+%    \begin{macrocode}
+function remove (name, description)
+    if not name or name == "" then
+        err("unable to remove function, no proper callback name passed")
+        return
+    elseif not callbacktypes[name] then
+        err("unable to remove function, '%s' is not a valid callback", name)
+        return
+    end
+    if not description or description == "" then
+        err(
+          "unable to remove function from '%s', no proper description passed",
+          name)
+        return
+    end
+    local l = callbacklist[name]
+    if not l then
+        err("no callback list for '%s'",name)
+        return
+    end
+    for k,v in ipairs(l) do
+        if v.description == description then
+            table.remove(l,k)
+            log("removing function '%s' from '%s'",description,name)
+            if not next(l) then
+              callbacklist[name] = nil
+              if not lua_callbacks_defaults[name] then
+                internalregister(name, nil)
+              end
+            end
+            return
+        end
+    end
+    warning("unable to remove function '%s' from '%s'",description,name)
+end
+%    \end{macrocode}
+%
+%    This function removes all the functions registered in a callback.
+%
+%    \begin{macrocode}
+function reset (name)
+    if not name or name == "" then
+        err("unable to reset, no proper callback name passed")
+        return
+    elseif not callbacktypes[name] then
+        err("reset error, '%s' is not a valid callback", name)
+        return
+    end
+    if not lua_callbacks_defaults[name] then
+        internalregister(name, nil)
+    end
+    local l = callbacklist[name]
+    if l then
+        log("resetting callback list '%s'",name)
+        callbacklist[name] = nil
+    end
+end
+%    \end{macrocode}
+%
+%    This first function creates a new callback. The signature is
+%    \texttt{create(name, ctype, default)} where \texttt{name} is the name of
+%    the new callback to create, \texttt{ctype} is the type of callback, and
+%    \texttt{default} is the default function to call if no function is
+%    registered in this callback.
+%
+%    The created callback will behave the same way Lua\TeX\ callbacks do, you
+%    can add and remove functions in it. The difference is that the callback
+%    is not automatically called, the package developer creating a new
+%    callback must also call it, see next function.
+%
+%    \begin{macrocode}
+function create(name, ctype, default)
+    if not name then
+        err("unable to call callback, no proper name passed", name)
+        return nil
+    end
+    if not ctype or not default then
+        err("unable to create callback '%s': "
+        .."callbacktype or default function not specified", name)
+        return nil
+    end
+    if callbacktypes[name] then
+        err("unable to create callback '%s', callback already exists", name)
+        return nil
+    end
+    local temp = str_to_type(ctype)
+    if not temp then
+        err("unable to create callback '%s', type '%s' undefined", name, ctype)
+        return nil
+    end
+    ctype = temp
+    lua_callbacks_defaults[name] = default
+    callbacktypes[name] = ctype
+end
+%    \end{macrocode}
+%
+%    This function calls a callback. It can only call a callback created by
+%    the \texttt{create} function.
+%
+%    \begin{macrocode}
+function call(name, ...)
+    if not name then
+        err("unable to call callback, no proper name passed", name)
+        return nil
+    end
+    if not lua_callbacks_defaults[name] then
+        err("unable to call lua callback '%s', unknown callback", name)
+        return nil
+    end
+    local l = callbacklist[name]
+    local f
+    if not l then
+        f = lua_callbacks_defaults[name]
+    else
+        if callbacktypes[name] == list then
+            f = listhandler(name)
+        elseif callbacktypes[name] == data then
+            f = datahandler(name)
+        elseif callbacktypes[name] == simple then
+            f = simplehandler(name)
+        elseif callbacktypes[name] == first then
+            f = firsthandler(name)
+        else
+            err("unknown callback type")
+        end
+    end
+    return f(...)
+end
+%    \end{macrocode}
+%
+%    This function tells if a function has already been registered in a
+%    callback, and gives its current priority. The arguments are the name of
+%    the callback and the description of the function. If it has already been
+%    registered, it gives its priority, and if not it returns false.
+%
+%    \begin{macrocode}
+function get_priority (name, description)
+    if not name or name == ""
+            or not callbacktypes[name]
+            or not description then
+        return 0
+    end
+    local l = callbacklist[name]
+    if not l then return 0 end
+    for p, f in pairs(l) do
+        if f.description == description then
+            return p
+        end
+    end
+    return 0
 end
 %    \end{macrocode}
 %
