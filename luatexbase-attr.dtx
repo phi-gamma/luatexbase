@@ -250,6 +250,27 @@ See source file '\inFileName' for details.
 \fi
 %    \end{macrocode}
 %
+%    \subsubsection{Primitives needed}
+%
+%    Load \pk{luatexbase-compat}.
+%
+%    \begin{macrocode}
+\begingroup\expandafter\expandafter\expandafter\endgroup
+\expandafter\ifx\csname RequirePackage\endcsname\relax
+  \input luatexbase-compat.sty
+\else
+  \RequirePackage{luatexbase-compat}
+\fi
+%    \end{macrocode}
+%
+%    Make sure the primitives we need are available.
+%
+%    \begin{macrocode}
+\luatexbase@ensure@primitive{luaescapestring}
+\luatexbase@ensure@primitive{attributedef}
+\luatexbase@ensure@primitive{attribute}
+%    \end{macrocode}
+%
 %    \subsubsection{Load supporting Lua module}
 %
 %    First load \pk{luatexbase-loader} (hence \pk{luatexbase-compat}), then
