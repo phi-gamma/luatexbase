@@ -121,9 +121,9 @@ See source file '\inFileName' for details.
 %
 % \section{Documentation}
 %
-% Two problems are currently addressed by this package: changes in the syntax
-% of |\directlua|, and variable policies for primitives activation and naming
-% (in \luatex itself as well as in \texlive).
+% Three problems are currently addressed by this package: changes in the
+% syntax of |\directlua|, version information, and variable policies for
+% primitives activation and naming (in \luatex itself as well as in \texlive).
 %
 % \medskip
 %
@@ -138,6 +138,14 @@ See source file '\inFileName' for details.
 % |\directlua0| on \luatex 0.35 and lower (where the number is mandatory), and
 % to |\directlua| otherwise. It is a macro in both case so that the number of
 % expansion steps remains constant.
+%
+% \medskip
+%
+% Current versions of \luatex make the version available directly from Lua as
+% |tex.luatexversion| and |tex.luatexrevision|. However, older versions (such
+% as 0.25.4) didn't, which makes it particularly uneasy to test the version
+% from within Lua. The present package makes this information available as
+% |luatexbase.luatexversion| and |luatexbase.luatexrevision|.
 %
 % \medskip
 %
@@ -298,6 +306,17 @@ See source file '\inFileName' for details.
 \the\toks0
 %    \end{macrocode}
 %
+%    \subsection{Version information}
+%
+%    Make |\luatexversion| and |\luatexrevision| available from Lua.
+%
+%    \begin{macrocode}
+\luatexbase@directlua{%
+  luatexbase = luatexbase or {}
+  luatexbase.luatexversion = \number\luatexversion\space
+  luatexbase.luatexrevision = \number\luatexrevision\space}
+%    \end{macrocode}
+%
 %    \subsection{Primitives}
 %
 %    Try reasonably hard to activate a primitive. First, check if it is
@@ -379,6 +398,8 @@ See source file '\inFileName' for details.
 \luatexbase@directlua{local answer = 42}
 \luatexbase@ensure@primitive{primitive}
 \luatexprimitive\relax
+\luatexbase@directlua{assert(type(luatexbase.luatexversion) == 'number')}
+\luatexbase@directlua{assert(type(luatexbase.luatexrevision) == 'number')}
 %</testplain,testlatex>
 %<testplain>\bye
 %<testlatex>\stop
