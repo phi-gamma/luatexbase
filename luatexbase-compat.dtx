@@ -1,0 +1,238 @@
+% \iffalse meta-comment
+%
+% Written in 2010 by Manuel Pégourié-Gonnard.
+%     <mpg@elzevir.fr>
+%
+% This work is under the CC0 license.
+%
+% This work consists of the main source file luatexbase-compat.dtx
+% and the derived files
+%   luatexbase-compat.pdf luatexbase-compat.sty
+%   test-compat-plain.tex test-compat-latex.tex
+%
+% Unpacking:
+%    tex luatexbase-compat.dtx
+% Documentation:
+%    pdflatex luatexbase-compat.dtx
+%
+%    The class ltxdoc loads the configuration file ltxdoc.cfg
+%    if available. Here you can specify further options, e.g.
+%    use A4 as paper format:
+%       \PassOptionsToClass{a4paper}{article}
+%
+%<*ignore>
+\begingroup
+  \def\x{LaTeX2e}%
+\expandafter\endgroup
+\ifcase 0\ifx\install y1\fi\expandafter
+         \ifx\csname processbatchFile\endcsname\relax\else1\fi
+         \ifx\fmtname\x\else 1\fi\relax
+\else\csname fi\endcsname
+%</ignore>
+%<*install>
+\input docstrip.tex
+
+\keepsilent
+\askforoverwritefalse
+
+\preamble
+
+Written in 2010 by Manuel Pegourie-Gonnard.
+
+This work is under the CC0 license.
+See source file '\inFileName' for details.
+
+\endpreamble
+
+\generate{%
+  \usedir{tex/luatex/luatexbase}%
+  \file{luatexbase-compat.sty}{\from{luatexbase-compat.dtx}{texpackage}}%
+}
+
+\generate{%
+  \usedir{doc/luatex/luatexbase}%
+  \file{test-compat-plain.tex}{\from{luatexbase-compat.dtx}{testplain}}%
+  \file{test-compat-latex.tex}{\from{luatexbase-compat.dtx}{testlatex}}%
+}
+
+\obeyspaces
+\Msg{************************************************************************}
+\Msg{*}
+\Msg{* To finish the installation you have to move the following}
+\Msg{* files into a directory searched by TeX:}
+\Msg{*}
+\Msg{*     luatexbase-compat.sty}
+\Msg{*}
+\Msg{* Happy TeXing!}
+\Msg{*}
+\Msg{************************************************************************}
+
+\endbatchfile
+%</install>
+%<*ignore>
+\fi
+%</ignore>
+%<*driver>
+\NeedsTeXFormat{LaTeX2e}
+\documentclass{ltxdoc}
+\input lltxb-dtxstyle.tex
+\EnableCrossrefs
+\CodelineIndex
+\begin{document}
+  \DocInput{luatexbase-compat.dtx}%
+\end{document}
+%</driver>
+% \fi
+%
+% \CheckSum{0}
+%
+% \CharacterTable
+%  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
+%   Lower-case    \a\b\c\d\e\f\g\h\i\j\k\l\m\n\o\p\q\r\s\t\u\v\w\x\y\z
+%   Digits        \0\1\2\3\4\5\6\7\8\9
+%   Exclamation   \!     Double quote  \"     Hash (number) \#
+%   Dollar        \$     Percent       \%     Ampersand     \&
+%   Acute accent  \'     Left paren    \(     Right paren   \)
+%   Asterisk      \*     Plus          \+     Comma         \,
+%   Minus         \-     Point         \.     Solidus       \/
+%   Colon         \:     Semicolon     \;     Less than     \<
+%   Equals        \=     Greater than  \>     Question mark \?
+%   Commercial at \@     Left bracket  \[     Backslash     \\
+%   Right bracket \]     Circumflex    \^     Underscore    \_
+%   Grave accent  \`     Left brace    \{     Vertical bar  \|
+%   Right brace   \}     Tilde         \~}
+%
+% \title{The \pk{luatexbase-compat} package}
+% \date{2010/01/21 v0.1}
+% \author{%
+%  Manuel P\'egouri\'e-Gonnard \\ \email{mpg@elzevir.fr} \and
+%   \'Elie Roux \\ \email{elie.roux@telecom-bretagne.eu}}
+%
+% \maketitle
+%
+% \begin{abstract}
+% \end{abstract}
+%
+% \tableofcontents
+%
+% \section{Documentation}
+%
+%
+%    \section{Implementation}
+%
+%    \begin{macrocode}
+%<*texpackage>
+%    \end{macrocode}
+%
+%    \subsection{Preliminaries}
+%
+%    Reload protection, especially for \plaintex.
+%
+%    \begin{macrocode}
+                \csname lltxb@compat@loaded\endcsname
+\expandafter\let\csname lltxb@compat@loaded\endcsname\endinput
+%    \end{macrocode}
+%
+%    Catcode defenses.
+%
+%    \begin{macrocode}
+\begingroup
+  \catcode123 1 % {
+  \catcode125 2 % }
+  \catcode 35 6 % #
+  \toks0{}%
+  \def\x{}%
+  \def\y#1 #2 {%
+    \toks0\expandafter{\the\toks0 \catcode#1 \the\catcode#1}%
+    \edef\x{\x \catcode#1 #2}}%
+  \y 123 1  % {
+  \y 125 2  % }
+  \y  35 6  % #
+  \y  10 12 % ^^J
+  \y  34 12 % "
+  \y  36 3  % $ $
+  \y  39 12 % '
+  \y  40 12 % (
+  \y  41 12 % )
+  \y  42 12 % *
+  \y  43 12 % +
+  \y  44 12 % ,
+  \y  45 12 % -
+  \y  46 12 % .
+  \y  47 12 % /
+  \y  60 12 % <
+  \y  61 12 % =
+  \y  64 11 % @ (letter)
+  \y  62 12 % >
+  \y  95 12 % _ (other)
+  \y  96 12 % `
+  \edef\y#1{\endgroup\edef#1{\the\toks0\relax}\x}%
+\expandafter\y\csname lltxb@compat@AtEnd\endcsname
+%    \end{macrocode}
+%
+%    Package declaration.
+%
+%    \begin{macrocode}
+\begingroup
+  \expandafter\ifx\csname ProvidesPackage\endcsname\relax
+    \def\x#1[#2]{\immediate\write16{Package: #1 #2}}
+  \else
+    \let\x\ProvidesPackage
+  \fi
+\expandafter\endgroup
+\x{luatexbase-compat}[2010/01/21 v0.1  Compatibility tools for LuaTeX  (mpg)]
+%    \end{macrocode}
+%
+%    Make sure \luatex is used.
+%
+%    \begin{macrocode}
+\begingroup\expandafter\expandafter\expandafter\endgroup
+\expandafter\ifx\csname RequirePackage\endcsname\relax
+  \input ifluatex.sty
+\else
+  \RequirePackage{ifluatex}
+\fi
+\ifluatex\else
+  \begingroup
+    \expandafter\ifx\csname PackageWarningNoLine\endcsname\relax
+      \def\x#1#2{\begingroup\newlinechar10
+        \immediate\write16{Package #1 warning: #2}\endgroup}
+    \else
+      \let\x\PackageWarningNoLine
+    \fi
+  \expandafter\endgroup
+  \x{luatexbase-compat}{LuaTeX is required for this package. Aborting.}
+  \lltxb@compat@AtEnd
+  \expandafter\endinput
+\fi
+%    \end{macrocode}
+%
+%    \subsection{Actually do stuff}
+%
+%
+%    \begin{macrocode}
+%    \end{macrocode}
+%
+%    That's all folks!
+%
+%    \begin{macrocode}
+\lltxb@compat@AtEnd
+%</texpackage>
+%    \end{macrocode}
+%
+%    \section{Test files}
+%
+%    Test fils for Plain and LaTeX
+%
+%    \begin{macrocode}
+%<testplain>\input luatexbase-compat.sty
+%<testlatex>\RequirePackage{luatexbase-compat}
+%<*testplain,testlatex>
+%</testplain,testlatex>
+%<testplain>\bye
+%<testlatex>\stop
+%    \end{macrocode}
+%
+%
+% \Finale
+\endinput
