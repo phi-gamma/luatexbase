@@ -338,11 +338,23 @@ local function find_module_file(mod)
 end
 %    \end{macrocode}
 %
+%    Combined searcher, using primarily the new kpse searcher, and the
+%    original as a fall-back.
+%
 %    \begin{macrocode}
+local package_loader_two = package.loaders[2]
 local function load_module(mod)
   local file = find_module_file(mod)
   if not file then
-    return "\n\t[luatexbase.loader] Search failed"
+    local msg = "\n\t[luatexbase.loader] Search failed"
+    local ret = package_loader_two(mod)
+    if type(ret) == 'string' then
+      return msg..ret
+    elseif type(ret) == 'nil' then
+      return msg
+    else
+      return ret
+    end
   end
   local loader, error = loadfile(file)
   if not loader then
@@ -353,8 +365,10 @@ local function load_module(mod)
 end
 %    \end{macrocode}
 %
+%    Finally install this combined loader as loader 2.
+%
 %    \begin{macrocode}
-table.insert(package.loaders, 2, load_module)
+package.loaders[2] = load_module
 %</luamodule>
 %    \end{macrocode}
 %

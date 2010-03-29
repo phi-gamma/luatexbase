@@ -19,6 +19,7 @@
     luatexbase-loader
         - require"foo.bar" now looks for foo/bar then foo.bar, see doc for
           details
+        - better cooperation with the original package loader
         - works with luatex 0.25.4
 
 2010/03/28
