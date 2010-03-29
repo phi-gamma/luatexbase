@@ -21,7 +21,8 @@ UNPACKED_ATTR = luatexbase-attr.sty attr.lua \
 UNPACKED_CCTB = luatexbase-cctb.sty cctb.lua \
 				test-cctb-plain.tex test-cctb-latex.tex
 UNPACKED_LOADER = $(LOADER_RUN) \
-				test-loader-plain.tex test-loader-latex.tex
+				test-loader-plain.tex test-loader-latex.tex \
+				test-loader.lua test-loader.sub.lua
 UNPACKED_MODUTILS = $(MOD_RUN) test-modutils.lua \
 				test-modutils-plain.tex test-modutils-latex.tex
 UNPACKED_COMPAT = $(COMPAT_RUN) \

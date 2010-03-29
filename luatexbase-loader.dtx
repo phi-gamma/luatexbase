@@ -67,6 +67,9 @@ See source file '\inFileName' for details.
 \generate{%
   \usedir{tex/luatex/luatexbase}%
   \file{luatexbase.loader.lua}{\from{luatexbase-loader.dtx}{luamodule}}%
+  \usedir{doc/luatex/luatexbase}%
+  \file{test-loader.lua}{\from{luatexbase-loader.dtx}{testdummy}}%
+  \file{test-loader.sub.lua}{\from{luatexbase-loader.dtx}{testdummy}}%
 }
 
 \obeyspaces
@@ -280,12 +283,40 @@ See source file '\inFileName' for details.
 module('luatexbase', package.seeall)
 %    \end{macrocode}
 %
-%    Find the full path corresponding to a mudole name.
+%    Emulate (approximatively) kpse's lua format search.
+%
+%    \begin{macrocode}
+local lua_suffixes = {
+  "",
+  ".luc", ".luctex", ".texluc",
+  ".lua", ".luatex", ".texlua",
+}
+local function find_file_lua(name)
+  for _, suf in ipairs(lua_suffixes) do
+    local name = name..suf
+    local f = kpse.find_file(name, 'texmfscripts')
+      or kpse.find_file(name, 'tex')
+    if f then return f end
+  end
+end
+%    \end{macrocode}
+%
+%    Don't use the emulated version if kpse lua format works.
+%
+%    \begin{macrocode}
+if pcall('kpse.find_file', 'dummy', 'lua') then
+  find_file_lua = function(name)
+    return kpse.find_file(name, 'lua')
+  end
+end
+%    \end{macrocode}
+%
+%    Find the full path corresponding to a module name.
 %
 %    \begin{macrocode}
 local function find_module_file(mod)
-  return kpse.find_file(mod:gsub('%.', '/'), 'lua')
-    or kpse.find_file(mod, 'lua')
+  return find_file_lua(mod:gsub('%.', '/'), 'lua')
+    or find_file_lua(mod, 'lua')
 end
 %    \end{macrocode}
 %
@@ -305,23 +336,30 @@ end
 %    \end{macrocode}
 %
 %    \begin{macrocode}
-table.insert(package.loaders, load_module)
+table.insert(package.loaders, 2, load_module)
 %</luamodule>
 %    \end{macrocode}
 %
 %    \section{Test files}
 %
-%    We just check that the package loads properly, under both LaTeX and Plain
-%    TeX. Anyway, the test files of other modules using this one already are a
-%    test\dots
+%    A dummy lua file for tests.
+%
+%    \begin{macrocode}
+%<*testdummy>
+return true
+%</testdummy>
+%    \end{macrocode}
+%
+%    Check that the package loads properly, under both LaTeX and Plain TeX,
+%    and load a dummy module in the current diretory.
 %
 %    \begin{macrocode}
 %<testplain>\input luatexbase-loader.sty
 %<testlatex>\RequirePackage{luatexbase-loader}
 %<*testplain,testlatex>
-%    \end{macrocode}
-%
-%    \begin{macrocode}
+\catcode64 11
+\luatexbase@directlua{require "test-loader"}
+\luatexbase@directlua{require "test-loader.sub"}
 %</testplain,testlatex>
 %<testplain>\bye
 %<testlatex>\stop
