@@ -13,7 +13,7 @@ LINKS = luatexbase.attr.lua luatexbase.cctb.lua \
 		luatexbase.mcb.lua luatexbase.modutils.lua
 
 # Files grouped by generation mode
-UNPACKED_MCB = mcb.lua \
+UNPACKED_MCB = luatexbase-mcb.sty mcb.lua \
 			   test-mcb-latex.tex test-mcb-plain.tex
 UNPACKED_REGS = luatexbase-regs.sty \
 				test-regs-plain.tex test-regs-latex.tex

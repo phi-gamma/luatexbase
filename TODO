@@ -1,18 +1,37 @@
 modutils
 --------
 
-Review extensively.
 - Renaming:
     \luatexUseModule
     \luatexRequireModule
     \luatexModuleError
 - stop using module() inside functions
+- Make more Lua objects local.
 - logic (see what LaTeX2e does)
+- syntax of public TeX macros and Lua functions
+- General review of code and comments.
+- Update user documentation.
 
 mcallbacks
 ----------
 
-Review extensively.
-Compatibility : tex.luaversion not available in 0.25.4 :'(
-Incorporate remaining bits from luatextra?
+- Compatibility : tex.luaversion not available in 0.25.4 :'(
+- Incorporate remaining bits from luatextra?
+- Make more Lua objects local.
+- Stop creating functions in the callback table ?!
+- Make a decision about names of public functions.
+- General review of code and comments.
+- Update user documentation.
 
+luatexbase
+----------
+
+- create it, make it load the others (except maybe mcb for now)
+- create general documentation
+
+afterwards
+----------
+
+- check/adapt luatextra
+- Bump version number, make zip, announce.
+- engage discussion with Heiko
