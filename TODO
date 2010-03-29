@@ -6,7 +6,6 @@ general
 compat
 ------
 
-- \EnsureLuaTeXPrimitive
 - use it in other packages, and test them with various versions
 
 loader

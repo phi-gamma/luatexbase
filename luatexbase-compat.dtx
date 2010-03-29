@@ -228,6 +228,65 @@ See source file '\inFileName' for details.
 \the\toks0
 %    \end{macrocode}
 %
+%    \subsection{Primitives}
+%
+%    \begin{macrocode}
+\begingroup
+\expandafter\ifx\csname newcommand\endcsname\relax
+  \toks0{\def\luatexbase@ensure@primitive#1}
+\else
+  \toks0{\newcommand*\luatexbase@ensure@primitive[1]}
+\fi
+\toks2{}\def\x#1{\toks2\expandafter{\the\toks2 #1}}
+\x{%
+  \ifcsname luatex#1\endcsname \else}
+\ifnum\luatexversion<37\relax
+%    \end{macrocode}
+%
+%    |tex.enableprimitives()| not available. If the unprefixed primitive is
+%    undefined, issue an error.
+%
+%    \begin{macrocode}
+  \x{%
+    \begingroup\expandafter\expandafter\expandafter\endgroup
+    \expandafter\ifx\csname #1\endcsname\relax}
+  \begingroup\expandafter\expandafter\expandafter\endgroup
+  \expandafter\ifx\csname PackageError\endcsname\relax
+    \x{%
+      \errmessage{%
+        Package luatexbase-compat error: failed to enable `#1'.}}
+  \else
+    \x{%
+      \PackageError{luatexbase-compat}{%
+        Package luatexbase-compat error: failed to enable `#1'.}{}}
+  \fi
+  \x{%
+    \else}
+%    \end{macrocode}
+%
+%    Use the unprefixed primitive to define the prefixed version.
+%
+%    \begin{macrocode}
+  \x{%
+      \expandafter\let\csname luatex#1\expandafter\endcsname
+      \csname#1\endcsname
+    \fi}
+\else
+%    \end{macrocode}
+%
+%    |tex.enableprimitives()| available, use it.
+%
+%    \begin{macrocode}
+  \x{%
+    \luatexbase@directlua{tex.enableprimitives('luatex', '#1')}}
+\fi
+\x{%
+  \fi}
+\toks0\expandafter{\the\toks0\expandafter{\the\toks2}}
+\expandafter\endgroup
+\the\toks0
+%    \end{macrocode}
+%
 %    That's all folks!
 %
 %    \begin{macrocode}
@@ -245,6 +304,8 @@ See source file '\inFileName' for details.
 %<*testplain,testlatex>
 \catcode64 11
 \luatexbase@directlua{local answer = 42}
+\luatexbase@ensure@primitive{primitive}
+\luatexprimitive\relax
 %</testplain,testlatex>
 %<testplain>\bye
 %<testlatex>\stop
