@@ -278,9 +278,10 @@ See source file '\inFileName' for details.
     \allocationnumber\lltxb@attribute@alloc
     \global\luatexattributedef#1=\allocationnumber
     \unsetluatexattribute#1%
-    \begingroup\escapechar\m@ne \expandafter\endgroup
+    \begingroup\escapechar\m@ne
     \luatexbase@directlua{luatexbase.attributedef_from_tex(
       '\luatexluaescapestring{\string#1}', '\number\allocationnumber')}%
+    \endgroup
     \wlog{\string#1=\string\luatexattribute\the\allocationnumber}%
   \else
     \errmessage{No room for a new \string\attribute}%
