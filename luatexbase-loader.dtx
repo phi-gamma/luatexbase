@@ -242,12 +242,23 @@ See source file '\inFileName' for details.
 %
 %    \subsubsection{Main content}
 %
+%    First load \pk{luatexbase-compat}.
+%
+%    \begin{macrocode}
+\begingroup\expandafter\expandafter\expandafter\endgroup
+\expandafter\ifx\csname RequirePackage\endcsname\relax
+  \input luatexbase-compat.sty
+\else
+  \RequirePackage{luatexbase-compat}
+\fi
+%    \end{macrocode}
+%
 %    Load the supporting Lua module. This one doesn't follow the usual naming
 %    conventions, since it won't be loaded with the usual functions for
 %    obvious bootstraping reasons.
 %
 %    \begin{macrocode}
-\directlua{%
+\luatexbase@directlua{%
   local file = "luatexbase.loader.lua"
   local path = assert(kpse.find_file(file, 'tex'),
     "File '"..file.."' no found")

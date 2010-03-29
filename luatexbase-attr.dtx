@@ -252,6 +252,9 @@ See source file '\inFileName' for details.
 %
 %    \subsubsection{Load supporting Lua module}
 %
+%    First load \pk{luatexbase-loader} (hence \pk{luatexbase-compat}), then
+%    the supporting Lua module.
+%
 %    \begin{macrocode}
 \begingroup\expandafter\expandafter\expandafter\endgroup
 \expandafter\ifx\csname RequirePackage\endcsname\relax
@@ -259,7 +262,7 @@ See source file '\inFileName' for details.
 \else
   \RequirePackage{luatexbase-loader}
 \fi
-\directlua{require('luatexbase.attr')}
+\luatexbase@directlua{require('luatexbase.attr')}
 %    \end{macrocode}
 %
 %    \subsection{User macros}
@@ -276,7 +279,7 @@ See source file '\inFileName' for details.
     \global\luatexattributedef#1=\allocationnumber
     \unsetluatexattribute#1%
     \begingroup\escapechar\m@ne \expandafter\endgroup
-    \directlua{luatexbase.attributedef_from_tex(
+    \luatexbase@directlua{luatexbase.attributedef_from_tex(
       '\luatexluaescapestring{\string#1}', '\number\allocationnumber')}%
     \wlog{\string#1=\string\luatexattribute\the\allocationnumber}%
   \else
@@ -343,13 +346,14 @@ end
 \newluatexattribute\testattr
 \setluatexattribute\testattr{1}
 \unsetluatexattribute\testattr
-\directlua{assert(luatexbase.attributes.testattr)}
+\catcode64 11
+\luatexbase@directlua{assert(luatexbase.attributes.testattr)}
 \begingroup
 \escapechar64
 \newluatexattribute\anotherattr
 \endgroup
 \setluatexattribute\anotherattr{1}
-\directlua{assert(luatexbase.attributes.anotherattr)}
+\luatexbase@directlua{assert(luatexbase.attributes.anotherattr)}
 %</testplain,testlatex>
 %<testplain>\bye
 %<testlatex>\stop

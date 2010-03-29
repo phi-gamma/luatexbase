@@ -782,7 +782,8 @@ end
 %<testplain>\input luatexbase-modutils.sty
 %<testlatex>\RequirePackage{luatexbase-modutils}
 %<*testplain,testlatex>
-\directlua{
+\catcode 64 11
+\luatexbase@directlua{
   require "luamcallbacks"
   local function one(head,...)
       texio.write_nl("I'm number 1")

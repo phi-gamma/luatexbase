@@ -4,6 +4,9 @@ NAME = luatexbase
 DTX = $(wildcard *.dtx)
 DOC = $(patsubst %.dtx, %.pdf, $(DTX))
 DTXSTY = lltxb-dtxstyle.tex
+
+# used for check dependencies
+COMPAT_RUN = luatexbase-compat.sty
 LOADER_RUN = luatexbase-loader.sty luatexbase.loader.lua
 MOD_RUN = luatexbase-modutils.sty modutils.lua
 LINKS = luatexbase.attr.lua luatexbase.cctb.lua luatexbase.modutils.lua
@@ -21,7 +24,7 @@ UNPACKED_LOADER = $(LOADER_RUN) \
 				test-loader-plain.tex test-loader-latex.tex
 UNPACKED_MODUTILS = $(MOD_RUN) test-modutils.lua \
 				test-modutils-plain.tex test-modutils-latex.tex
-UNPACKED_COMPAT = luatexbase-compat.sty \
+UNPACKED_COMPAT = $(COMPAT_RUN) \
 				test-compat-plain.tex test-compat-latex.tex
 UNPACKED = $(UNPACKED_MCB) $(UNPACKED_REGS) $(UNPACKED_ATTR) $(UNPACKED_CCTB) \
 		   $(UNPACKED_LOADER) $(UNPACKED_MODUTILS) $(UNPACKED_COMPAT)
@@ -97,23 +100,23 @@ check-regs: $(UNPACKED_REGS)
 	luatex --interaction=batchmode test-regs-plain.tex >/dev/null
 	lualatex --interaction=batchmode test-regs-latex.tex >/dev/null
 
-check-attr: $(UNPACKED_ATTR) $(LOADER_RUN) $(LINKS)
+check-attr: $(UNPACKED_ATTR) $(LOADER_RUN) $(LINKS) $(COMPAT_RUN)
 	luatex --interaction=batchmode test-attr-plain.tex >/dev/null
 	lualatex --interaction=batchmode test-attr-latex.tex >/dev/null
 
-check-cctb: $(UNPACKED_CCTB) $(LOADER_RUN) $(LINKS)
+check-cctb: $(UNPACKED_CCTB) $(LOADER_RUN) $(LINKS) $(COMPAT_RUN)
 	luatex --interaction=batchmode test-cctb-plain.tex >/dev/null
 	lualatex --interaction=batchmode test-cctb-latex.tex >/dev/null
 
-check-loader: $(UNPACKED_LOADER)
+check-loader: $(UNPACKED_LOADER) $(COMPAT_RUN)
 	luatex --interaction=batchmode test-loader-plain.tex >/dev/null
 	lualatex --interaction=batchmode test-loader-latex.tex >/dev/null
 
-check-modutils: $(UNPACKED_MODUTILS) $(LOADER_RUN) $(LINKS)
+check-modutils: $(UNPACKED_MODUTILS) $(LOADER_RUN) $(LINKS) $(COMPAT_RUN)
 	luatex --interaction=batchmode test-modutils-plain.tex >/dev/null
 	lualatex --interaction=batchmode test-modutils-latex.tex >/dev/null
 
-check-mcb: $(UNPACKED_MCB) $(LOADER_RUN) $(MOD_RUN) $(LINKS)
+check-mcb: $(UNPACKED_MCB) $(LOADER_RUN) $(MOD_RUN) $(LINKS) $(COMPAT_RUN)
 	luatex --interaction=batchmode test-callbacks-plain.tex >/dev/null
 	lualatex --interaction=batchmode test-callbacks-latex.tex >/dev/null
 

@@ -275,6 +275,9 @@ See source file '\inFileName' for details.
 %
 %    \subsubsection{Load supporting Lua module}
 %
+%    First load \pk{luatexbase-loader} (hence \pk{luatexbase-compat}), then
+%    the supporting Lua module.
+%
 %    \begin{macrocode}
 \begingroup\expandafter\expandafter\expandafter\endgroup
 \expandafter\ifx\csname RequirePackage\endcsname\relax
@@ -282,7 +285,7 @@ See source file '\inFileName' for details.
 \else
   \RequirePackage{luatexbase-loader}
 \fi
-\directlua{require('luatexbase.cctb')}
+\luatexbase@directlua{require('luatexbase.cctb')}
 %    \end{macrocode}
 %
 %    \subsubsection{User macros}
@@ -300,7 +303,7 @@ See source file '\inFileName' for details.
     \global\chardef#1\allocationnumber
     \luatexinitcatcodetable\allocationnumber
     \begingroup\escapechar\m@ne \expandafter\endgroup
-    \directlua{luatexbase.catcodetabledef_from_tex(
+    \luatexbase@directlua{luatexbase.catcodetabledef_from_tex(
       '\luatexluaescapestring{\string#1}', '\number\allocationnumber')}%
     \wlog{\string#1=\string\luatexcatcodetable\the\allocationnumber}%
   \else
@@ -423,7 +426,7 @@ See source file '\inFileName' for details.
 %    Finally do the shortcuts.
 %
 %    \begin{macrocode}
-\directlua{luatexbase.catcodetable_do_shortcuts()}
+\luatexbase@directlua{luatexbase.catcodetable_do_shortcuts()}
 %    \end{macrocode}
 %
 %    That's all, folks!
@@ -483,7 +486,7 @@ end
 %<testlatex>\RequirePackage{luatexbase-cctb}
 %<*testplain,testlatex>
 \newluatexcatcodetable\testcctb
-\directlua{assert(luatexbase.catcodetables.testcctb)}
+\luatexbase@directlua{assert(luatexbase.catcodetables.testcctb)}
 %    \end{macrocode}
 %
 %    Also check that the catcodetable's number is remembered well,
@@ -494,7 +497,7 @@ end
 \escapechar64
 \newluatexcatcodetable\anothercctb
 \endgroup
-\directlua{assert(luatexbase.catcodetables.anothercctb)}
+\luatexbase@directlua{assert(luatexbase.catcodetables.anothercctb)}
 %    \end{macrocode}
 %
 %    Now, play a little bit with predefined tables.
@@ -505,7 +508,8 @@ end
 \luatexcatcodetable\CatcodeTableLaTeX
 \ifnum\catcode64=12 \else \ERROR \fi
 %<testlatex>\documentclass{minimal}
-\directlua{%
+\catcode64 11
+\luatexbase@directlua{%
   tex.sprint('\string\\setbox0=\string\\hbox{')
   tex.sprint(luatexbase.catcodetables.string, "\string\\undef # _^&")
   tex.sprint('}')
