@@ -231,7 +231,8 @@ See source file '\inFileName' for details.
 \fi
 %    \end{macrocode}
 %
-%    Load \pk{luatexbase-loader} (hence \pk{luatexbase-compat}).
+%    Load \pk{luatexbase-loader} (hence \pk{luatexbase-compat}) and require
+%    supporting Lua module.
 %
 %    \begin{macrocode}
 \begingroup\expandafter\expandafter\expandafter\endgroup
@@ -240,22 +241,10 @@ See source file '\inFileName' for details.
 \else
   \RequirePackage{luatexbase-loader}
 \fi
+\luatexbase@directlua{require('luatexbase.modutils')}
 %    \end{macrocode}
 %
-%    \subsubsection{Main code}
-%
-%    The \texttt{\string\luatexModuleError} macro is called by the lua function
-%    \texttt{luatexbase.module\_error}. It is necessary because we can't call
-%    directly \texttt{\string\errmessage} in lua.
-%
-%    \begin{macrocode}
-\def\luatexModuleError#1#2{%
-  \errorcontextlines=0\relax
-  \immediate\write16{}%
-  \errmessage{Module #1 error: #2^^J^^J%
-See the module #1 documentation for explanation.^^J ...^^J}%
-}
-%    \end{macrocode}
+%    \subsubsection{User macros}
 %
 %    Then we define
 %    \texttt{\string\luatexUseModule} that simply calls
@@ -283,7 +272,6 @@ See the module #1 documentation for explanation.^^J ...^^J}%
 %    \end{macrocode}
 %
 %    \begin{macrocode}
-\luatexbase@directlua{require('luatexbase.modutils')}
 %    \end{macrocode}
 %
 %    \begin{macrocode}
@@ -301,25 +289,7 @@ module("luatexbase", package.seeall)
 %    Initialisation borrowed from luatextra
 %
 %    \begin{macrocode}
-local format = string.format
 local modules = modules or {}
-%    \end{macrocode}
-%
-%    Here we define the warning and error functions specific to
-%    \texttt{luatexbase}.
-%
-%    \begin{macrocode}
-local internal_warning_spaces = "                   "
-local internal_error_spaces = "                 "
-local function internal_warning(msg)
-    if not msg then return end
-    texio.write_nl(format("\nLuaTeXtra Warning: %s\n\n", msg))
-end
-local function internal_error(msg)
-    if not msg then return end
-    tex.sprint(format(
-    "\\immediate\\write16{}\\errmessage{LuaTeXtra error: %s^^J^^J}", msg))
-end
 %    \end{macrocode}
 %
 %    \subsubsection{Error, warning and info function for modules}
@@ -331,39 +301,32 @@ end
 %    to be used by lua module writers.
 %
 %    \begin{macrocode}
-function module_error(package, msg, helpmsg)
-    if not package or not msg then
-        return
-    end
-    if helpmsg then
-        tex.sprint(format("\\errhelp{%s}", helpmsg))
-    end
-    tex.sprint(format("\\luatexModuleError{%s}{%s}", package, msg))
+local function module_error_int(mod, ...)
+  error('Module '..mod..' error: '..string.format(...), 3)
 end
-function module_warning(modulename, msg)
-    if not modulename or not msg then
-        return
-    end
-    texio.write_nl(format("\nModule %s Warning: %s\n\n", modulename, msg))
+function module_error(mod, ...)
+  module_error_int(mod, ...)
 end
-function module_info(modulename, msg)
-    if not modulename or not msg then
-        return
-    end
-    texio.write_nl(format("%s: %s\n", modulename, msg))
+function module_warning(mod, ...)
+  texio.write_nl("Module "..mod.." warning: "..string.format(...))
 end
-function module_log(modulename, msg)
-    if not modulename or not msg then
-        return
-    end
-    texio.write_nl('log', format("%s: %s", modulename, msg))
+function module_info(mod, ...)
+  texio.write_nl(mod..": "..string.format(...))
 end
-function module_term(modulename, msg)
-    if not modulename or not msg then
-        return
-    end
-    texio.write_nl('term', format("%s: %s", modulename, msg))
+function module_log(mod, ...)
+  texio.write_nl('log', mod..": "..string.format(...))
 end
+function module_term(mod, ...)
+  texio.write_nl('term', mod..": "..string.format(...))
+end
+%    \end{macrocode}
+%
+%    For our own convenience, local functions for warning and errors in this
+%    module.
+%
+%    \begin{macrocode}
+local function err(...) module_error_int('luatexbase.modutils', ...) end
+local function warn(...) module_warning('luatexbase.modutils', ...) end
 %    \end{macrocode}
 %
 %    \subsubsection{module loading and providing functions}
@@ -380,9 +343,8 @@ function use_module(name)
     end
     require(name)
     if not modules[name] then
-        internal_warning(format("You have requested module `%s',\n"
-        .."%s but the file %s does not provide it.",
-        name, internal_warning_spaces, filename))
+        warn("You have requested module `%s', "
+        .."but the file %s does not provide it.", name, filename)
     end
 end
 %    \end{macrocode}
@@ -430,17 +392,15 @@ function require_module(name, version)
     if modules[name] then
         if luaversion.type == date then
             if datetonumber(modules[name].date) < luaversion.version then
-                internal_error(format(
-                "found module `%s' loaded in version %s, "
+                err("found module `%s' loaded in version %s, "
                 .."but version %s was required",
-                name, modules[name].date, version))
+                name, modules[name].date, version)
             end
         else
             if modules[name].version < luaversion.version then
-                internal_error(format(
-                "found module `%s' loaded in version %.02f, "
+                err("found module `%s' loaded in version %.02f, "
                 .."but version %s was required",
-                name, modules[name].version, version))
+                name, modules[name].version, version)
             end
         end
     else
@@ -463,12 +423,12 @@ end
 %    \begin{macrocode}
 function provides_module(mod)
     if not mod then
-        internal_error('cannot provide nil module')
+        err('cannot provide nil module')
         return
     end
     if not mod.version or not mod.name or not mod.date
     or not mod.description then
-        internal_error("invalid module registered: "
+        err("invalid module registered: "
         .."fields name, version, date and description are mandatory")
         return
     end
@@ -476,18 +436,18 @@ function provides_module(mod)
     if requiredversion then
         if requiredversion.type == date 
         and requiredversion.version > datetonumber(mod.date) then
-            internal_error(format("loading module %s in version %s, "
+            err("loading module %s in version %s, "
             .."but version %s was required",
-            mod.name, mod.date, requiredversion.orig))
+            mod.name, mod.date, requiredversion.orig)
         elseif requiredversion.type == number
         and requiredversion.version > mod.version then
-            internal_error(format("loading module %s in version %.02f, "
+            err("loading module %s in version %.02f, "
             .."but version %s was required",
-            mod.name, mod.version, requiredversion.orig))
+            mod.name, mod.version, requiredversion.orig)
         end
     end
     modules[mod.name] = module
-    texio.write_nl('log', format("Lua module: %s %s v%.02f %s\n",
+    texio.write_nl('log', string.format("Lua module: %s %s v%.02f %s\n",
     mod.name, mod.date, mod.version, mod.description))
 end
 %    \end{macrocode}

@@ -4,8 +4,8 @@ modutils
 - Renaming:
     \luatexUseModule
     \luatexRequireModule
-    \luatexModuleError
 - syntax of public TeX macros and Lua functions
+- create private functions for infwarrerr?
 - review logic (see what LaTeX2e does)
 - General review of code and comments.
 - Update user documentation.

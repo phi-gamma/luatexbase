@@ -7,6 +7,7 @@ Summary of backwards-incompatible interface changes between 0.1 and 0.2:
     - \luatexsetcatcoderange has been renamed to \setcatcoderange.
     - luamcallbacks has been renamed; Lua objects are now in luatexbase,
       no more in callback.* or luamcallbacks.*
+    - module error/warning etc now apply string.format to the arguments.
 
 2010/03/29
     all
@@ -33,6 +34,9 @@ Summary of backwards-incompatible interface changes between 0.1 and 0.2:
           details
         - better cooperation with the original package loader
         - works with luatex 0.25.4
+    luatexbase-modutils
+        - module error/warning etc now apply string.format to the arguments.
+        - use error() instead of \errmessage.
 
 2010/03/28
     luatexbase-*
