@@ -292,10 +292,13 @@ See source file '\inFileName' for details.
 %
 %    \subsection{Lua module}
 %
-%    Module identification.
-%
 %    \begin{macrocode}
 %<*lua>
+%    \end{macrocode}
+%
+%    \subsubsection{Module identification}
+%
+%    \begin{macrocode}
 module('luatexbase.mcb', package.seeall)
 luatexbase.provides_module({
     name          = "luamcallbacks",
@@ -308,18 +311,37 @@ luatexbase.provides_module({
 })
 %    \end{macrocode}
 %
+%    Shortcuts for error functions.
+%
+%    \begin{macrocode}
+local log = log or function(...)
+  luatexbase.module_log('luamcallbacks', string.format(...))
+end
+local info = info or function(...)
+  luatexbase.module_info('luamcallbacks', string.format(...))
+end
+local warning = warning or function(...)
+  luatexbase.module_warning('luamcallbacks', string.format(...))
+end
+local err = err or function(...)
+  luatexbase.module_error('luamcallbacks', string.format(...))
+end
+%    \end{macrocode}
+%
+%    \subsubsection{Initialisations}
+%
 %    \texttt{callbacklist} is the main list, that contains the callbacks as
 %    keys and a table of the registered functions a values.
 %
 %    \begin{macrocode}
-callbacklist = callbacklist or { }
+local callbacklist = callbacklist or { }
 %    \end{macrocode}
 %
 %    A table with the default functions of the created callbacks. See
 %    \texttt{create} for further informations.
 %
 %    \begin{macrocode}
-lua_callbacks_defaults = { }
+local lua_callbacks_defaults = { }
 %    \end{macrocode}
 %
 %    There are 4 types of callback:
@@ -344,7 +366,7 @@ local simple = 4
 %    and the type (list or data) as values.
 %
 %    \begin{macrocode}
-callbacktypes = callbacktypes or {
+local callbacktypes = callbacktypes or {
   buildpage_filter = simple,
   token_filter = first,
   pre_output_filter = list,
@@ -406,31 +428,20 @@ end
 %    \end{macrocode}
 %
 %    As we overwrite \texttt{callback.register}, we save it as
-%    \texttt{internalregister}. After that we declare some
-%    functions to write the errors or the logs.
+%    \texttt{internalregister}.
 %
 %    \begin{macrocode}
-internalregister = internalregister or callback.register
-log = log or function(...)
-  luatexbase.module_log('luamcallbacks', string.format(...))
-end
-info = info or function(...)
-  luatexbase.module_info('luamcallbacks', string.format(...))
-end
-warning = warning or function(...)
-  luatexbase.module_warning('luamcallbacks', string.format(...))
-end
-err = err or function(...)
-  luatexbase.module_error('luamcallbacks', string.format(...))
-end
+local internalregister = internalregister or callback.register
 %    \end{macrocode}
+%
+%    \subsubsection{Unsorted stuff}
 %
 %    A simple function we'll use later to understand the arguments of the
 %    \texttt{create} function. It takes a string and returns the type
 %    corresponding to the string or nil.
 %
 %    \begin{macrocode}
-function str_to_type(str)
+local function str_to_type(str)
     if str == 'list' then
         return list
     elseif str == 'data' then
@@ -457,7 +468,7 @@ end
 %    callback must also call it, see next function.
 %
 %    \begin{macrocode}
-function create(name, ctype, default)
+local function create(name, ctype, default)
     if not name then
         err("unable to call callback, no proper name passed", name)
         return nil
@@ -486,7 +497,7 @@ end
 %    the \texttt{create} function.
 %
 %    \begin{macrocode}
-function call(name, ...)
+local function call(name, ...)
     if not name then
         err("unable to call callback, no proper name passed", name)
         return nil
@@ -533,10 +544,10 @@ end
 %    Something that must be made clear, is that there is absolutely no
 %    solution for packages conflicts: if two packages want the top priority on
 %    a certain callback, they will have to decide the priority they will give
-%    to their function themself. Most of the time, the priority is not needed.
+%    to their function themselves. Most of the time, the priority is not needed.
 %
 %    \begin{macrocode}
-function add (name,func,description,priority)
+local function add (name,func,description,priority)
     if type(func) ~= "function" then
         err("unable to add function, no proper function passed")
         return
@@ -624,7 +635,7 @@ end
 %    \texttt{mcallbacks.add}.
 %
 %    \begin{macrocode}
-function remove (name, description)
+local function remove (name, description)
     if not name or name == "" then
         err("unable to remove function, no proper callback name passed")
         return
@@ -663,7 +674,7 @@ end
 %    This function removes all the functions registered in a callback.
 %
 %    \begin{macrocode}
-function reset (name)
+local function reset (name)
     if not name or name == "" then
         err("unable to reset, no proper callback name passed")
         return
@@ -687,6 +698,7 @@ end
 %     and return true, false, or a new list head.
 %
 %    \begin{macrocode}
+-- local
 function listhandler (name)
     return function(head,...)
         local l = callbacklist[name]
@@ -721,7 +733,7 @@ end
 %     The handler for callbacks taking datas and returning modified ones.
 %
 %    \begin{macrocode}
-function datahandler (name)
+local function datahandler (name)
     return function(data,...)
         local l = callbacklist[name]
         if l then
@@ -739,7 +751,7 @@ end
 %     list.
 %
 %    \begin{macrocode}
-function firsthandler (name)
+local function firsthandler (name)
     return function(...)
         local l = callbacklist[name]
         if l then
@@ -755,7 +767,7 @@ end
 %     Handler for simple functions that don't return anything.
 %
 %    \begin{macrocode}
-function simplehandler (name)
+local function simplehandler (name)
     return function(...)
         local l = callbacklist[name]
         if l then
@@ -783,6 +795,8 @@ err("function callback.register has been deleted by luamcallbacks, "
 .."please use callback.add instead.")
 end
 %    \end{macrocode}
+%
+%    That's all folks!
 %
 %    \begin{macrocode}
 %</lua>
