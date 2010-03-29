@@ -301,7 +301,7 @@ end
 warning = warning or function(...)
   luatexbase.module_warning('luamcallbacks', format(...))
 end
-error = error or function(...)
+err = err or function(...)
   luatexbase.module_error('luamcallbacks', format(...))
 end
 %    \end{macrocode}
@@ -340,20 +340,20 @@ end
 %    \begin{macrocode}
 function create(name, ctype, default)
     if not name then
-        error(format("unable to call callback, no proper name passed", name))
+        err(format("unable to call callback, no proper name passed", name))
         return nil
     end
     if not ctype or not default then
-        error(format("unable to create callback '%s', callbacktype or default function not specified", name))
+        err(format("unable to create callback '%s', callbacktype or default function not specified", name))
         return nil
     end
     if callbacktypes[name] then
-        error(format("unable to create callback '%s', callback already exists", name))
+        err(format("unable to create callback '%s', callback already exists", name))
         return nil
     end
     local temp = str_to_type(ctype)
     if not temp then
-        error(format("unable to create callback '%s', type '%s' undefined", name, ctype))
+        err(format("unable to create callback '%s', type '%s' undefined", name, ctype))
         return nil
     end
     ctype = temp
@@ -368,11 +368,11 @@ end
 %    \begin{macrocode}
 function call(name, ...)
     if not name then
-        error(format("unable to call callback, no proper name passed", name))
+        err(format("unable to call callback, no proper name passed", name))
         return nil
     end
     if not lua_callbacks_defaults[name] then
-        error(format("unable to call lua callback '%s', unknown callback", name))
+        err(format("unable to call lua callback '%s', unknown callback", name))
         return nil
     end
     local l = callbacklist[name]
@@ -389,7 +389,7 @@ function call(name, ...)
         elseif callbacktypes[name] == first then
             f = firsthandler(name)
         else
-            error("unknown callback type")
+            err("unknown callback type")
         end
     end
     return f(...)
@@ -418,20 +418,20 @@ end
 %    \begin{macrocode}
 function add (name,func,description,priority)
     if type(func) ~= "function" then
-        error("unable to add function, no proper function passed")
+        err("unable to add function, no proper function passed")
         return
     end
     if not name or name == "" then
-        error("unable to add function, no proper callback name passed")
+        err("unable to add function, no proper callback name passed")
         return
     elseif not callbacktypes[name] then
-        error(
+        err(
           format("unable to add function, '%s' is not a valid callback",
           name))
         return
     end
     if not description or description == "" then
-        error(
+        err(
           format("unable to add function to '%s', no proper description passed",
           name))
         return
@@ -455,7 +455,7 @@ function add (name,func,description,priority)
             elseif callbacktypes[name] == first then
                 internalregister(name, firsthandler(name))
             else
-                error("unknown callback type")
+                err("unknown callback type")
             end
         end
     end
@@ -508,23 +508,23 @@ end
 %    \begin{macrocode}
 function remove (name, description)
     if not name or name == "" then
-        error("unable to remove function, no proper callback name passed")
+        err("unable to remove function, no proper callback name passed")
         return
     elseif not callbacktypes[name] then
-        error(
+        err(
           format("unable to remove function, '%s' is not a valid callback",
           name))
         return
     end
     if not description or description == "" then
-        error(
+        err(
           format("unable to remove function from '%s', no proper description passed",
           name))
         return
     end
     local l = callbacklist[name]
     if not l then
-        error(format("no callback list for '%s'",name))
+        err(format("no callback list for '%s'",name))
         return
     end
     for k,v in ipairs(l) do
@@ -551,10 +551,10 @@ end
 %    \begin{macrocode}
 function reset (name)
     if not name or name == "" then
-        error("unable to reset, no proper callback name passed")
+        err("unable to reset, no proper callback name passed")
         return
     elseif not callbacktypes[name] then
-        error(
+        err(
           format("reset error, '%s' is not a valid callback",
           name))
         return
@@ -594,7 +594,7 @@ function listhandler (name)
                     head = rtv2
                 end
                 if done == false then
-                    error(format(
+                    err(format(
                       "function \"%s\" returned false in callback '%s'", 
                       f.description, name))
                 end
@@ -668,7 +668,7 @@ callback.call = call
 callback.get_priority = get_priority
 
 callback.register = function (...)
-error("function callback.register has been deleted by luamcallbacks, please use callback.add instead.")
+err("function callback.register has been deleted by luamcallbacks, please use callback.add instead.")
 end
 %    \end{macrocode}
 %
