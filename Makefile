@@ -73,7 +73,7 @@ world: all ctan
 	$(DO_PDFLATEX)
 
 luatexbase.%.lua: %.lua
-	ln -s $< $@
+	ln -sf $< $@
 
 $(UNPACKED_MCB): luamcallbacks.dtx
 	$(DO_TEX)
