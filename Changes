@@ -1,6 +1,12 @@
                     Changes in the luatexbase package/bundle
 
-2010/03/28
+Summary of backwards-incompatible interface changes between 0.1 and 0.2:
+    - the luatex objects are now in table luatexbase, not luatextra
+    - the Lua tables tex.attributenumber and tex.catcodetablenumber are not
+      created any more, use their couterparts in luatexbase.
+    - \luatexsetcatcoderange has been renamed to \setcatcoderange
+
+2010/03/29
     all
         - use luatexbase as the Lua module name
         - change the filename of the lua module (suppress luatexbase.)

@@ -111,12 +111,82 @@ See source file '\inFileName' for details.
 % \maketitle
 %
 % \begin{abstract}
+% The \luatex manual is very clear: everything may change. This package
+% provides tools to help package writers deal with the changes. It helps
+% supporting \luatex versions down to 0.25.4, and is regularly tested with
+% \luatex 0.40.6 (\texlive 2009) and from trunk.
 % \end{abstract}
 %
 % \tableofcontents
 %
 % \section{Documentation}
 %
+% Two problems are currently addressed by this package: changes in the syntax
+% of |\directlua|, and variable policies for primitives activation and naming
+% (in \luatex itself as well as in \texlive).
+%
+% \medskip
+%
+% Older versions of \luatex used to support multiple Lua states. A number was
+% mandatory with |\directlua| in order to specify the Lua state to be used.
+% Later, support for multiple Lua states was removed and the old syntax
+% resulted in a warning. Now (\luatex 0.50), |\directlua| again accepts a
+% number after |\directlua|, but with a different meaning (see the \luatex
+% manual for details).
+%
+% This package provides a macro |\luatexbase@directlua| that expands to
+% |\directlua0| on \luatex 0.35 and lower (where the number is mandatory), and
+% to |\directlua| otherwise. It is a macro in both case so that the number of
+% expansion steps remains constant.
+%
+% \medskip
+%
+% Starting with \luatex 0.39.0, the only primitives available in Ini\tex mode
+% are the basic primitives from \tex{}82 and |\directlua|. All other
+% primitives are hidden by default and have to be activated using a Lua
+% function. In \texlive 2009 (\luatex 0.40.6), the following arrangement has
+% been made in order to try preserving usability while avoiding name clashes
+% in the \latex world: in \latex-based formats, all pdf\tex primitives are
+% enabled with their normal name, but the primitives specific to \luatex are
+% enabled with the |luatex| prefix.\footnote{The prefix is dropped for
+% primitives whose name already starts with \texttt{luatex}.} In Plain based
+% formats however, all the primitives are enabled with their natural name, but
+% are also provided with the same name as in \latex-based formats in order to
+% help writing generic packages.
+%
+% So, starting with \texlive 2009, the situation is clear: the prefixed
+% version of the \luatex primitives is always available. But in earlier
+% versions (\texlive 2008, \luatex 0.25.4) those primitives were available
+% only with their natural names. Also, it is theoretically possible, however
+% unlikely, that the prefixed primitives are not available for some reason.
+%
+% \begin{quote}
+% \cs{luatexbase@ensure@primitive}\marg{name}
+% \end{quote}
+% The tool provided to deal with that is \cs{luatexbase@ensure@primitive},
+% whose argument is a primitive name (without a leading backslash nor any
+% |luatex| prefix, eg just |{latelua}|). It makes sure that the primitive gets
+% available as \cs{luatex\meta{name}}.
+%
+% \textbf{Warning.} In particular circumstances, this macro may fail silently
+% for primitives whose natural name starts with |luatex|, hence such
+% primitives shouldn't be used as arguments. This is actually not a problem,
+% since the only three such primitives are |\luatexversion|, |\luatexrevision|
+% and |\luatexdatestamp|. The first two are already activated by \pk{ifluatex}
+% which is loaded by this package, so you don't need to activated them
+% yourself. The third should never be used in production according to the
+% \luatex manual.
+%
+% \textit{Remark.} If you only aim at compatibility down to \texlive 2009
+% (\luatex 0.40.6), then you can simply use the primitives with their prefixed
+% name (except for |\directlua| which never needs a prefix). If you want extra
+% security and/or compatibility down to \texlive 2008 (\luatex 0.25.4) then
+% you should use \cs{luatebase@ensure@primitive} for each primitive you intend
+% to use (except |\directlua| again).
+%
+% This package doesn't try to activate every primitive, since it would require
+% and extensive list of primitives for each version of \luatex, so it seems
+% simpler to leave that burden on package writers.
 %
 %    \section{Implementation}
 %
@@ -229,6 +299,9 @@ See source file '\inFileName' for details.
 %    \end{macrocode}
 %
 %    \subsection{Primitives}
+%
+%    Try reasonably hard to activate a primitive. First, check if it is
+%    already activated an do nothing in this case.
 %
 %    \begin{macrocode}
 \begingroup
