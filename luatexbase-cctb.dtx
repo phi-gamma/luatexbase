@@ -302,9 +302,10 @@ See source file '\inFileName' for details.
     \allocationnumber\lltxb@catcodetable@alloc
     \global\chardef#1\allocationnumber
     \luatexinitcatcodetable\allocationnumber
-    \begingroup\escapechar\m@ne \expandafter\endgroup
+    \begingroup\escapechar\m@ne
     \luatexbase@directlua{luatexbase.catcodetabledef_from_tex(
       '\luatexluaescapestring{\string#1}', '\number\allocationnumber')}%
+    \endgroup
     \wlog{\string#1=\string\luatexcatcodetable\the\allocationnumber}%
   \else
     \errmessage{No room for a new \string\luatexcatcodetable}%
@@ -485,19 +486,20 @@ end
 %<testplain>\input luatexbase-cctb.sty
 %<testlatex>\RequirePackage{luatexbase-cctb}
 %<*testplain,testlatex>
-\newluatexcatcodetable\testcctb
-\luatexbase@directlua{assert(luatexbase.catcodetables.testcctb)}
+\begingroup \catcode64 11 \global\let\lua\luatexbase@directlua \endgroup
 %    \end{macrocode}
 %
 %    Also check that the catcodetable's number is remembered well,
 %    independently of the current value of |\escapechar|.
 
 %    \begin{macrocode}
+\newluatexcatcodetable\testcctb
+\lua{assert(luatexbase.catcodetables.testcctb)}
 \begingroup
 \escapechar64
 \newluatexcatcodetable\anothercctb
 \endgroup
-\luatexbase@directlua{assert(luatexbase.catcodetables.anothercctb)}
+\lua{assert(luatexbase.catcodetables.anothercctb)}
 %    \end{macrocode}
 %
 %    Now, play a little bit with predefined tables.
@@ -508,8 +510,7 @@ end
 \luatexcatcodetable\CatcodeTableLaTeX
 \ifnum\catcode64=12 \else \ERROR \fi
 %<testlatex>\documentclass{minimal}
-\catcode64 11
-\luatexbase@directlua{%
+\lua{%
   tex.sprint('\string\\setbox0=\string\\hbox{')
   tex.sprint(luatexbase.catcodetables.string, "\string\\undef # _^&")
   tex.sprint('}')
