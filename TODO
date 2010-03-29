@@ -17,8 +17,8 @@ mcallbacks
 
 - Make more Lua objects local.
 - Stop creating functions in the callback table ?!
-- Make a decision about names of public functions.
 - Incorporate remaining bits from luatextra?
+- Enhance test file?
 - General review of code and comments.
 - Update user documentation.
 

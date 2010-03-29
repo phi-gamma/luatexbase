@@ -564,7 +564,7 @@ end
 %    to their function themselves. Most of the time, the priority is not needed.
 %
 %    \begin{macrocode}
-function add (name,func,description,priority)
+function add_to_callback (name,func,description,priority)
     if type(func) ~= "function" then
         err("unable to add function, no proper function passed")
         return
@@ -581,7 +581,7 @@ function add (name,func,description,priority)
           name)
         return
     end
-    if get_priority(name, description) ~= 0 then
+    if priority_in_callback(name, description) ~= 0 then
         warning("function '%s' already registered in callback '%s'",
           description, name)
     end
@@ -624,12 +624,12 @@ end
 %    \end{macrocode}
 %
 %    The function that removes a function from a callback. The signature is
-%    \texttt{mcallbacks.remove (name, description)} with \texttt{name} being
+%    \texttt{remove (name, description)} with \texttt{name} being
 %    the name of callbacks, and description the description passed to
-%    \texttt{mcallbacks.add}.
+%    \texttt{add}.
 %
 %    \begin{macrocode}
-function remove (name, description)
+function remove_from_callback (name, description)
     if not name or name == "" then
         err("unable to remove function, no proper callback name passed")
         return
@@ -668,7 +668,7 @@ end
 %    This function removes all the functions registered in a callback.
 %
 %    \begin{macrocode}
-function reset (name)
+function reset_callback (name)
     if not name or name == "" then
         err("unable to reset, no proper callback name passed")
         return
@@ -699,7 +699,7 @@ end
 %    callback must also call it, see next function.
 %
 %    \begin{macrocode}
-function create(name, ctype, default)
+function create_callback(name, ctype, default)
     if not name then
         err("unable to call callback, no proper name passed", name)
         return nil
@@ -728,7 +728,7 @@ end
 %    the \texttt{create} function.
 %
 %    \begin{macrocode}
-function call(name, ...)
+function call_callback(name, ...)
     if not name then
         err("unable to call callback, no proper name passed", name)
         return nil
@@ -764,7 +764,7 @@ end
 %    registered, it gives its priority, and if not it returns false.
 %
 %    \begin{macrocode}
-function get_priority (name, description)
+function priority_in_callback (name, description)
     if not name or name == ""
             or not callbacktypes[name]
             or not description then
@@ -785,12 +785,13 @@ end
 %    overwrite \texttt{callback.register} so that it outputs an error.
 %
 %    \begin{macrocode}
-callback.add = add
-callback.remove = remove
-callback.reset = reset
-callback.create = create
-callback.call = call
-callback.get_priority = get_priority
+callback.add = add_to_callback
+callback.remove = remove_from_callback
+callback.reset = reset_callback
+callback.get_priority = priority_in_callback
+
+callback.create = create_callback
+callback.call = call_callback
 
 callback.register = function (...)
 err("function callback.register has been deleted by luamcallbacks, "
