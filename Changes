@@ -5,6 +5,7 @@ Summary of backwards-incompatible interface changes between 0.1 and 0.2:
     - the Lua tables tex.attributenumber and tex.catcodetablenumber are not
       created any more, use their couterparts in luatexbase.
     - \luatexsetcatcoderange has been renamed to \setcatcoderange
+    - renamed luamcallbacks; Lua objects are now in luatexbase.mcb
 
 2010/03/29
     all
@@ -20,7 +21,9 @@ Summary of backwards-incompatible interface changes between 0.1 and 0.2:
         - don't create tex.catcodetablenumber
         - rename \luatexsetcatcoderange to \setcatcoderange
         - load lua-compat
-    luamcallbacks
+    luamcallbacks -> luatexbase-mcb
+        - rename package
+        - functions are now in luatexbase.mcb rather than luamcallbacks
         - test file now for plain and latex
     luatexbase-loader
         - require"foo.bar" now looks for foo/bar then foo.bar, see doc for

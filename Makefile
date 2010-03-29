@@ -9,11 +9,12 @@ DTXSTY = lltxb-dtxstyle.tex
 COMPAT_RUN = luatexbase-compat.sty
 LOADER_RUN = luatexbase-loader.sty luatexbase.loader.lua
 MOD_RUN = luatexbase-modutils.sty modutils.lua
-LINKS = luatexbase.attr.lua luatexbase.cctb.lua luatexbase.modutils.lua
+LINKS = luatexbase.attr.lua luatexbase.cctb.lua \
+		luatexbase.mcb.lua luatexbase.modutils.lua
 
 # Files grouped by generation mode
-UNPACKED_MCB = luamcallbacks.lua \
-			   test-callbacks-latex.tex test-callbacks-plain.tex
+UNPACKED_MCB = mcb.lua \
+			   test-mcb-latex.tex test-mcb-plain.tex
 UNPACKED_REGS = luatexbase-regs.sty \
 				test-regs-plain.tex test-regs-latex.tex
 UNPACKED_ATTR = luatexbase-attr.sty attr.lua \
@@ -76,7 +77,7 @@ world: all ctan
 luatexbase.%.lua: %.lua
 	ln -sf $< $@
 
-$(UNPACKED_MCB): luamcallbacks.dtx
+$(UNPACKED_MCB): luatexbase-mcb.dtx
 	$(DO_TEX)
 
 $(UNPACKED_REGS): luatexbase-regs.dtx
@@ -118,8 +119,8 @@ check-modutils: $(UNPACKED_MODUTILS) $(LOADER_RUN) $(LINKS) $(COMPAT_RUN)
 	lualatex --interaction=batchmode test-modutils-latex.tex >/dev/null
 
 check-mcb: $(UNPACKED_MCB) $(LOADER_RUN) $(MOD_RUN) $(LINKS) $(COMPAT_RUN)
-	luatex --interaction=batchmode test-callbacks-plain.tex >/dev/null
-	lualatex --interaction=batchmode test-callbacks-latex.tex >/dev/null
+	luatex --interaction=batchmode test-mcb-plain.tex >/dev/null
+	lualatex --interaction=batchmode test-mcb-latex.tex >/dev/null
 
 check-compat: $(UNPACKED_COMPAT)
 	luatex --interaction=batchmode test-compat-plain.tex >/dev/null

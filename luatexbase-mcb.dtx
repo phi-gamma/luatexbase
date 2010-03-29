@@ -4,15 +4,15 @@
 %
 % This work is under the CC0 license.
 %
-% This work consists of the main source file luamcallbacks.dtx
+% This work consists of the main source file luatexbase-mcb.dtx
 % and the derived files
-%    luamcallbacks.sty, luamcallbacks.tex, luamcallbacks.lua
-%    test-luamcallbacks.tex, luamcallbacks.pdf.
+%    luatexbase-mcb.sty, mcb.lua, luatexbase-mcb.pdf,
+%    test-mcb-plain.tex test-mcb-latex.tex
 %
 % Unpacking:
-%    tex luamcallbacks.dtx
+%    tex luatexbase-mcb.dtx
 % Documentation:
-%    pdflatex luamcallbacks.dtx
+%    pdflatex luatexbase-mcb.dtx
 %
 %<*ignore>
 \begingroup
@@ -44,8 +44,8 @@ See source file '\inFileName' for details.
 
 \generate{%
   \usedir{doc/luatex/luatexbase}%
-  \file{test-callbacks-plain.tex}{\from{luamcallbacks.dtx}{testplain}}%
-  \file{test-callbacks-latex.tex}{\from{luamcallbacks.dtx}{testlatex}}%
+  \file{test-mcb-plain.tex}{\from{luatexbase-mcb.dtx}{testplain}}%
+  \file{test-mcb-latex.tex}{\from{luatexbase-mcb.dtx}{testlatex}}%
 }
 
 \def\MetaPrefix{-- }
@@ -59,7 +59,7 @@ See source file '\inFileName' for details.
 
 \generate{%
   \usedir{tex/luatex/luatexbase}%
-  \file{luamcallbacks.lua}{\from{luamcallbacks.dtx}{lua}}%
+  \file{mcb.lua}{\from{luatexbase-mcb.dtx}{lua}}%
 }
 
 \obeyspaces
@@ -68,7 +68,7 @@ See source file '\inFileName' for details.
 \Msg{* To finish the installation you have to move the following}
 \Msg{* files into a directory searched by TeX:}
 \Msg{*}
-\Msg{*     luamcallbacks.lua}
+\Msg{*     luatexbase-mcb.sty mcb.lua}
 \Msg{*}
 \Msg{* Happy TeXing!}
 \Msg{*}
@@ -83,7 +83,7 @@ See source file '\inFileName' for details.
 \documentclass{ltxdoc}
 \input{lltxb-dtxstyle}
 \begin{document}
-  \DocInput{luamcallbacks.dtx}%
+  \DocInput{luatexbase-mcb.dtx}%
 \end{document}
 %</driver>
 % \fi
@@ -106,9 +106,7 @@ See source file '\inFileName' for details.
 %   Grave accent  \`     Left brace    \{     Vertical bar  \|
 %   Right brace   \}     Tilde         \~}
 %
-% \GetFileInfo{luamcallbacks.drv}
-%
-% \title{The \textsf{luamcallbacks} package}
+% \title{The \textsf{luatexbase-mcb} package}
 % \date{2009/09/18 v0.93}
 % \author{Elie Roux \\ \texttt{elie.roux@telecom-bretagne.eu}}
 %
@@ -171,37 +169,24 @@ See source file '\inFileName' for details.
 % \texttt{open\_read\_file}. There is though a solution for several packages
 % to use these callbacks, see the implementation of \texttt{luatextra}.
 %
-% \StopEventually{
-% }
+%    \section{Implementation}
 %
-% \section{Package code}
+%    \subsection{Lua module}
 %
-% \iffalse
-%<*lua>
-% \fi
-%
-%    The package contains \texttt{luamcallbacks.lua} with the new functions,
-%    and an example of the use of luamcallbacks.
-%
-%    First the \texttt{luamcallbacks} module is registered as a Lua\TeX\
-%    module, with some informations.
+%    Module identification.
 %
 %    \begin{macrocode}
-
-luamcallbacks          = { }
-
-luamcallbacks.module = {
+%<*lua>
+module('luatexbase.mcb', package.seeall)
+luatexbase.provides_module({
     name          = "luamcallbacks",
     version       = 0.93,
     date          = "2009/09/18",
-    description   = "Module to register several functions in a callback.",
-    author        = "Hans Hagen & Elie Roux",
-    copyright     = "Hans Hagen & Elie Roux",
+    description   = "register several functions in a callback",
+    author        = "Hans Hagen, Elie Roux and Manuel Pégourie-Gonnard",
+    copyright     = "Hans Hagen, Elie Roux and Manuel Pégourie-Gonnard",
     license       = "CC0",
-}
-
-luatexbase.provides_module(luamcallbacks.module)
-
+})
 %    \end{macrocode}
 %
 %    \texttt{callbacklist} is the main list, that contains the callbacks as
@@ -209,16 +194,16 @@ luatexbase.provides_module(luamcallbacks.module)
 %
 %    \begin{macrocode}
 
-luamcallbacks.callbacklist = luamcallbacks.callbacklist or { }
+callbacklist = callbacklist or { }
 
 %    \end{macrocode}
 %
 %    A table with the default functions of the created callbacks. See
-%    \texttt{luamcallbacks.create} for further informations.
+%    \texttt{create} for further informations.
 %
 %    \begin{macrocode}
 
-luamcallbacks.lua_callbacks_defaults = { }
+lua_callbacks_defaults = { }
 
 local format = string.format
 
@@ -249,7 +234,7 @@ local simple = 4
 %
 %    \begin{macrocode}
 
-luamcallbacks.callbacktypes = luamcallbacks.callbacktypes or {
+callbacktypes = callbacktypes or {
 buildpage_filter = simple,
 token_filter = first,
 pre_output_filter = list,
@@ -307,34 +292,34 @@ read_data_file = first,
 %    \begin{macrocode}
 
 if tex.luatexversion > 42 then
-    luamcallbacks.callbacktypes["process_output_buffer"] = data
+    callbacktypes["process_output_buffer"] = data
 end
 
 %    \end{macrocode}
 %
 %    As we overwrite \texttt{callback.register}, we save it as
-%    \texttt{luamcallbacks.internalregister}. After that we declare some
+%    \texttt{internalregister}. After that we declare some
 %    functions to write the errors or the logs.
 %
 %    \begin{macrocode}
 
-luamcallbacks.internalregister = luamcallbacks.internalregister or callback.register
+internalregister = internalregister or callback.register
 
-local callbacktypes = luamcallbacks.callbacktypes
+local callbacktypes = callbacktypes
 
-luamcallbacks.log = luamcallbacks.log or function(...)
+log = log or function(...)
   luatexbase.module_log('luamcallbacks', format(...))
 end
 
-luamcallbacks.info = luamcallbacks.info or function(...)
+info = info or function(...)
   luatexbase.module_info('luamcallbacks', format(...))
 end
 
-luamcallbacks.warning = luamcallbacks.warning or function(...)
+warning = warning or function(...)
   luatexbase.module_warning('luamcallbacks', format(...))
 end
 
-luamcallbacks.error = luamcallbacks.error or function(...)
+error = error or function(...)
   luatexbase.module_error('luamcallbacks', format(...))
 end
 
@@ -346,7 +331,7 @@ end
 %
 %    \begin{macrocode}
 
-function luamcallbacks.str_to_type(str)
+function str_to_type(str)
     if str == 'list' then
         return list
     elseif str == 'data' then
@@ -362,7 +347,7 @@ end
 
 %    \end{macrocode}
 %
-%    \begin{macro}{luamcallbacks.create}
+%    \begin{macro}{create}
 %
 %    This first function creates a new callback. The signature is
 %    \texttt{create(name, ctype, default)} where \texttt{name} is the name of
@@ -377,26 +362,26 @@ end
 %
 %    \begin{macrocode}
 
-function luamcallbacks.create(name, ctype, default)
+function create(name, ctype, default)
     if not name then
-        luamcallbacks.error(format("unable to call callback, no proper name passed", name))
+        error(format("unable to call callback, no proper name passed", name))
         return nil
     end
     if not ctype or not default then
-        luamcallbacks.error(format("unable to create callback '%s', callbacktype or default function not specified", name))
+        error(format("unable to create callback '%s', callbacktype or default function not specified", name))
         return nil
     end
     if callbacktypes[name] then
-        luamcallbacks.error(format("unable to create callback '%s', callback already exists", name))
+        error(format("unable to create callback '%s', callback already exists", name))
         return nil
     end
-    local temp = luamcallbacks.str_to_type(ctype)
+    local temp = str_to_type(ctype)
     if not temp then
-        luamcallbacks.error(format("unable to create callback '%s', type '%s' undefined", name, ctype))
+        error(format("unable to create callback '%s', type '%s' undefined", name, ctype))
         return nil
     end
     ctype = temp
-    luamcallbacks.lua_callbacks_defaults[name] = default
+    lua_callbacks_defaults[name] = default
     callbacktypes[name] = ctype
 end
 
@@ -404,37 +389,37 @@ end
 %
 %    \end{macro}
 %
-%    \begin{macro}{luamcallbacks.call}
+%    \begin{macro}{call}
 %
 %    This function calls a callback. It can only call a callback created by
 %    the \texttt{create} function.
 %
 %    \begin{macrocode}
 
-function luamcallbacks.call(name, ...)
+function call(name, ...)
     if not name then
-        luamcallbacks.error(format("unable to call callback, no proper name passed", name))
+        error(format("unable to call callback, no proper name passed", name))
         return nil
     end
-    if not luamcallbacks.lua_callbacks_defaults[name] then
-        luamcallbacks.error(format("unable to call lua callback '%s', unknown callback", name))
+    if not lua_callbacks_defaults[name] then
+        error(format("unable to call lua callback '%s', unknown callback", name))
         return nil
     end
-    local l = luamcallbacks.callbacklist[name]
+    local l = callbacklist[name]
     local f
     if not l then
-        f = luamcallbacks.lua_callbacks_defaults[name]
+        f = lua_callbacks_defaults[name]
     else
         if callbacktypes[name] == list then
-            f = luamcallbacks.listhandler(name)
+            f = listhandler(name)
         elseif callbacktypes[name] == data then
-            f = luamcallbacks.datahandler(name)
+            f = datahandler(name)
         elseif callbacktypes[name] == simple then
-            f = luamcallbacks.simplehandler(name)
+            f = simplehandler(name)
         elseif callbacktypes[name] == first then
-            f = luamcallbacks.firsthandler(name)
+            f = firsthandler(name)
         else
-            luamcallbacks.error("unknown callback type")
+            error("unknown callback type")
         end
     end
     return f(...)
@@ -444,9 +429,9 @@ end
 %
 %    \end{macro}
 %
-%    \begin{macro}{luamcallbacks.add}
+%    \begin{macro}{add}
 %
-%    The main function. The signature is \texttt{luamcallbacks.add (name,
+%    The main function. The signature is \texttt{add (name,
 %    func, description, priority)} with \texttt{name} being the name of the
 %    callback in which the function is added; \texttt{func} is the added
 %    function; \texttt{description} is a small character string describing the
@@ -454,7 +439,7 @@ end
 %    priority the function will have.
 %
 %    The functions for a callbacks are added in a list (in
-%    \texttt{luamcallbacks.callbacklist\\.callbackname}). If they have no
+%    \texttt{callbacklist\\.callbackname}). If they have no
 %    priority or a high priority number, they will be added at the end of the
 %    list, and will be called after the others. If they have a low priority
 %    number, the will be added at the beginning of the list and will be called
@@ -467,46 +452,46 @@ end
 %
 %    \begin{macrocode}
 
-function luamcallbacks.add (name,func,description,priority)
+function add (name,func,description,priority)
     if type(func) ~= "function" then
-        luamcallbacks.error("unable to add function, no proper function passed")
+        error("unable to add function, no proper function passed")
         return
     end
     if not name or name == "" then
-        luamcallbacks.error("unable to add function, no proper callback name passed")
+        error("unable to add function, no proper callback name passed")
         return
     elseif not callbacktypes[name] then
-        luamcallbacks.error(
+        error(
           format("unable to add function, '%s' is not a valid callback",
           name))
         return
     end
     if not description or description == "" then
-        luamcallbacks.error(
+        error(
           format("unable to add function to '%s', no proper description passed",
           name))
         return
     end
-    if luamcallbacks.get_priority(name, description) ~= 0 then
-        luamcallbacks.warning(
+    if get_priority(name, description) ~= 0 then
+        warning(
           format("function '%s' already registered in callback '%s'",
           description, name))
     end
-    local l = luamcallbacks.callbacklist[name]
+    local l = callbacklist[name]
     if not l then
         l = {}
-        luamcallbacks.callbacklist[name] = l
-        if not luamcallbacks.lua_callbacks_defaults[name] then
+        callbacklist[name] = l
+        if not lua_callbacks_defaults[name] then
             if callbacktypes[name] == list then
-                luamcallbacks.internalregister(name, luamcallbacks.listhandler(name))
+                internalregister(name, listhandler(name))
             elseif callbacktypes[name] == data then
-                luamcallbacks.internalregister(name, luamcallbacks.datahandler(name))
+                internalregister(name, datahandler(name))
             elseif callbacktypes[name] == simple then
-                luamcallbacks.internalregister(name, luamcallbacks.simplehandler(name))
+                internalregister(name, simplehandler(name))
             elseif callbacktypes[name] == first then
-                luamcallbacks.internalregister(name, luamcallbacks.firsthandler(name))
+                internalregister(name, firsthandler(name))
             else
-                luamcallbacks.error("unknown callback type")
+                error("unknown callback type")
             end
         end
     end
@@ -521,10 +506,10 @@ function luamcallbacks.add (name,func,description,priority)
         priority = 1
     end
     if callbacktypes[name] == first and (priority ~= 1 or #l ~= 0) then
-        luamcallbacks.warning(format("several callbacks registered in callback '%s', only the first function will be active.", name))
+        warning(format("several callbacks registered in callback '%s', only the first function will be active.", name))
     end
     table.insert(l,priority,f)
-    luamcallbacks.log(
+    log(
       format("inserting function '%s' at position %s in callback list for '%s'",
       description,priority,name))
 end
@@ -533,7 +518,7 @@ end
 %
 %    \end{macro}
 %
-%    \begin{macro}{luamcallbacks.get priority}
+%    \begin{macro}{get priority}
 %
 %    This function tells if a function has already been registered in a
 %    callback, and gives its current priority. The arguments are the name of
@@ -542,11 +527,11 @@ end
 %
 %    \begin{macrocode}
 
-function luamcallbacks.get_priority (name, description)
+function get_priority (name, description)
     if not name or name == "" or not callbacktypes[name] or not description then
         return 0
     end
-    local l = luamcallbacks.callbacklist[name]
+    local l = callbacklist[name]
     if not l then return 0 end
     for p, f in pairs(l) do
         if f.description == description then
@@ -560,7 +545,7 @@ end
 %
 %    \end{macro}
 %
-%    \begin{macro}{luamcallbacks.remove}
+%    \begin{macro}{remove}
 %
 %    The function that removes a function from a callback. The signature is
 %    \texttt{mcallbacks.remove (name, description)} with \texttt{name} being
@@ -569,42 +554,42 @@ end
 %
 %    \begin{macrocode}
 
-function luamcallbacks.remove (name, description)
+function remove (name, description)
     if not name or name == "" then
-        luamcallbacks.error("unable to remove function, no proper callback name passed")
+        error("unable to remove function, no proper callback name passed")
         return
     elseif not callbacktypes[name] then
-        luamcallbacks.error(
+        error(
           format("unable to remove function, '%s' is not a valid callback",
           name))
         return
     end
     if not description or description == "" then
-        luamcallbacks.error(
+        error(
           format("unable to remove function from '%s', no proper description passed",
           name))
         return
     end
-    local l = luamcallbacks.callbacklist[name]
+    local l = callbacklist[name]
     if not l then
-        luamcallbacks.error(format("no callback list for '%s'",name))
+        error(format("no callback list for '%s'",name))
         return
     end
     for k,v in ipairs(l) do
         if v.description == description then
             table.remove(l,k)
-            luamcallbacks.log(
+            log(
               format("removing function '%s' from '%s'",description,name))
             if not next(l) then
-              luamcallbacks.callbacklist[name] = nil
-              if not luamcallbacks.lua_callbacks_defaults[name] then
-                luamcallbacks.internalregister(name, nil)
+              callbacklist[name] = nil
+              if not lua_callbacks_defaults[name] then
+                internalregister(name, nil)
               end
             end
             return
         end
     end
-    luamcallbacks.warning(
+    warning(
       format("unable to remove function '%s' from '%s'",description,name))
 end
 
@@ -612,29 +597,29 @@ end
 %
 %    \end{macro}
 %
-%    \begin{macro}{luamcallbacks.reset}
+%    \begin{macro}{reset}
 %
 %    This function removes all the functions registered in a callback.
 %
 %    \begin{macrocode}
 
-function luamcallbacks.reset (name)
+function reset (name)
     if not name or name == "" then
-        luamcallbacks.error("unable to reset, no proper callback name passed")
+        error("unable to reset, no proper callback name passed")
         return
     elseif not callbacktypes[name] then
-        luamcallbacks.error(
+        error(
           format("reset error, '%s' is not a valid callback",
           name))
         return
     end
-    if not luamcallbacks.lua_callbacks_defaults[name] then
-        luamcallbacks.internalregister(name, nil)
+    if not lua_callbacks_defaults[name] then
+        internalregister(name, nil)
     end
-    local l = luamcallbacks.callbacklist[name]
+    local l = callbacklist[name]
     if l then
-        luamcallbacks.log(format("resetting callback list '%s'",name))
-        luamcallbacks.callbacklist[name] = nil
+        log(format("resetting callback list '%s'",name))
+        callbacklist[name] = nil
     end
 end
 
@@ -646,13 +631,13 @@ end
 %     handler for the first type of callbacks: the ones that take a list head
 %     and return true, false, or a new list head.
 %
-%    \begin{macro}{luamcallbacks.listhandler}
+%    \begin{macro}{listhandler}
 %
 %    \begin{macrocode}
 
-function luamcallbacks.listhandler (name)
+function listhandler (name)
     return function(head,...)
-        local l = luamcallbacks.callbacklist[name]
+        local l = callbacklist[name]
         if l then
             local done = true
             for _, f in ipairs(l) do
@@ -669,7 +654,7 @@ function luamcallbacks.listhandler (name)
                     head = rtv2
                 end
                 if done == false then
-                    luamcallbacks.error(format(
+                    error(format(
                       "function \"%s\" returned false in callback '%s'", 
                       f.description, name))
                 end
@@ -687,13 +672,13 @@ end
 %
 %     The handler for callbacks taking datas and returning modified ones.
 %
-%    \begin{macro}{luamcallbacks.datahandler}
+%    \begin{macro}{datahandler}
 %
 %    \begin{macrocode}
 
-function luamcallbacks.datahandler (name)
+function datahandler (name)
     return function(data,...)
-        local l = luamcallbacks.callbacklist[name]
+        local l = callbacklist[name]
         if l then
             for _, f in ipairs(l) do
                 data = f.func(data,...)
@@ -711,13 +696,13 @@ end
 %     functions in them. In this case we only call the first function of the
 %     list.
 %
-%    \begin{macro}{luamcallbacks.firsthandler}
+%    \begin{macro}{firsthandler}
 %
 %    \begin{macrocode}
 
-function luamcallbacks.firsthandler (name)
+function firsthandler (name)
     return function(...)
-        local l = luamcallbacks.callbacklist[name]
+        local l = callbacklist[name]
         if l then
             local f = l[1].func
             return f(...)
@@ -733,13 +718,13 @@ end
 %
 %     Handler for simple functions that don't return anything.
 %
-%    \begin{macro}{luamcallbacks.simplehandler}
+%    \begin{macro}{simplehandler}
 %
 %    \begin{macrocode}
 
-function luamcallbacks.simplehandler (name)
+function simplehandler (name)
     return function(...)
-        local l = luamcallbacks.callbacklist[name]
+        local l = callbacklist[name]
         if l then
             for _, f in ipairs(l) do
                 f.func(...)
@@ -757,15 +742,15 @@ end
 %
 %    \begin{macrocode}
 
-callback.add = luamcallbacks.add
-callback.remove = luamcallbacks.remove
-callback.reset = luamcallbacks.reset
-callback.create = luamcallbacks.create
-callback.call = luamcallbacks.call
-callback.get_priority = luamcallbacks.get_priority
+callback.add = add
+callback.remove = remove
+callback.reset = reset
+callback.create = create
+callback.call = call
+callback.get_priority = get_priority
 
 callback.register = function (...)
-luamcallbacks.error("function callback.register has been deleted by luamcallbacks, please use callback.add instead.")
+error("function callback.register has been deleted by luamcallbacks, please use callback.add instead.")
 end
 
 %    \end{macrocode}
@@ -784,7 +769,7 @@ end
 %<*testplain,testlatex>
 \catcode 64 11
 \luatexbase@directlua{
-  require "luamcallbacks"
+  require "luatexbase.mcb"
   local function one(head,...)
       texio.write_nl("I'm number 1")
       return head, true
