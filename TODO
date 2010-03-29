@@ -13,10 +13,10 @@ compat
 loader
 ------
 
-- write doc
 - make a real test using a fake texmf tree as TEXMFHOME?
 - ensure compatibility with older versions of LuaTeX (no 'lua' type for
   kpse.find_file).
+- Make a decision about the behaviour (discuss this with Heiko & all)
 
 modutils
 --------

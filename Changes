@@ -3,11 +3,16 @@
 2010/03/28
     all
         - use luatexbase as the Lua module name
+        - change the filename of the lua module (suppress luatexbase.)
     luatexbase-attr
         - don't create tex.attributenumber
     luatexbase-cctb
         - don't create tex.catcodetablenumber
         - rename \luatexsetcatcoderange to \setcatcoderange
+    luamcallbacks
+        - test file now for plain and latex
+    luatexbase-loader
+        - require"foo.bar" now looks for foo/bar then foo.bar
 
 2010/03/28
     luatexbase-*
