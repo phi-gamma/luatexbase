@@ -126,6 +126,8 @@ See source file '\inFileName' for details.
 % \begin{abstract}
 % \end{abstract}
 %
+% \tableofcontents
+%
 % \section{Documentation}
 %
 % Lua has some embedded module management, with the functions \texttt{module}
@@ -278,7 +280,8 @@ See the module #1 documentation for explanation.^^J ...^^J}%
 %    date).
 %
 %    \begin{macrocode}
-  \newcommand\luatexRequireModule[2][0]{\luatexbase@directlua{luatexbase.require_module([[#2]], [[#1]])}}
+  \newcommand\luatexRequireModule[2][0]{%
+    \luatexbase@directlua{luatexbase.require_module([[#2]], [[#1]])}}
 \fi
 %    \end{macrocode}
 %
@@ -332,7 +335,8 @@ internal_error_spaces = "                 "
 
 function internal_error(msg)
     if not msg then return end
-    tex.sprint(format("\\immediate\\write16{}\\errmessage{LuaTeXtra error: %s^^J^^J}", msg))
+    tex.sprint(format(
+    "\\immediate\\write16{}\\errmessage{LuaTeXtra error: %s^^J^^J}", msg))
 end
 
 %    \end{macrocode}
@@ -403,7 +407,9 @@ function use_module(name)
     end
     require(name)
     if not modules[name] then
-        internal_warning(format("You have requested module `%s',\n%s but the file %s does not provide it.", name, internal_warning_spaces, filename))
+        internal_warning(format("You have requested module `%s',\n"
+        .."%s but the file %s does not provide it.",
+        name, internal_warning_spaces, filename))
     end
     if not package.loaded[name] then
         module(name, package.seeall)
@@ -465,11 +471,17 @@ function require_module(name, version)
     if modules[name] then
         if luaversion.type == date then
             if datetonumber(modules[name].date) < luaversion.version then
-                internal_error(format("found module `%s' loaded in version %s, but version %s was required", name, modules[name].date, version))
+                internal_error(format(
+                "found module `%s' loaded in version %s, "
+                .."but version %s was required",
+                name, modules[name].date, version))
             end
         else
             if modules[name].version < luaversion.version then
-                internal_error(format("found module `%s' loaded in version %.02f, but version %s was required", name, modules[name].version, version))
+                internal_error(format(
+                "found module `%s' loaded in version %.02f, "
+                .."but version %s was required",
+                name, modules[name].version, version))
             end
         end
     else
@@ -501,22 +513,30 @@ function provides_module(mod)
         internal_error('cannot provide nil module')
         return
     end
-    if not mod.version or not mod.name or not mod.date or not mod.description then
-        internal_error('invalid module registered, fields name, version, date and description are mandatory')
+    if not mod.version or not mod.name or not mod.date
+    or not mod.description then
+        internal_error("invalid module registered: "
+        .."fields name, version, date and description are mandatory")
         return
     end
     requiredversion = requiredversions[mod.name]
     if requiredversion then
-        if requiredversion.type == date and requiredversion.version > datetonumber(mod.date) then
-            internal_error(format("loading module %s in version %s, but version %s was required", mod.name, mod.date, requiredversion.orig))
-        elseif requiredversion.type == number and requiredversion.version > mod.version then
-            internal_error(format("loading module %s in version %.02f, but version %s was required", mod.name, mod.version, requiredversion.orig))
+        if requiredversion.type == date 
+        and requiredversion.version > datetonumber(mod.date) then
+            internal_error(format("loading module %s in version %s, "
+            .."but version %s was required",
+            mod.name, mod.date, requiredversion.orig))
+        elseif requiredversion.type == number
+        and requiredversion.version > mod.version then
+            internal_error(format("loading module %s in version %.02f, "
+            .."but version %s was required",
+            mod.name, mod.version, requiredversion.orig))
         end
     end
     modules[mod.name] = module
-    texio.write_nl('log', format("Lua module: %s %s v%.02f %s\n", mod.name, mod.date, mod.version, mod.description))
+    texio.write_nl('log', format("Lua module: %s %s v%.02f %s\n",
+    mod.name, mod.date, mod.version, mod.description))
 end
-
 %    \end{macrocode}
 %
 %    \end{macro}
