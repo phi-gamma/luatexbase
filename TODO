@@ -15,8 +15,6 @@ modutils
 mcallbacks
 ----------
 
-- Make more Lua objects local.
-- Stop creating functions in the callback table ?!
 - Incorporate remaining bits from luatextra?
 - Enhance test file?
 - General review of code and comments.

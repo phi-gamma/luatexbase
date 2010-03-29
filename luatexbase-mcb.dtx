@@ -299,7 +299,7 @@ See source file '\inFileName' for details.
 %    \subsubsection{Module identification}
 %
 %    \begin{macrocode}
-module('luatexbase.mcb', package.seeall)
+module('luatexbase', package.seeall)
 luatexbase.provides_module({
     name          = "luamcallbacks",
     version       = 0.93,
@@ -781,19 +781,11 @@ function priority_in_callback (name, description)
 end
 %    \end{macrocode}
 %
-%    Finally we add some functions to the \texttt{callback} module, and we
+%    Finally we
 %    overwrite \texttt{callback.register} so that it outputs an error.
 %
 %    \begin{macrocode}
-callback.add = add_to_callback
-callback.remove = remove_from_callback
-callback.reset = reset_callback
-callback.get_priority = priority_in_callback
-
-callback.create = create_callback
-callback.call = call_callback
-
-callback.register = function (...)
+callback.register = function ()
 err("function callback.register has been deleted by luamcallbacks, "
 .."please use callback.add instead.")
 end
@@ -830,11 +822,11 @@ end
       return head, true
   end
 
-  callback.add("hpack_filter",one,"my example function one",1)
-  callback.add("hpack_filter",two,"my example function two",2)
-  callback.add("hpack_filter",three,"my example function three",1)
+  luatexbase.add_to_callback("hpack_filter",one,"my sample function one",1)
+  luatexbase.add_to_callback("hpack_filter",two,"my sample function two",2)
+  luatexbase.add_to_callback("hpack_filter",three,"my sample function three",1)
 
-  callback.remove("hpack_filter","my example function three")
+  luatexbase.remove_from_callback("hpack_filter","my sample function three")
 }
 %</testplain,testlatex>
 %<testplain>\bye
