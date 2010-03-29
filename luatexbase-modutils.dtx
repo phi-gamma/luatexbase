@@ -310,15 +310,6 @@ local format = string.format
 luatexbase.modules = luatexbase.modules or {}
 %    \end{macrocode}
 %
-%    A small patch, for the \texttt{module} function to work in this file. I
-%    can't understand why it doens't otherwise.
-%
-%    \begin{macrocode}
-
-luatexbase.module = module
-
-%    \end{macrocode}
-%
 %    Here we define the warning and error functions specific to
 %    \texttt{luatexbase}.
 %
@@ -410,9 +401,6 @@ function use_module(name)
         internal_warning(format("You have requested module `%s',\n"
         .."%s but the file %s does not provide it.",
         name, internal_warning_spaces, filename))
-    end
-    if not package.loaded[name] then
-        module(name, package.seeall)
     end
 end
 %    \end{macrocode}

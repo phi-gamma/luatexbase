@@ -5,7 +5,6 @@ modutils
     \luatexUseModule
     \luatexRequireModule
     \luatexModuleError
-- stop using module() inside functions
 - Make more Lua objects local.
 - logic (see what LaTeX2e does)
 - syntax of public TeX macros and Lua functions
