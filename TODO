@@ -15,11 +15,10 @@ modutils
 mcallbacks
 ----------
 
-- Compatibility : tex.luaversion not available in 0.25.4 :'(
-- Incorporate remaining bits from luatextra?
 - Make more Lua objects local.
 - Stop creating functions in the callback table ?!
 - Make a decision about names of public functions.
+- Incorporate remaining bits from luatextra?
 - General review of code and comments.
 - Update user documentation.
 

@@ -397,10 +397,11 @@ callbacktypes = callbacktypes or {
 %    \end{macrocode}
 %
 %    In Lua\TeX\ version 0.43, a new callback called |process_output_buffer|
-%    appeared, so we enable it.
+%    appeared, so we enable it. Test the version using the compat package for,
+%    well, compatibility.
 %
 %    \begin{macrocode}
-if tex.luatexversion > 42 then
+if luatexbase.luatexversion > 42 then
     callbacktypes["process_output_buffer"] = data
 end
 %    \end{macrocode}
