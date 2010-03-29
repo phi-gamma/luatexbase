@@ -291,7 +291,7 @@ local lua_suffixes = {
   ".luc", ".luctex", ".texluc",
   ".lua", ".luatex", ".texlua",
 }
-local function find_file_lua(name)
+local function find_file_lua_emul(name)
   for _, suf in ipairs(lua_suffixes) do
     local name = name..suf
     local f = kpse.find_file(name, 'texmfscripts')
@@ -301,12 +301,18 @@ local function find_file_lua(name)
 end
 %    \end{macrocode}
 %
-%    Don't use the emulated version if kpse lua format works.
+%    If lua search format is available, use it with emulation as a fall-back,
+%    or just use emulation.
 %
 %    \begin{macrocode}
+local find_file_lua
 if pcall('kpse.find_file', 'dummy', 'lua') then
-  find_file_lua = function(name)
-    return kpse.find_file(name, 'lua')
+  find_file_lua = function (name)
+    return kpse.find_file(name, 'lua') or find_file_lua_emul(name)
+  end
+else
+  find_file_lua = function (name)
+    return find_file_lua_emul(name)
   end
 end
 %    \end{macrocode}
