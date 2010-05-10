@@ -344,7 +344,7 @@ function use_module(name)
     require(name)
     if not modules[name] then
         warn("You have requested module `%s', "
-        .."but the file %s does not provide it.", name, filename)
+        .."but no file seems to provide it.", name)
     end
 end
 %    \end{macrocode}
