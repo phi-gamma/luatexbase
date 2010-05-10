@@ -303,6 +303,11 @@ module('luatexbase', package.seeall)
 %    empty string at the beginning (since this is what kpse does: first try
 %    without adding a suffix).
 %
+%    There is a problem with using the |tex| search format: kpse will try to
+%    add suffixes from the |TEX_SUFFIXES| constant, which leads to problems
+%    when a file \meta{name}|.tex| exists. We prevent that by checking the
+%    extension of the file found.
+%
 %    \begin{macrocode}
 local lua_search_suffixes = {
    "", ".luc", ".luctex", ".texluc", ".lua", ".luatex", ".texlua",
@@ -320,9 +325,9 @@ local function find_file_lua_emul(name)
     local name = name..suf
     local f = kpse.find_file(name, 'texmfscripts')
       or kpse.find_file(name, 'tex')
-    if suffix == "" and f then
+    if suf == "" and f then
       local ext = string.match(f,"^.+%.([^/\\]-)$")
-      if lua_valid_suffixes then
+      if lua_valid_suffixes[suf] then
         return f
       end
     elseif f then
