@@ -15,8 +15,9 @@ UNPACKED_ATTR = luatexbase-attr.sty luatexbase.attr.lua \
 				test-attr-plain.tex test-attr-latex.tex
 UNPACKED_CCTB = luatexbase-cctb.sty luatexbase.cctb.lua \
 				test-cctb-plain.tex test-cctb-latex.tex
+TMP_LOADER = test-loader # temporary file for testing
 UNPACKED_LOADER = $(LOADER_RUN) \
-				test-loader-plain.tex test-loader-latex.tex
+				$(TMP_LOADER).lua test-loader.sub.lua
 UNPACKED_MODUTILS = $(MOD_RUN) \
 				test-modutils-plain.tex test-modutils-latex.tex test-modutils.lua
 UNPACKED = $(UNPACKED_MCB) $(UNPACKED_REGS) $(UNPACKED_ATTR) $(UNPACKED_CCTB) \
@@ -95,6 +96,7 @@ check-cctb: $(UNPACKED_CCTB) $(LOADER_RUN)
 	lualatex --interaction=batchmode test-cctb-latex.tex >/dev/null
 
 check-loader: $(UNPACKED_LOADER)
+	echo "this is no lua code" > $(TMP_LOADER).tex
 	luatex --interaction=batchmode test-loader-plain.tex >/dev/null
 	lualatex --interaction=batchmode test-loader-latex.tex >/dev/null
 
@@ -141,5 +143,5 @@ clean:
 	@$(RM) -- *.log *.aux *.toc *.idx *.ind *.ilg *.out test-*.pdf
 
 mrproper: clean
-	@$(RM) -- $(GENERATED) $(ZIPS)
+	@$(RM) -- $(GENERATED) $(ZIPS) $(TMP_LOADER).tex
 
