@@ -297,11 +297,16 @@ module('luatexbase', package.seeall)
 %
 %    Emulate (approximatively) kpse's lua format search.
 %
+%    |lua_search_suffixes| is taken verbatim from Kpathsea's source
+%    (\file{tex-file.c}, constant |LUA_SUFFIXES|),\footnote{Unchanged since
+%    2007-07-06, last checked 2010-05-10.} except for the addition of the
+%    empty string at the beginning (since this is what kpse does: first try
+%    without adding a suffix).
+%
 %    \begin{macrocode}
 local lua_search_suffixes = {
-  ".luc", ".lua", "", ".luctex", ".texluc",
-  ".luatex", ".texlua",
-}
+   "", ".luc", ".luctex", ".texluc", ".lua", ".luatex", ".texlua",
+   }
 local lua_valid_suffixes = {
   luc = true,
   lua = true,
