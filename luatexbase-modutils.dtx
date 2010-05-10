@@ -403,7 +403,7 @@ function luatextra.use_module(name)
     end
     require(name)
     if not luatextra.modules[name] then
-        luatextra.internal_warning(format("You have requested module `%s',\n%s but the file %s does not provide it.", name, luatextra.internal_warning_spaces, filename))
+        luatextra.internal_warning(format("You have requested module `%s',\n%s but the file %s does not provide it.", name, luatextra.internal_warning_spaces))
     end
     if not package.loaded[name] then
         luatextra.module(name, package.seeall)
