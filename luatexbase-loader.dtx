@@ -298,17 +298,31 @@ module('luatexbase', package.seeall)
 %    Emulate (approximatively) kpse's lua format search.
 %
 %    \begin{macrocode}
-local lua_suffixes = {
-  "",
-  ".luc", ".luctex", ".texluc",
-  ".lua", ".luatex", ".texlua",
+local lua_search_suffixes = {
+  ".luc", ".lua", "", ".luctex", ".texluc",
+  ".luatex", ".texlua",
+}
+local lua_valid_suffixes = {
+  luc = true,
+  lua = true,
+  luctex = true, 
+  texluc = true,
+  luatex = true,
+  texlua = true,
 }
 local function find_file_lua_emul(name)
-  for _, suf in ipairs(lua_suffixes) do
+  for _, suf in ipairs(lua_search_suffixes) do
     local name = name..suf
     local f = kpse.find_file(name, 'texmfscripts')
       or kpse.find_file(name, 'tex')
-    if f then return f end
+    if suffix == "" and f then
+      local ext = string.match(f,"^.+%.([^/\\]-)$")
+      if lua_valid_suffixes then
+        return f
+      end
+    elseif f then
+      return f
+    end
   end
 end
 %    \end{macrocode}
