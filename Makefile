@@ -21,7 +21,8 @@ UNPACKED_ATTR = luatexbase-attr.sty attr.lua \
 				test-attr-plain.tex test-attr-latex.tex
 UNPACKED_CCTB = luatexbase-cctb.sty cctb.lua \
 				test-cctb-plain.tex test-cctb-latex.tex
-TMP_LOADER = test-loader # temporary file for testing
+# temporary file for testing loader
+TMP_LOADER = test-loader
 UNPACKED_LOADER = $(LOADER_RUN) \
 				test-loader-plain.tex test-loader-latex.tex \
 				$(TMP_LOADER).lua test-loader.sub.lua
