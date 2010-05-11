@@ -118,27 +118,86 @@ See source file '\inFileName' for details.
 % \title{The \pk{luatexbase-modutils} package}
 % \date{v0.1 2010-03-27}
 % \author{%
-%  Manuel P\'egouri\'e-Gonnard \\ \texttt{mpg@elzevir.fr} \and
-%   \'Elie Roux \\ \texttt{elie.roux@telecom-bretagne.eu}}
+%  Manuel P\'egouri\'e-Gonnard \\ \email{mpg@elzevir.fr} \and
+%  \'Elie Roux \\ \email{elie.roux@telecom-bretagne.eu}}
 %
 % \maketitle
 %
 % \begin{abstract}
+% This package provides functions similar to \latex's |\usepackage| and
+% |\ProvidesPackage| macros,\footnote{and their variants or synonyms such as
+% |\documentclass| and |\RequirePackage| or |\ProvidesClass| and
+% |\ProvidesFiles|} or more precisely the part of these macros that deals with
+% identification and version checking (no attempt is done at implementing an
+% option mechanism). Functions for error reporting are provided too.
+%
+% It also loads \pf{luatexbase-loader}.
 % \end{abstract}
 %
 % \tableofcontents
 %
 % \section{Documentation}
 %
-% Lua has some embedded module management, with the functions \texttt{module}
-% and \texttt{require}. With this package we try get more control on the
-% module system, by implementing something close to the \LaTeX 's
-% \texttt{\string\usepackage} and \texttt{\string\RequirePackage} macros: the
-% \texttt{\string\luatexUseModule} and \texttt{\string\luatexRequireModule}
-% that act like them, but for lua files. The functions \texttt{module} and
-% \texttt{require} should not be used, in profit of the lua functions
-% \texttt{luatexbase.provides\_module} and \texttt{luatexbase.use\_module} or
-% \texttt{luatexbase.require\_module}.
+% Lua's standard function |require()| is similar to \tex's |\input| primitive
+% but is somehow more evolved in that it makes a few checks to avoid loading
+% the same module twice. In the \tex world, this needs to be taken care of by
+% macro packages; in the \latex world this is done by |\usepackage|.
+%
+% But |\usepackage| also takes care of many other things. Most notably, it
+% implements a complex option system, and does some identification and version
+% checking. The present package doesn't try to provide anything for options,
+% but implements a system for identification and version checking similar to
+% \latex's system. Both \tex macros and Lua functions are provided.
+%
+% This package also provides Lua functions for reporting errors, warnings,
+% etc.
+%
+% It is important to notice that Lua's standard function |module()| is
+% completely unrelated to the present package. It has nothing to do with
+% identification and deals only with namespaces.\footnote{More precisely, it
+% modifies the current environment.} So, you should continue to
+% use it normally, unlike the |require()| function which can be replaced with
+% this package's |luatexbase.require_module()|.
+%
+% \subsection{\tex macros}
+%
+% The two macros |\luatexUseModule| and |\luatexRequireModule| are very
+% similar and are interfaces to the Lua functions |use_module| and
+% |require_module|. The only difference between those macros is the number of
+% arguments (just as the underlying Lua functions): |\luatexUseModule| only
+% take one argument: the module name\footnote{without extension} while
+% |\luatexRequireModule| takes another argument for specifying a minimal
+% version (see below). With \latex, this argument is the first and is
+% optional. Otherwise, it's the second one and it's mandatory.
+%
+% \subsection{Lua functions}
+%
+% The main functions are |luatexbase.require_module| and
+% |luatexbase.use_module| which may be used as a replacement to |require()|.
+% The only difference between these functions is, |require_module| accepts a
+% second, optional argument in order to specify a minimal version. They do the
+% same as |require()| but also make sure the module loaded correctly
+% identifies itself with the name given, and its version is greater than the
+% minimal version required. The version can be given either as a (floating
+% point) number or as a date in YYYY/MM/DD format.
+%
+% Modules identify themselves using |luatexbase.provides_module|, whose only
+% argument is a table with some information about the module. The mandatory
+% fields are |name| (a string), |version| (a number), |date| (a string) and
+% |description| (a string). Other fields are optional and ignored, and usually
+% include |copyright|, |author| and |license|.
+%
+% \bigskip
+%
+% Functions for reporting are provided; similarly to \latex's |\PackageError|
+% etc. they take the module name as their first argument and include it in the
+% printed message in an appropriate way. The remaining arguments are passed to
+% |string.format()| before being printed.
+%
+% The function provided (all found in the |luatexbase| table) are
+% |module_error, |module_warning|, |module_info| (writes to terminal and log),
+% |module_log| (writes only to the log file) and |module_term| (writes only to
+% the terminal).
 %
 %    \section{Implementation}
 %

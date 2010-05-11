@@ -10,8 +10,8 @@ modutils
 - General review of code and comments.
 - Update user documentation.
 
-mcallbacks
-----------
+mcb
+---
 
 - Incorporate remaining bits from luatextra?
 - Enhance test file?
@@ -27,6 +27,4 @@ luatexbase
 afterwards
 ----------
 
-- check/adapt luatextra
-- Bump version number, make zip, announce.
-- engage discussion with Heiko
+- Bump version number, upload.
