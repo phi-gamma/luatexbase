@@ -126,12 +126,12 @@ See source file '\inFileName' for details.
 % \begin{abstract}
 % This package provides functions similar to \latex's |\usepackage| and
 % |\ProvidesPackage| macros,\footnote{and their variants or synonyms such as
-% |\documentclass| and |\RequirePackage| or |\ProvidesClass| and
-% |\ProvidesFiles|} or more precisely the part of these macros that deals with
-% identification and version checking (no attempt is done at implementing an
-% option mechanism). Functions for error reporting are provided too.
+% \cs{documentclass} and \cs{RequirePackage} or \cs{ProvidesClass} and
+% \cs{ProvidesFiles}} or more precisely the part of these macros that deals
+% with identification and version checking (no attempt is done at implementing
+% an option mechanism). Functions for error reporting are provided too.
 %
-% It also loads \pf{luatexbase-loader}.
+% It also loads \pk{luatexbase-loader}.
 % \end{abstract}
 %
 % \tableofcontents
@@ -194,10 +194,10 @@ See source file '\inFileName' for details.
 % printed message in an appropriate way. The remaining arguments are passed to
 % |string.format()| before being printed.
 %
-% The function provided (all found in the |luatexbase| table) are
-% |module_error, |module_warning|, |module_info| (writes to terminal and log),
-% |module_log| (writes only to the log file) and |module_term| (writes only to
-% the terminal).
+% The functions provided (all found in the |luatexbase| table) are
+% |module_error|, |module_warning|, |module_info| (writes to terminal and
+% log), |module_log| (writes only to the log file) and |module_term| (writes
+% only to the terminal).
 %
 %    \section{Implementation}
 %
@@ -305,32 +305,26 @@ See source file '\inFileName' for details.
 %
 %    \subsubsection{User macros}
 %
-%    Then we define
-%    \texttt{\string\luatexUseModule} that simply calls
-%    \texttt{luatexbase.use\_module}.
-%    If the package is loaded with Plain, we define
-%    \texttt{\string\luaRequireModule} with two mandatory arguments.
+%    Interface to |use_module()|.
 %
 %    \begin{macrocode}
-\def\luatexUseModule#1{\luatexbase@directlua{luatexbase.use_module([[#1]])}}
-\expandafter\ifx\csname ProvidesPackage\endcsname\relax
-  \def\luatexRequireModule#1#2{\luatexbase@directlua{%
-      luatexbase.require_module([[#1]], [[#2]])}}
+\def\luatexUseModule#1{\luatexbase@directlua{%
+    luatexbase.use_module("\luatexluescapestring{#1}")}}
+%    \end{macrocode}
+%
+%    Interface to |require_module()| with syntax depending on the format.
+%
+%    \begin{macrocode}
+\begingroup\expandafter\expandafter\expandafter\endgroup
+\expandafter\ifx\csname newcommand\endcsname\relax
+  \def\luatexRequireModule#1#2{%
+    \luatexbase@directlua{luatexbase.require_module(
+      "\luatexluaescapestring{#1}", "\luatexluaescapestring{#2}")}}
 \else
-%    \end{macrocode}
-%
-%    If the package is loaded with \LaTeX , we define 
-%    \texttt{\string\luaRequireModule} with one mandatory
-%    argument (the name of the package) and one optional (the version or the
-%    date).
-%
-%    \begin{macrocode}
   \newcommand\luatexRequireModule[2][0]{%
-    \luatexbase@directlua{luatexbase.require_module([[#2]], [[#1]])}}
+    \luatexbase@directlua{luatexbase.require_module(
+      "\luatexluaescapestring{#2}", "\luatexluaescapestring{#1}")}}
 \fi
-%    \end{macrocode}
-%
-%    \begin{macrocode}
 %    \end{macrocode}
 %
 %    \begin{macrocode}
@@ -345,19 +339,50 @@ See source file '\inFileName' for details.
 module("luatexbase", package.seeall)
 %    \end{macrocode}
 %
-%    Initialisation borrowed from luatextra
+%    \subsection{Internal functions and data}
+%
+%    Tables holding informations about the modules loaded and the versions
+%    required.
 %
 %    \begin{macrocode}
 local modules = modules or {}
+local requiredversions = {}
+%    \end{macrocode}
+%
+%    If the given string begins with a date in YYYY/MM/DD format, return the
+%    date as the number YYYYMMDD; otherwise, return nil.
+%
+%    \begin{macrocode}
+local function datetonumber(date)
+    local datenum, ok = version:gsub("^(%d%d%d%d)/(%d%d)/(%d%d).*", "%1%2%3")
+    return (ok == 1) and tonumber(datenum) or nil
+end
+%    \end{macrocode}
+%
+%    Parse a version into a table indicating a type (date or number), a
+%    numeric version and the original version string.
+%
+%    \begin{macrocode}
+local date, number = 1, 2
+local function parse_version(version)
+    local datenum = datetonumber(date)
+    if ok == 1 then
+        return {type = date, version = tonumber(datenum), orig = version}
+    else
+        return {type = number, version = tonumber(version), orig = version}
+    end
+end
 %    \end{macrocode}
 %
 %    \subsubsection{Error, warning and info function for modules}
 %
-%    Some module printing functions are provided, they have the same
-%    philosophy as the \LaTeX 's \texttt{\string\PackageError} and
-%    \texttt{\string\PackageWarning} macros: their first argument is the name
-%    of the module, and the second is the message. These functions are meant
-%    to be used by lua module writers.
+%    Here are the reporting functions for the modules. For errors, Lua's
+%    |error()| is used. For now, the error reports look less good than with
+%    \tex's |\errmessage|, but hopefully it will be improved in future
+%    versions of \luatex. We could invoke |\errmessage| using |tex.sprint()|,
+%    but it may cause problems on the \tex end, and moreover |error()| will
+%    still be used by Lua for other errors, so it makes messages more
+%    consistent.
 %
 %    \begin{macrocode}
 local function module_error_int(mod, ...)
@@ -380,8 +405,8 @@ function module_term(mod, ...)
 end
 %    \end{macrocode}
 %
-%    For our own convenience, local functions for warning and errors in this
-%    module.
+%    For our own convenience, local functions for warning and errors in the
+%    present module.
 %
 %    \begin{macrocode}
 local function err(...) module_error_int('luatexbase.modutils', ...) end
@@ -390,64 +415,25 @@ local function warn(...) module_warning('luatexbase.modutils', ...) end
 %
 %    \subsubsection{module loading and providing functions}
 %
-%    This macro is the one used to simply load a lua module file. It does not
-%    reload it if it's already loaded, and prints the filename in the terminal
-%    and the log. A lua module must call the macro
-%    \texttt{provides\_module}.
+%    Load a module without version checking.
 %
 %    \begin{macrocode}
 function use_module(name)
-    if not name or modules[name] then
-        return
-    end
     require(name)
     if not modules[name] then
-        warn("You have requested module `%s', "
-        .."but no file seems to provide it.", name)
+        warn("Module didn't properly identified itself: %s", name)
     end
 end
 %    \end{macrocode}
 %
-%    Some internal functions to convert a date into a number, and to determine
-%    if a string is a date. It is useful for
-%    \texttt{require\_package} to understand if a user asks a
-%    version with a date or a version number.
-%
-%    \begin{macrocode}
-local function datetonumber(date)
-    numbers = string.gsub(date, "(%d+)/(%d+)/(%d+)", "%1%2%3")
-    return tonumber(numbers)
-end
-local function isdate(date)
-    for _, _ in string.gmatch(date, "%d+/%d+/%d+") do
-        return true
-    end
-    return false
-end
-local date, number = 1, 2
-local function versiontonumber(version)
-    if isdate(version) then
-        return {type = date, version = datetonumber(version), orig = version}
-    else
-        return {type = number, version = tonumber(version), orig = version}
-    end
-end
-local requiredversions = {}
-%    \end{macrocode}
-%
-%    This function is like the \texttt{use\_module} function, but
-%    can accept a second argument that checks for the version of the module.
-%    The version can be a number or a date (format yyyy/mm/dd).
+%    Load a module with optional version checking.
 %
 %    \begin{macrocode}
 function require_module(name, version)
-    if not name then
-        return
-    end
     if not version then
         return use_module(name)
     end
-    luaversion = versiontonumber(version)
+    luaversion = parse_version(version)
     if modules[name] then
         if luaversion.type == date then
             if datetonumber(modules[name].date) < luaversion.version then
@@ -469,15 +455,7 @@ function require_module(name, version)
 end
 %    \end{macrocode}
 %
-%    This macro is the one that must be called in the module files. It takes a
-%    table as argument. You can put any information you want in this table,
-%    but the mandatory ones are \texttt{name} (a string), \texttt{version} (a
-%    number), \texttt{date} (a string) and \texttt{description} (a string).
-%    Other fields are usually \texttt{copyright}, \texttt{author} and
-%    \texttt{license}.
-%
-%    This function logs informations about the module the same way \LaTeX\
-%    does for informations about packages.
+%    Provide identification information for a module.
 %
 %    \begin{macrocode}
 function provides_module(mod)
