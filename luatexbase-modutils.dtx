@@ -355,13 +355,23 @@ local modules = modules or {}
 local requiredversions = {}
 %    \end{macrocode}
 %
-%    If the given string begins with a date in YYYY/MM/DD format, return the
-%    date as the number YYYYMMDD; otherwise, return nil.
+%    Convert a date in YYYY/MM/DD format into a number
 %
 %    \begin{macrocode}
 local function datetonumber(date)
-    local datenum, ok = version:gsub("^(%d%d%d%d)/(%d%d)/(%d%d).*", "%1%2%3")
-    return (ok == 1) and tonumber(datenum) or nil
+    numbers = string.gsub(date, "(%d+)/(%d+)/(%d+)", "%1%2%3")
+    return tonumber(numbers)
+end
+%    \end{macrocode}
+%
+%    Say if a string is a date in YYYY//MM/DD format.
+%
+%    \begin{macrocode}
+local function isdate(date)
+    for _, _ in string.gmatch(date, "%d+/%d+/%d+") do
+        return true
+    end
+    return false
 end
 %    \end{macrocode}
 %
@@ -371,9 +381,8 @@ end
 %    \begin{macrocode}
 local date, number = 1, 2
 local function parse_version(version)
-    local datenum = datetonumber(date)
-    if ok == 1 then
-        return {type = date, version = tonumber(datenum), orig = version}
+    if isdate(version) then
+        return {type = date, version = datetonumber(version), orig = version}
     else
         return {type = number, version = tonumber(version), orig = version}
     end
