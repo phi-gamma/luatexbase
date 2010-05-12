@@ -5,14 +5,6 @@ DTX = $(wildcard *.dtx)
 DOC = $(patsubst %.dtx, %.pdf, $(DTX))
 DTXSTY = lltxb-dtxstyle.tex
 
-# used for check dependencies
-COMPAT_RUN = luatexbase-compat.sty
-LOADER_RUN = luatexbase-loader.sty luatexbase.loader.lua
-MOD_RUN = luatexbase-modutils.sty modutils.lua
-LINKS = luatexbase.attr.lua luatexbase.cctb.lua \
-		luatexbase.mcb.lua luatexbase.modutils.lua
-TMP_LOADER = test-loader
-
 # Files grouped by generation mode
 UNPACKED_MCB = luatexbase-mcb.sty mcb.lua \
 			   test-mcb-latex.tex test-mcb-plain.tex
@@ -22,18 +14,22 @@ UNPACKED_ATTR = luatexbase-attr.sty attr.lua \
 				test-attr-plain.tex test-attr-latex.tex
 UNPACKED_CCTB = luatexbase-cctb.sty cctb.lua \
 				test-cctb-plain.tex test-cctb-latex.tex
-UNPACKED_LOADER = $(LOADER_RUN) \
+UNPACKED_LOADER = luatexbase-loader.sty luatexbase.loader.lua \
 				test-loader-plain.tex test-loader-latex.tex \
-				$(TMP_LOADER).lua test-loader.sub.lua
-UNPACKED_MODUTILS = $(MOD_RUN) test-modutils.lua \
+				$(TEST_LOADER).lua test-loader.sub.lua
+UNPACKED_MODUTILS = luatexbase-modutils.sty modutils.lua test-modutils.lua \
 				test-modutils-plain.tex test-modutils-latex.tex
-UNPACKED_COMPAT = $(COMPAT_RUN) \
+UNPACKED_COMPAT = luatexbase-compat.sty \
 				test-compat-plain.tex test-compat-latex.tex
 UNPACKED = $(UNPACKED_MCB) $(UNPACKED_REGS) $(UNPACKED_ATTR) $(UNPACKED_CCTB) \
 		   $(UNPACKED_LOADER) $(UNPACKED_MODUTILS) $(UNPACKED_COMPAT)
 COMPILED = $(DOC)
 GENERATED = $(COMPILED) $(UNPACKED)
 SOURCE = $(DTX) $(DTXSTY) README TODO Changes Makefile
+
+# used for check
+TEST_LOADER = test-loader
+TMP_LOADER = $(TEST_LOADER).tex
 
 # Files grouped by installation location
 RUNFILES = $(filter-out test-%, $(UNPACKED))
@@ -118,7 +114,7 @@ check-cctb: install-runfiles
 	$(TESTENV) lualatex --interaction=batchmode test-cctb-latex.tex >/dev/null
 
 check-loader: install-runfiles
-	echo "this is no lua code" > $(TMP_LOADER).tex
+	echo "this is no lua code" > $(TMP_LOADER)
 	$(TESTENV) luatex --interaction=batchmode test-loader-plain.tex >/dev/null
 	$(TESTENV) lualatex --interaction=batchmode test-loader-latex.tex >/dev/null
 
@@ -171,6 +167,6 @@ clean:
 	@$(RM) -- *.log *.aux *.toc *.idx *.ind *.ilg *.out test-*.pdf
 
 mrproper: clean
-	@$(RM) -- $(GENERATED) $(ZIPS) $(LINKS) $(TMP_LOADER).tex
+	@$(RM) -- $(GENERATED) $(ZIPS) $(TMP_LOADER)
 	@$(RM) -r $(TEXMFROOT)
 
