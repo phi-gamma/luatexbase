@@ -150,14 +150,16 @@ See source file '\inFileName' for details.
 % |foo/bar| using Kpathsea with the format |lua| (that is, search along
 % |LUAINPUTS| and try the following extensions:  |.luc|, |.luctex|, |.texluc|,
 % |.lua|, |.luatex|, |.texlua|). If this search fails, it falls back to
-% |foo.bar|.
+% |foo.bar| (along the same path with the same extensions).
 %
 % Also, older versions of \luatex, such as 0.25.4 (\texlive 2008), don't know
 % about the |lua| format for kpse searching. So, an emulator for this function
 % is provided. The emulator is not perfect, in particular it may find more
-% results than the normal |lua| format search. In order to ensure more
-% homogeneous results across versions, this emulator is used as a fall-back
-% when the real |lua| format search doesn't find any result.
+% results than the normal |lua| format search.\footnote{An may also fail to
+% find the file in particular cases, see comments in the implementation for
+% details.} In order to ensure more homogeneous results across versions, this
+% emulator is used as a fall-back when the real |lua| format search doesn't
+% find any result.
 %
 % Finally, a combined version of this new kpse searcher and the original
 % function at |package.loaders[2]| (using first the new loader, then the old
@@ -295,42 +297,62 @@ See source file '\inFileName' for details.
 module('luatexbase', package.seeall)
 %    \end{macrocode}
 %
-%    Emulate (approximatively) kpse's lua format search.
+%    Emulate (approximatively) kpse's lua format search. More precisely,
+%    combine the search path of |texmfscripts| and |tex| in order to
+%    approximate |LUAINPUTS|. But we need to handle suffixes ourselves.
 %
-%    |lua_search_suffixes| is taken verbatim from Kpathsea's source
+%    |lua_suffixes| is taken verbatim from Kpathsea's source
 %    (\file{tex-file.c}, constant |LUA_SUFFIXES|),\footnote{Unchanged since
-%    2007-07-06, last checked 2010-05-10.} except for the addition of the
-%    empty string at the beginning (since this is what kpse does: first try
-%    without adding a suffix).
-%
-%    There is a problem with using the |tex| search format: kpse will try to
-%    add suffixes from the |TEX_SUFFIXES| constant, which leads to problems
-%    when a file \meta{name}|.tex| exists. We prevent that by checking the
-%    extension of the file found.
+%    2007-07-06, last checked 2010-05-10.}.
 %
 %    \begin{macrocode}
-local lua_search_suffixes = {
-   "", ".luc", ".luctex", ".texluc", ".lua", ".luatex", ".texlua",
-   }
-local lua_valid_suffixes = {
-  luc = true,
-  lua = true,
-  luctex = true, 
-  texluc = true,
-  luatex = true,
-  texlua = true,
+local lua_suffixes = {
+  ".luc", ".luctex", ".texluc", ".lua", ".luatex", ".texlua",
 }
-local function find_file_lua_emul(name)
-  for _, suf in ipairs(lua_search_suffixes) do
-    local name = name..suf
+%    \end{macrocode}
+%
+%    Auxiliary function for suffixes: says if |suffix| is a suffix of |name|.
+%
+%    \begin{macrocode}
+local function ends_with(suffix, name)
+    return name:sub(-suffix:len()) == suffix
+end
+%    \end{macrocode}
+%
+%    The search function first builds the list of filenames to be search. For
+%    the lua format, kpse always adds a suffix if no (known) suffix is
+%    present, so we do the same.
+%
+%    \begin{macrocode}
+function find_file_lua_emul(name)
+  local search_list = {}
+  for _, suffix in ipairs(lua_suffixes) do
+    if ends_with(suffix, name) then
+      search_list = { name }
+      break
+    else
+      table.insert(search_list, name..suffix)
+    end
+  end
+%    \end{macrocode}
+%
+%    Now look for each file in this list.
+%
+%    \begin{macrocode}
+  for _, search_name in ipairs(search_list) do
     local f = kpse.find_file(name, 'texmfscripts')
       or kpse.find_file(name, 'tex')
-    if suf == "" and f then
-      local ext = string.match(f,"^.+%.([^/\\]-)$")
-      if lua_valid_suffixes[suf] then
-        return f
-      end
-    elseif f then
+%    \end{macrocode}
+%
+%    There is a problem with using the |tex| search format: kpse will try to
+%    add suffixes from the |TEX_SUFFIXES| list, which may lead to problems
+%    if a file like \meta{name}|.lua.tex| exists. We prevent that by checking if
+%    the file found ends with the required name. So \meta{name}|.lua| will
+%    still be hidden by \meta{name}.|lua.tex| but it seems less bad not to
+%    find it than to return an incorrect result.
+%
+%    \begin{macrocode}
+    if f and ends_with(search_name, f) then
       return f
     end
   end

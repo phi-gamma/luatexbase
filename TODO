@@ -1,3 +1,5 @@
+loader: kpse emulation is still wrong, see kpathsea's manual 4.2
+
 modutils
 --------
 
