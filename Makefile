@@ -11,6 +11,7 @@ LOADER_RUN = luatexbase-loader.sty luatexbase.loader.lua
 MOD_RUN = luatexbase-modutils.sty modutils.lua
 LINKS = luatexbase.attr.lua luatexbase.cctb.lua \
 		luatexbase.mcb.lua luatexbase.modutils.lua
+TMP_LOADER = test-loader
 
 # Files grouped by generation mode
 UNPACKED_MCB = luatexbase-mcb.sty mcb.lua \
@@ -21,8 +22,6 @@ UNPACKED_ATTR = luatexbase-attr.sty attr.lua \
 				test-attr-plain.tex test-attr-latex.tex
 UNPACKED_CCTB = luatexbase-cctb.sty cctb.lua \
 				test-cctb-plain.tex test-cctb-latex.tex
-# temporary file for testing loader
-TMP_LOADER = test-loader
 UNPACKED_LOADER = $(LOADER_RUN) \
 				test-loader-plain.tex test-loader-latex.tex \
 				$(TMP_LOADER).lua test-loader.sub.lua
@@ -51,6 +50,12 @@ RUNDIR = $(TEXMFROOT)/tex/$(FORMAT)/$(NAME)
 DOCDIR = $(TEXMFROOT)/doc/$(FORMAT)/$(NAME)
 SRCDIR = $(TEXMFROOT)/source/$(FORMAT)/$(NAME)
 TEXMFROOT = ./texmf
+
+INSTALL_RUNFILES = @mkdir -p $(RUNDIR) && cp $(RUNFILES) $(RUNDIR)
+INSTALL_DOCFILES = @mkdir -p $(DOCDIR) && cp $(DOCFILES) $(DOCDIR)
+INSTALL_SRCFILES = @mkdir -p $(SRCDIR) && cp $(SRCFILES) $(SRCDIR)
+
+TESTENV = TEXINPUTS=.:$(TEXMFROOT)/tex//:
 
 CTAN_ZIP = $(NAME).zip
 TDS_ZIP = $(NAME).tds.zip
@@ -104,26 +109,26 @@ check-regs: $(UNPACKED_REGS)
 	luatex --interaction=batchmode test-regs-plain.tex >/dev/null
 	lualatex --interaction=batchmode test-regs-latex.tex >/dev/null
 
-check-attr: $(UNPACKED_ATTR) $(LOADER_RUN) $(LINKS) $(COMPAT_RUN)
-	luatex --interaction=batchmode test-attr-plain.tex >/dev/null
-	lualatex --interaction=batchmode test-attr-latex.tex >/dev/null
+check-attr: install-runfiles
+	$(TESTENV) luatex --interaction=batchmode test-attr-plain.tex >/dev/null
+	$(TESTENV) lualatex --interaction=batchmode test-attr-latex.tex >/dev/null
 
-check-cctb: $(UNPACKED_CCTB) $(LOADER_RUN) $(LINKS) $(COMPAT_RUN)
-	luatex --interaction=batchmode test-cctb-plain.tex >/dev/null
-	lualatex --interaction=batchmode test-cctb-latex.tex >/dev/null
+check-cctb: install-runfiles
+	$(TESTENV) luatex --interaction=batchmode test-cctb-plain.tex >/dev/null
+	$(TESTENV) lualatex --interaction=batchmode test-cctb-latex.tex >/dev/null
 
-check-loader: $(UNPACKED_LOADER) $(COMPAT_RUN)
+check-loader: install-runfiles
 	echo "this is no lua code" > $(TMP_LOADER).tex
-	luatex --interaction=batchmode test-loader-plain.tex >/dev/null
-	lualatex --interaction=batchmode test-loader-latex.tex >/dev/null
+	$(TESTENV) luatex --interaction=batchmode test-loader-plain.tex >/dev/null
+	$(TESTENV) lualatex --interaction=batchmode test-loader-latex.tex >/dev/null
 
-check-modutils: $(UNPACKED_MODUTILS) $(LOADER_RUN) $(LINKS) $(COMPAT_RUN)
-	luatex --interaction=batchmode test-modutils-plain.tex >/dev/null
-	lualatex --interaction=batchmode test-modutils-latex.tex >/dev/null
+check-modutils: install-runfiles
+	$(TESTENV) luatex --interaction=batchmode test-modutils-plain.tex >/dev/null
+	$(TESTENV) lualatex --interaction=batchmode test-modutils-latex.tex >/dev/null
 
-check-mcb: $(UNPACKED_MCB) $(LOADER_RUN) $(MOD_RUN) $(LINKS) $(COMPAT_RUN)
-	luatex --interaction=batchmode test-mcb-plain.tex >/dev/null
-	lualatex --interaction=batchmode test-mcb-latex.tex >/dev/null
+check-mcb: install-runfiles
+	$(TESTENV) luatex --interaction=batchmode test-mcb-plain.tex >/dev/null
+	$(TESTENV) lualatex --interaction=batchmode test-mcb-latex.tex >/dev/null
 
 check-compat: $(UNPACKED_COMPAT)
 	luatex --interaction=batchmode test-compat-plain.tex >/dev/null
@@ -134,25 +139,26 @@ $(CTAN_ZIP): $(SOURCE) $(COMPILED) $(TDS_ZIP)
 	@$(RM) -- $@
 	@zip -9 $@ $^ >/dev/null
 
-define run-install
-@mkdir -p $(RUNDIR) && cp $(RUNFILES) $(RUNDIR)
-@mkdir -p $(DOCDIR) && cp $(DOCFILES) $(DOCDIR)
-@mkdir -p $(SRCDIR) && cp $(SRCFILES) $(SRCDIR)
-endef
-
 $(TDS_ZIP): TEXMFROOT=./tmp-texmf
 $(TDS_ZIP): $(ALL_FILES)
 	@echo "Making TDS-ready archive $@."
 	@$(RM) -- $@
-	$(run-install)
+	$(INSTALL_RUNFILES)
+	$(INSTALL_DOCFILES)
+	$(INSTALL_SRCFILES)
 	@cd $(TEXMFROOT) && zip -9 ../$@ -r . >/dev/null
 	@$(RM) -r -- $(TEXMFROOT)
 
-.PHONY: install manifest clean mrproper
+.PHONY: install manifest clean mrproper install-runfiles
 
 install: $(ALL_FILES)
 	@echo "Installing in '$(TEXMFROOT)'."
-	$(run-install)
+	$(INSTALL_RUNFILES)
+	$(INSTALL_DOCFILES)
+	$(INSTALL_SRCFILES)
+
+install-runfiles: $(RUNFILES)
+	$(INSTALL_RUNFILES)
 
 manifest: 
 	@echo "Source files:"
@@ -166,4 +172,5 @@ clean:
 
 mrproper: clean
 	@$(RM) -- $(GENERATED) $(ZIPS) $(LINKS) $(TMP_LOADER).tex
+	@$(RM) -r $(TEXMFROOT)
 
