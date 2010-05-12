@@ -340,8 +340,8 @@ function find_file_lua_emul(name)
 %
 %    \begin{macrocode}
   for _, search_name in ipairs(search_list) do
-    local f = kpse.find_file(name, 'texmfscripts')
-      or kpse.find_file(name, 'tex')
+    local f = kpse.find_file(search_name, 'texmfscripts')
+      or kpse.find_file(search_name, 'tex')
 %    \end{macrocode}
 %
 %    There is a problem with using the |tex| search format: kpse will try to
