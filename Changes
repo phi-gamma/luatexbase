@@ -9,7 +9,7 @@ Summary of backwards-incompatible interface changes between 0.1 and 0.2:
       no more in callback.* or luamcallbacks.*
     - module error/warning etc now apply string.format to the arguments.
 
-2010/03/29
+2010/05/12 v0.2
     all
         - use luatexbase as the Lua module name
         - change the filename of the lua module (suppress luatexbase.)
@@ -24,7 +24,7 @@ Summary of backwards-incompatible interface changes between 0.1 and 0.2:
         - rename \luatexsetcatcoderange to \setcatcoderange
         - load lua-compat
     luamcallbacks -> luatexbase-mcb
-        - rename package
+        - rename package, new version numbering starting at 0.2
         - functions are now in luatexbase rather than luamcallbacks, they
           are no more copied to callbacks either
         - lua objects are now local (except for the public interface)
