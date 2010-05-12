@@ -303,6 +303,12 @@ See source file '\inFileName' for details.
 \luatexbase@directlua{require('luatexbase.modutils')}
 %    \end{macrocode}
 %
+%    Make sure the primitives we need are available.
+%
+%    \begin{macrocode}
+\luatexbase@ensure@primitive{luaescapestring}
+%    \end{macrocode}
+%
 %    \subsubsection{User macros}
 %
 %    Interface to |use_module()|.
