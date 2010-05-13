@@ -1,4 +1,5 @@
-loader: kpse emulation is still wrong, see kpathsea's manual 4.2
+attr: \newluatexattribute -> \newattribute?
+(Do it unless strong opposition before, like, May 16th.)
 
 modutils
 --------
