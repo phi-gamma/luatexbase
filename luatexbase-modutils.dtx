@@ -169,14 +169,12 @@ See source file '\inFileName' for details.
 %
 % \subsection{Lua functions}
 %
-% The main functions are |luatexbase.require_module| and
-% |luatexbase.use_module| which may be used as a replacement to |require()|.
-% The only difference between these functions is, |require_module| accepts a
-% second, optional argument in order to specify a minimal version. They do the
-% same as |require()| but also make sure the module loaded correctly
-% identifies itself with the name given, and its version is greater than the
-% minimal version required. The version can be given either as a (floating
-% point) number or as a date in YYYY/MM/DD format.
+% The main function is |luatexbase.require_module| which may be used as a
+% replacement to |require()|, but also checks that the module correctly
+% identified itself, and accepts a second, optional argument containing
+% version information to be checked against the similar information provided
+% by the loaded module.  The version can be given either as a (floating point)
+% number or as a date in YYYY/MM/DD format.
 %
 % Modules identify themselves using |luatexbase.provides_module|, whose only
 % argument is a table with some information about the module. The mandatory
@@ -466,7 +464,7 @@ local function warn(...) module_warning('luatexbase.modutils', ...) end
 %    Load a module without version checking.
 %
 %    \begin{macrocode}
-function use_module(name)
+local function use_module(name)
     require(name)
     if not modules[name] then
         warn("Module didn't properly identified itself: %s", name)
@@ -479,7 +477,8 @@ end
 %    \begin{macrocode}
 function require_module(name, version)
     if not version then
-        return use_module(name)
+        use_module(name)
+        return
     end
     luaversion = parse_version(version)
     if modules[name] then

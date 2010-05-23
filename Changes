@@ -1,5 +1,15 @@
                     Changes in the luatexbase package/bundle
 
+
+(current changes)
+    attr
+        - Name changes: \*luatexattribute -> \*attribute.
+    modutils
+        - \luatexUseModule and \luatexRequireModule replaced by
+          \RequireLuaModule with a unified syntax.
+        - luatexbase.use_module removed (use luatexbase.require_module with
+          a single argument instead).
+
 2010/10/04
     various documentation updates/fixes uploaded to CTAN
 

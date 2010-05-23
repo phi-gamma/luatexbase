@@ -1,8 +1,8 @@
 modutils
 --------
 
-- syntax of public TeX macros and Lua functions
 - create private functions for infwarrerr?
+- use LaTeX style linebreaks in messages?
 
 - review logic: should this module be mandatory?
   if not, what should happen with mixed require(), require_module(),
