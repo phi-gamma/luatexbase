@@ -3,6 +3,7 @@
 (current changes)
     attr
         - allocate from 1 to avoid problems with some external code
+        - provide a Lua interface: new_attribute() and unset_attribute().
 
 Summary of backwards-incompatible interface changes between 0.1 and 0.2:
     - Lua objects are now in table luatexbase, not luatextra.
