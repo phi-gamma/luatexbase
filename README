@@ -1,56 +1,46 @@
                           The luatexbase generic bundle
 
 
-luatexbase provides basic resource management, similar to the way TeX
-resources are handled by Plain TeX and LaTeX, for new resources introduced by
-LuaTeX.
+The bundle provides basic facilities for LuaTeX macro programmers, mostly
+resource allocation and convenience packages. Provided are:
 
-Each resource is handled in a separate package.
+– luatexbase-compat: compatibility helpers;
+– luatexbase-regs: allocation of registers and the like;
+– luatexbase-loader: Lua module loading;
+– luatexbase-attr: attribute allocation;
+– luatexbase-cctb: catcode table allocation;
+– luatexbase-modutils: Lua module declaration; and
+- luatexbase-mcb: callbacks extensions.
 
-The resources considered are:
-- registers (\count, \box, etc.)    -> luatexbase-regs
-- Lua module loading                -> luatexbase-loader
-- \attribute's                      -> luatexbase-attr
-- \catcodetable's                   -> luatexbase-cctb
-- Lua callbacks                     -> luamcallbacks
-
-Additional convenience packages:
-- Lua module declaration            -> luatexbase-modutils
-- compatibility helpers             -> luatexbase-compat
-
-WARNING: these packages are subject to change or even be merged or disappear in
-the near future!
+Additionally, a `luatexbase' package loads all of the above in one step (and
+does nothing else) for your convenience.
 
 Installation
 ------------
 
 Here are the recommended installation methods (preferred first).
-(Methods "commented out" are not available right now.)
 
-% 1. If you are using TeX Live 2009 or later, use 'tlmgr install luatexbase'.
-% Alternatively, try your (TeX or Linux) distribution's package management system.
-% 
-% 2. a. Grab luatextra.tds.zip on the CTAN.
-%    b. Unzip it at the root of one or your TDS trees.
-%    c. You may need to update some filename database after this, see your TeX
-% distribution's manual for details.
+1. If you are using TeX Live 2010 or later, use 'tlmgr install luatexbase'.
+Alternatively, try your (TeX or Linux) distribution's package management system.
+
+2. a. Grab luatextra.tds.zip on the CTAN.
+   b. Unzip it at the root of one or your TDS trees.
+   c. You may need to update some filename database after this, see your TeX
+      distribution's manual for details. (Hint: with TeX Live, run 'mktexlsr';
+      with MikTeX, look for "Refresh FNDB" in the MikTeX menu.)
 
 3. a. Grab the sources from CTAN or github.
    b. Run 'make install TEXMFROOT=/path/to/texmf'.
+      (Warning: 'make install' without giving a TEXMFROOT will
+       put files in './texmf', which is probably not what you want.)
    c. See 2c.
-
-4. Try to figure it out by looking at the Makefile and comments in the sources.
-
 
 License
 -------
 
-This work and the derived files are under the Creative Commons CC0 license.
+This work and the derived files are under the Creative Commons CC0 license,
+which is as close to public domain as possible in the country of the authors.
+See the full text [1] or the FAQ [2].
 
-See the full text at
-
-http://creativecommons.org/publicdomain/zero/1.0/legalcode
-
-and a FAQ at
-
-http://wiki.creativecommons.org/CC0
+[1]: http://creativecommons.org/publicdomain/zero/1.0/legalcode
+[2]: http://wiki.creativecommons.org/CC0
