@@ -288,11 +288,14 @@ See source file '\inFileName' for details.
 %
 %    \subsection{User macros}
 %
-%    The allocaton macro.
+%    The allocaton macro. Unlike other registers, allocate starting from 1.
+%    Some code (eg, font handling coming from Con\tex{}t) behaves strangely
+%    with \verb+\attribute0+ and since there is plenty of room here, it
+%    doesn't seem bad to ``loose'' one item in order to avoid this problem.
 %
 %    \begin{macrocode}
 \newcount\lltxb@attribute@alloc
-\lltxb@attribute@alloc\m@ne
+\lltxb@attribute@alloc\z@
 \def\newluatexattribute#1{%
   \ifnum\lltxb@attribute@alloc<65535\relax
     \global\advance\lltxb@attribute@alloc\@ne

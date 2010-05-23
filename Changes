@@ -1,5 +1,9 @@
                     Changes in the luatexbase package/bundle
 
+(current changes)
+    attr
+        - allocate from 1 to avoid problems with some external code
+
 Summary of backwards-incompatible interface changes between 0.1 and 0.2:
     - Lua objects are now in table luatexbase, not luatextra.
     - Lua tables tex.attributenumber and tex.catcodetablenumber are not
