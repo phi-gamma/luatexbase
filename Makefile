@@ -21,8 +21,10 @@ UNPACKED_MODUTILS = luatexbase-modutils.sty modutils.lua test-modutils.lua \
 				test-modutils-plain.tex test-modutils-latex.tex
 UNPACKED_COMPAT = luatexbase-compat.sty \
 				test-compat-plain.tex test-compat-latex.tex
+UNPACKED_CORE = luatexbase.sty
 UNPACKED = $(UNPACKED_MCB) $(UNPACKED_REGS) $(UNPACKED_ATTR) $(UNPACKED_CCTB) \
-		   $(UNPACKED_LOADER) $(UNPACKED_MODUTILS) $(UNPACKED_COMPAT)
+		   $(UNPACKED_LOADER) $(UNPACKED_MODUTILS) $(UNPACKED_COMPAT) \
+		   $(UNPACKED_CORE)
 COMPILED = $(DOC)
 GENERATED = $(COMPILED) $(UNPACKED)
 SOURCE = $(DTX) $(DTXSTY) README TODO Changes Makefile
@@ -99,6 +101,9 @@ $(UNPACKED_MODUTILS): luatexbase-modutils.dtx
 	$(DO_TEX)
 
 $(UNPACKED_COMPAT): luatexbase-compat.dtx
+	$(DO_TEX)
+
+$(UNPACKED_CORE): luatexbase.dtx
 	$(DO_TEX)
 
 check-regs: $(UNPACKED_REGS)
