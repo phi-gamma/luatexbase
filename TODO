@@ -1,5 +1,4 @@
-attr: \newluatexattribute -> \newattribute?
-(Do it unless strong opposition before, like, May 16th.)
+attr: \newluatexattribute -> \newattribute
 
 modutils
 --------
@@ -20,12 +19,6 @@ mcb
 - Enhance test file?
 - General review of code and comments.
 - Update user documentation.
-
-luatexbase
-----------
-
-- create it, make it load the others (except maybe mcb for now)
-- create general documentation
 
 afterwards
 ----------
