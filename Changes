@@ -9,6 +9,8 @@
           \RequireLuaModule with a unified syntax.
         - luatexbase.use_module removed (use luatexbase.require_module with
           a single argument instead).
+        - change formatting of messages.
+        - rm module_log & module_term functions.
 
 2010/10/04
     various documentation updates/fixes uploaded to CTAN

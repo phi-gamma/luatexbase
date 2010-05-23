@@ -187,12 +187,12 @@ See source file '\inFileName' for details.
 % Functions for reporting are provided; similarly to \latex's |\PackageError|
 % etc. they take the module name as their first argument and include it in the
 % printed message in an appropriate way. The remaining arguments are passed to
-% |string.format()| before being printed.
+% |string.format()|, and the package name is prepended to each line of the
+% resulting string before it is output.
 %
 % The functions provided (all found in the |luatexbase| table) are
 % |module_error|, |module_warning|, |module_info| (writes to terminal and
-% log), |module_log| (writes only to the log file) and |module_term| (writes
-% only to the terminal).
+% log).
 %
 %    \section{Implementation}
 %
@@ -431,23 +431,32 @@ end
 %    consistent.
 %
 %    \begin{macrocode}
+local function msg_format(msg_type, mod_name, ...)
+  local cont = '('..mod_name..')' .. ('Module: '..msg_type):gsub('.', ' ')
+  return 'Module '..mod_name..' '..msg_type..': '
+    .. string.format(...):gsub('\n', '\n'..cont)
+end
 local function module_error_int(mod, ...)
-  error('Module '..mod..' error: '..string.format(...), 3)
+  error(msg_format('error', mod, ...), 3)
 end
 function module_error(mod, ...)
   module_error_int(mod, ...)
 end
+%    \end{macrocode}
+%
+%    Split the lines explicitely in order not to depend on the value of
+%    |\newlinechar|.
+%
+%    \begin{macrocode}
 function module_warning(mod, ...)
-  texio.write_nl("Module "..mod.." warning: "..string.format(...))
+  for _, line in ipairs(msg_format('warning', mod, ...):explode('\n')) do
+    texio.write_nl(line)
+  end
 end
 function module_info(mod, ...)
-  texio.write_nl(mod..": "..string.format(...))
-end
-function module_log(mod, ...)
-  texio.write_nl('log', mod..": "..string.format(...))
-end
-function module_term(mod, ...)
-  texio.write_nl('term', mod..": "..string.format(...))
+  for _, line in ipairs(msg_format('info', mod, ...):explode('\n')) do
+    texio.write_nl(line)
+  end
 end
 %    \end{macrocode}
 %
