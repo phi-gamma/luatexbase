@@ -161,14 +161,11 @@ See source file '\inFileName' for details.
 %
 % \subsection{\tex macros}
 %
-% The two macros |\luatexUseModule| and |\luatexRequireModule| are very
-% similar and are interfaces to the Lua functions |use_module| and
-% |require_module|. The only difference between those macros is the number of
-% arguments (just as the underlying Lua functions): |\luatexUseModule| only
-% take one argument: the module name\footnote{without extension} while
-% |\luatexRequireModule| takes another argument for specifying a minimal
-% version (see below). With \latex, this argument is the first and is
-% optional. Otherwise, it's the second one and it's mandatory.
+% The macro |\RequireLuaModule| is and interface to the Lua function
+% |require_module|. Just as the underlying Lua function, this macro takes
+% the module name as its first, mandatory argument, and version information as
+% a second, optional argument (using the usual \latex convention for optional
+% arguments, even under \plaintex).
 %
 % \subsection{Lua functions}
 %
@@ -309,28 +306,64 @@ See source file '\inFileName' for details.
 \luatexbase@ensure@primitive{luaescapestring}
 %    \end{macrocode}
 %
-%    \subsubsection{User macros}
+%    \subsection{Auxiliary definitions}
 %
-%    Interface to |use_module()|.
+%    We need a version of |\@ifnextchar|. The definitions for the not-\latex
+%    case are stolen from \pk{ltxcmds} verbatim, only the prefix is changed.
 %
 %    \begin{macrocode}
-\def\luatexUseModule#1{\luatexbase@directlua{%
-    luatexbase.use_module("\luatexluaescapestring{#1}")}}
+\ifdefined\kernel@ifnextchar
+  \let\lltxb@ifnextchar\kernel@ifnextchar
+\else
+  \chardef\lltxb@zero0
+  \chardef\lltxb@two2
+  \long\def\lltxb@ifnextchar#1#2#3{%
+    \begingroup
+    \let\lltxb@CharToken= #1\relax
+    \toks\lltxb@zero{#2}%
+    \toks\lltxb@two{#3}%
+    \futurelet\lltxb@LetToken\lltxb@ifnextchar@
+  }
+  \def\lltxb@ifnextchar@{%
+    \ifx\lltxb@LetToken\lltxb@CharToken
+      \expandafter\endgroup\the\toks\expandafter\lltxb@zero
+    \else
+      \ifx\lltxb@LetToken\lltxb@SpaceToken
+         \expandafter\expandafter\expandafter\lltxb@@ifnextchar
+      \else
+         \expandafter\endgroup\the\toks
+         \expandafter\expandafter\expandafter\lltxb@two
+      \fi
+    \fi
+  }
+  \begingroup
+    \def\x#1{\endgroup
+      \def\lltxb@@ifnextchar#1{%
+         \futurelet\lltxb@LetToken\lltxb@ifnextchar@
+      }%
+    }%
+  \x{ }
+  \begingroup
+    \def\x#1{\endgroup
+      \let\lltxb@SpaceToken= #1%
+    }%
+  \x{ }
+\fi
 %    \end{macrocode}
 %
-%    Interface to |require_module()| with syntax depending on the format.
+%    \subsubsection{User macro}
+%
+%    Interface to the Lua function for module loading.
 %
 %    \begin{macrocode}
-\begingroup\expandafter\expandafter\expandafter\endgroup
-\expandafter\ifx\csname newcommand\endcsname\relax
-  \def\luatexRequireModule#1#2{%
-    \luatexbase@directlua{luatexbase.require_module(
-      "\luatexluaescapestring{#1}", "\luatexluaescapestring{#2}")}}
-\else
-  \newcommand\luatexRequireModule[2][0]{%
-    \luatexbase@directlua{luatexbase.require_module(
-      "\luatexluaescapestring{#2}", "\luatexluaescapestring{#1}")}}
-\fi
+\def\RequireLuaModule#1{%
+  \lltxb@ifnextchar[{\lltxb@requirelua{#1}}{\lltxb@requirelua{#1}[]}}
+\def\lltxb@requirelua#1[#2]{%
+  \luatexbase@directlua{luatexbase.require_module(
+    "\luatexluaescapestring{#1}"
+    \expandafter\ifx\expandafter\/\detokenize{#2}\/\else
+      , "\luatexluaescapestring{#2}"
+    \fi)}}
 %    \end{macrocode}
 %
 %    \begin{macrocode}
@@ -531,11 +564,8 @@ luatexbase.provides_module {
 %<testplain>\input luatexbase-modutils.sty
 %<testlatex>\RequirePackage{luatexbase-modutils}
 %<*testplain,testlatex>
-\luatexUseModule{test-modutils}
-\luatexRequireModule
-%<testlatex>[1970/01/01]
-{test-modutils}
-%<testplain>{1970/01/01}
+\RequireLuaModule{test-modutils}
+\RequireLuaModule{test-modutils}[1970/01/01]
 %</testplain,testlatex>
 %<testplain>\bye
 %<testlatex>\stop
