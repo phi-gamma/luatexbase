@@ -66,6 +66,8 @@ See source file '\inFileName' for details.
 %<*driver>
 \documentclass{ltxdoc}
 \input{lltxb-dtxstyle}
+\newcommand\subpk[1]{%
+  \item[\href{luatexbase-#1.pdf}{luatexbase-#1}\normalfont:]}
 \begin{document}
   \DocInput{luatexbase.dtx}%
 \end{document}
@@ -99,12 +101,40 @@ See source file '\inFileName' for details.
 % \maketitle
 %
 % \begin{abstract}
+% This convenience package loads all of the (stable) packages in the
+% \pk{luatexbase} bundle.
 % \end{abstract}
 %
 % \tableofcontents
 %
 % \section{Documentation}
 %
+% The \pk{luatexbase} package loads the following packages:
+% \begin{description}
+%   \subpk{compat} compatibility helpers for \verb+\directlua+, primitive
+%   names and version information from Lua.
+%   \subpk{loader} extension of \luatex's Lua module loader (since version
+%   0.60.0, this is more of a compatibility layer for older versions than a
+%   real extension).
+%   \subpk{regs} extented allocation scheme for registers and the like,
+%   \emph{\`a la} \pk{etex}.
+%   \subpk{cctb} catcode table allocation.
+%   \subpk{attr} attribute allocation.
+% \end{description}
+%
+% These packages are almost stable: it is unlikely that backward-incompatible
+% changes will be made in the future (other than necessary for merging with
+% \pk{luatex.sty}, which strongly overlaps with the above). If they happen,
+% such changes will be announced on \email{lualatex-dev@tug.org} before they
+% are pushed to the master branch and then CTAN.
+%
+% Other packages included in the bundle, but currently not loaded by the
+% present package, are:
+% \begin{description}
+%   \subpk{modutils} Lua module declaration, including version checks.
+%   \subpk{mcb} callbacks extensions allowing to register many functions in a
+%   single callback, and declare new callbacks for packages.
+% \end{description}
 %
 %    \section{Implementation}
 %
@@ -214,8 +244,7 @@ See source file '\inFileName' for details.
 \fi
 %    \end{macrocode}
 %
-%    \begin{macrocode}
-%    \end{macrocode}
+%    This is the end, my friend\dots the end.
 %
 %    \begin{macrocode}
 \lltxb@core@AtEnd
