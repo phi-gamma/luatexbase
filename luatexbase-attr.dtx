@@ -132,12 +132,10 @@ See source file '\inFileName' for details.
 %
 % \section{Documentation}
 %
-% \subsection{\tex interface}
-%
-% The main macro defined here is |\newluatexattribute|. It behaves in the same
-% way as |\newcount|. There are also two helper macros: |\setluatexattibute|
+% The main macro defined here is |\newattribute|. It behaves in the same
+% way as |\newcount|. There are also two helper macros: |\setattribute|
 % sets an attribute's value (locally, but you can use |\global| in front of
-% it). |\unsetluatexattribute| unsets an attribute by giving it a special
+% it). |\unsetattribute| unsets an atribute by giving it a special
 % value, depending on \luatex's version; you should always use this macro
 % in order to be sure the correct special value for your version of \luatex is
 % used.
@@ -151,7 +149,7 @@ See source file '\inFileName' for details.
 % The various Lua functions for manipulating attributes use a number to
 % designate the attribute. Hence, package writers need a way to know the
 % number of the attribute associated to |\fooattr| assuming it was defined
-% using |\newluatexattribute\fooattr|, something that \luatex currently
+% using |\newattribute\fooattr|, something that \luatex currently
 % doesn't support (you can get the current value of the associated attribute
 % as |tex.atrribute.fooattr|, but not the attribute number).
 %
@@ -159,7 +157,7 @@ See source file '\inFileName' for details.
 % extract the number at any time from the |\meaning| of |\foobar|.
 % Alternatively, one could look at |\the\allocationnumber| just after the
 % definition of |\fooattr| and remember it in a Lua variable. For your
-% convenience, this is automatically done by |\newluatexattribute|: the number
+% convenience, this is automatically done by |\newattribute|: the number
 % is remembered in a dedicated Lua table so that you can get it as
 % |luatexbase.attributes.foobar| (mind the absence of backslash here) at any
 % time.
@@ -308,7 +306,7 @@ See source file '\inFileName' for details.
 %    macros.
 %
 %    \begin{macrocode}
-\def\newluatexattribute#1{%
+\def\newattribute#1{%
   \begingroup\escapechar\m@ne \expandafter\expandafter\expandafter
   \endgroup                   \expandafter\expandafter\expandafter
   \allocationnumber           \luatexbase@directlua{tex.write(
@@ -317,14 +315,14 @@ See source file '\inFileName' for details.
     \global\luatexattributedef#1=\allocationnumber
     \wlog{\string#1=\string\luatexattribute\the\allocationnumber}%
   \else
-    \errmessage{No room for a new \string\attribute}%
+    \errmessage{No room for a new \string\luatexattribute}%
   \fi}
 %    \end{macrocode}
 %
-%    Helper macro |\unsetluatexattribute|: wrapper around the Lua function.
+%    Helper macro |\unsetattribute|: wrapper around the Lua function.
 %
 %    \begin{macrocode}
-\def\unsetluatexattribute#1{%
+\def\unsetattribute#1{%
   \begingroup\escapechar\m@ne
   \luatexbase@directlua{%
     luatexbase.unset_attribute("\luatexluaescapestring{\string#1}")}%
@@ -334,7 +332,7 @@ See source file '\inFileName' for details.
 %    And now the trivial helper macro.
 %
 %    \begin{macrocode}
-\def\setluatexattribute#1#2{%
+\def\setattribute#1#2{%
   #1=\numexpr#2\relax}
 %    \end{macrocode}
 %
@@ -408,18 +406,18 @@ end
 %<testplain>\input luatexbase-attr.sty
 %<testlatex>\RequirePackage{luatexbase-attr}
 %<*testplain,testlatex>
-\newluatexattribute\testattr
-\setluatexattribute\testattr{1}
-\unsetluatexattribute\testattr
+\newattribute\testattr
+\setattribute\testattr{1}
+\unsetattribute\testattr
 \catcode64 11
 \luatexbase@directlua{assert(luatexbase.attributes.testattr)}
 \luatexbase@directlua{luatexbase.new_attribute('luatestattr')}
 \luatexbase@directlua{assert(luatexbase.attributes.luatestattr)}
 \begingroup
 \escapechar64
-\newluatexattribute\anotherattr
+\newattribute\anotherattr
 \endgroup
-\setluatexattribute\anotherattr{1}
+\setattribute\anotherattr{1}
 \luatexbase@directlua{assert(luatexbase.attributes.anotherattr)}
 %</testplain,testlatex>
 %<testplain>\bye
