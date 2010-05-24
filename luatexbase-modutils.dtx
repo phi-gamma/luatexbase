@@ -486,7 +486,7 @@ function provides_module(mod)
     end
     requiredversion = requiredversions[mod.name]
     if requiredversion then
-        if requiredversion.type == date 
+        if requiredversion.type == date
         and requiredversion.version > datetonumber(mod.date) then
             err("loading module %s in version %s, "
             .."but version %s was required",
@@ -498,7 +498,7 @@ function provides_module(mod)
             mod.name, mod.version, requiredversion.orig)
         end
     end
-    modules[mod.name] = module
+    modules[mod.name] = mod
     texio.write_nl('log', string.format("Lua module: %s %s v%.02f %s\n",
     mod.name, mod.date, mod.version, mod.description))
 end
@@ -531,6 +531,7 @@ luatexbase.provides_module {
 %<testplain>\input luatexbase-modutils.sty
 %<testlatex>\RequirePackage{luatexbase-modutils}
 %<*testplain,testlatex>
+\luatexUseModule{test-modutils}
 \luatexRequireModule
 %<testlatex>[1970/01/01]
 {test-modutils}
