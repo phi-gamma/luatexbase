@@ -192,7 +192,10 @@ See source file '\inFileName' for details.
 %
 % The functions provided (all found in the |luatexbase| table) are
 % |module_error|, |module_warning|, |module_info| (writes to terminal and
-% log).
+% log). Custom versions of this functions, not needing the first argument, are
+% returned (in the order: error, warning, info) by
+% |luatexbase.errwarinf|\parg{name} and by the |luatexbase.provides_module()|
+% functions.
 %
 %    \section{Implementation}
 %
@@ -426,9 +429,13 @@ end
 %    |error()| is used. For now, the error reports look less good than with
 %    \tex's |\errmessage|, but hopefully it will be improved in future
 %    versions of \luatex. We could invoke |\errmessage| using |tex.sprint()|,
-%    but it may cause problems on the \tex end, and moreover |error()| will
-%    still be used by Lua for other errors, so it makes messages more
-%    consistent.
+%    but it may cause problems on the \tex end,\footnote{Eg, it will not work
+%    inside an \cs{edef}.} and moreover |error()| will still be used by Lua
+%    for other errors, so it makes messages more consistent.
+%
+%    An internal function is used for error messages, so that the calling
+%    level (last argument of |error()| remains constant using either
+%    |module_error()| or a custom version as return by |errwarinf()|.
 %
 %    \begin{macrocode}
 local function msg_format(msg_type, mod_name, ...)
@@ -460,12 +467,21 @@ function module_info(mod, ...)
 end
 %    \end{macrocode}
 %
+%    Produce custom versions of the reporting functions.
+%
+%    \begin{macrocode}
+function errwarinf(name)
+  return function(...) module_error_int(name, ...) end,
+    function(...) module_warning(name, ...) end,
+    function(...) module_info(name, ...) end
+end
+%    \end{macrocode}
+%
 %    For our own convenience, local functions for warning and errors in the
 %    present module.
 %
 %    \begin{macrocode}
-local function err(...) module_error_int('luatexbase.modutils', ...) end
-local function warn(...) module_warning('luatexbase.modutils', ...) end
+local err, warn = errwarinf('luatexbase.modutils')
 %    \end{macrocode}
 %
 %    \subsubsection{module loading and providing functions}
@@ -511,7 +527,8 @@ function require_module(name, version)
 end
 %    \end{macrocode}
 %
-%    Provide identification information for a module.
+%    Provide identification information for a module. As a bonus, custom
+%    reporting functions are returned.
 %
 %    \begin{macrocode}
 function provides_module(mod)
@@ -542,6 +559,7 @@ function provides_module(mod)
     modules[mod.name] = mod
     texio.write_nl('log', string.format("Lua module: %s %s v%.02f %s\n",
     mod.name, mod.date, mod.version, mod.description))
+    return errwarinf(mod.name)
 end
 %    \end{macrocode}
 %
@@ -555,12 +573,13 @@ end
 %
 %    \begin{macrocode}
 %<*testdummy>
-luatexbase.provides_module {
+local err, warn, info = luatexbase.provides_module {
   name        = 'test-modutils',
   date        = '2000/01/01',
   version     = 1,
   description = 'dummy test package',
 }
+info('It works!\nOh, rly?\nYeah rly!')
 %</testdummy>
 %    \end{macrocode}
 %

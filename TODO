@@ -1,8 +1,6 @@
 modutils
 --------
 
-- create private functions for infwarrerr?
-
 - review logic: should this module be mandatory?
   if not, what should happen with mixed require(), require_module(),
 declaration and no declaration?
