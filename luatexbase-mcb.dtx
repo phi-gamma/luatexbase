@@ -122,12 +122,14 @@ See source file '\inFileName' for details.
 % \maketitle
 %
 % \begin{abstract}
-% This package manages the callback adding and removing, by adding
-% \texttt{callback.add} and \texttt{callback.remove}, and overwriting
-% \texttt{callback.register}. It also allows to create and call new callbacks.
-% For an introduction on this package (among others), please refer to the
-% document \texttt{luatextra-reference.pdf}.
-% \par\textbf{Warning.} Currently assumes that \textsf{luatexbase-modutils}
+% This package manages the callback adding and removing, by providing new
+% functions and overwriting \texttt{callback.register}. It also allows to
+% create and call new callbacks.\par
+% For an (outdated) introduction on this package (among others), please refer
+% to the document \texttt{luatextra-reference.pdf}. The documentation section
+% of the present document is currently incomplete, sorry for this and thanks
+% for your patience.\par
+% \textbf{Warning.} Currently assumes that \textsf{luatexbase-modutils}
 % has been previously loaded. (This is a temporary limitation.)
 % \end{abstract}
 %
@@ -147,7 +149,8 @@ See source file '\inFileName' for details.
 % impossible with them to be compatible with each other.
 %
 % This package solves this problem by adding mainly one new function
-% \texttt{callback.\\add} that adds a function in a callback. With this
+% \verb+luatexbase.add_to_callback+ that adds a function in a callback. With
+% this
 % function it is possible for packages to register their function in a
 % callback without overwriting the functions of the other packages.
 %
@@ -787,7 +790,7 @@ end
 %    \begin{macrocode}
 callback.register = function ()
 err("function callback.register has been deleted by luamcallbacks, "
-.."please use callback.add instead.")
+.."please use luatexbase.add_to_callback instead.")
 end
 %    \end{macrocode}
 %
