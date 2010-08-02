@@ -1,5 +1,7 @@
 attr: \newluatexattribute -> \newattribute
 
+all: error if not running luatex!
+
 modutils
 --------
 
@@ -8,6 +10,7 @@ modutils
     \luatexRequireModule
 - syntax of public TeX macros and Lua functions
 - create private functions for infwarrerr?
+- use tex.error for error reporting if available
 - review logic (see what LaTeX2e does)
 - General review of code and comments.
 - Update user documentation.
@@ -19,6 +22,7 @@ mcb
 - Enhance test file?
 - General review of code and comments.
 - Update user documentation.
+
 
 afterwards
 ----------
