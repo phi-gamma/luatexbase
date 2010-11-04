@@ -703,6 +703,7 @@ function create_callback(name, ctype, default)
         err("unable to create callback '%s':\ntype '%s' undefined", name, ctype)
         return nil
     end
+    info("creating new callback '%s'", name)
     ctype = temp
     lua_callbacks_defaults[name] = default
     callbacktypes[name] = ctype
