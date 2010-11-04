@@ -11,6 +11,7 @@
           a single argument instead).
         - change formatting of messages.
         - rm module_log & module_term functions.
+        - luatexbase.require_module now returns curstom err/war/inf functions.
 
 2010/10/04
     various documentation updates/fixes uploaded to CTAN
