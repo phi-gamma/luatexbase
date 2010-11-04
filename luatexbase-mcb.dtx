@@ -766,13 +766,12 @@ function priority_in_callback (name, description)
 end
 %    \end{macrocode}
 %
-%    Finally we
-%    overwrite \texttt{callback.register} so that it outputs an error.
+%    Finally, overwrite \code{callback.register} so that bails out in error.
 %
 %    \begin{macrocode}
 callback.register = function ()
-err("function callback.register has been deleted by luamcallbacks, "
-.."please use luatexbase.add_to_callback instead.")
+  err("function callback.register has been trapped,\n"
+  .."please use luatexbase.add_to_callback instead.")
 end
 %    \end{macrocode}
 %
@@ -792,26 +791,44 @@ end
 %<*testplain,testlatex>
 \catcode 64 11
 \luatexbase@directlua{
-  local function one(head,...)
-      texio.write_nl("I'm number 1")
+  local function sample(head,...)
       return head, true
   end
 
-  local function two(head,...)
-      texio.write_nl("I'm number 2")
-      return head, true
+  local prio = luatexbase.priority_in_callback
+  luatexbase.add_to_callback("hpack_filter", sample, "sample function one", 1)
+  luatexbase.add_to_callback("hpack_filter", sample, "sample function two", 2)
+  luatexbase.add_to_callback("hpack_filter", sample, "sample function three", 1)
+  texio.write_nl(prio("hpack_filter", "sample function three"))
+  luatexbase.remove_from_callback("hpack_filter", "sample function three")
+  texio.write_nl(prio("hpack_filter", "sample function three"))
+  luatexbase.reset_callback("hpack_filter")
+  texio.write_nl(prio("hpack_filter", "sample function one"))
+
+  local function data_one(s)
+    texio.write_nl("I'm data 1 whith argument: "..s)
+    return s
+  end
+  local function data_two(s)
+    texio.write_nl("I'm data 2 whith argument: "..s)
+    return s
+  end
+  local function data_three(s)
+    texio.write_nl("I'm data 3 whith argument: "..s)
+    return s
   end
 
-  local function three(head,...)
-      texio.write_nl("I'm number 3")
-      return head, true
-  end
-
-  luatexbase.add_to_callback("hpack_filter",one,"my sample function one",1)
-  luatexbase.add_to_callback("hpack_filter",two,"my sample function two",2)
-  luatexbase.add_to_callback("hpack_filter",three,"my sample function three",1)
-
-  luatexbase.remove_from_callback("hpack_filter","my sample function three")
+--[[
+  luatexbase.create_callback("fooback", "data", data_one)
+  luatexbase.call_callback("fooback", "default")
+  luatexbase.add_to_callback("fooback", data_two, "my sample function two", 2)
+  luatexbase.add_to_callback("fooback", data_three, "my sample function three", 1)
+  luatexbase.call_callback("fooback", "all")
+  luatexbase.remove_from_callback("fooback", "my sample function three")
+  luatexbase.call_callback("fooback", "all but three")
+  luatexbase.reset_callback("fooback")
+  luatexbase.call_callback("fooback", "default")
+  --]]
 }
 %</testplain,testlatex>
 %<testplain>\bye
