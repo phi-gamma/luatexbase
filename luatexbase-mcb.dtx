@@ -125,10 +125,8 @@ See source file '\inFileName' for details.
 % This package manages the callback adding and removing, by providing new
 % functions and overwriting \texttt{callback.register}. It also allows to
 % create and call new callbacks.\par
-% For an (outdated) introduction on this package (among others), please refer
-% to the document \texttt{luatextra-reference.pdf}. The documentation section
-% of the present document is currently incomplete, sorry for this and thanks
-% for your patience.\par
+% The user part of this documentation is currently very incomplete, and will
+% be expanded later.  Sorry for this and thanks for your patience.\par
 % \textbf{Warning.} Currently assumes that \textsf{luatexbase-modutils}
 % has been previously loaded. (This is a temporary limitation.)
 % \end{abstract}
@@ -150,18 +148,21 @@ See source file '\inFileName' for details.
 %
 % This package solves this problem by adding mainly one new function
 % \verb+luatexbase.add_to_callback+ that adds a function in a callback. With
-% this
-% function it is possible for packages to register their function in a
-% callback without overwriting the functions of the other packages.
+% this function it is possible for packages to register their function in a
+% callback without overwriting the functions of the other packages. There are
+% also functions to remove one or all functions from a callback.
+% See comments in the implementation section for details.
 %
 % The functions are called in a certain order, and when a package registers a
 % callback it can assign a priority to its function. Conflicts can still
 % remain even with the priority mechanism, for example in the case where two
 % packages want to have the highest priority. In these cases the packages have
 % to solve the conflicts themselves.
+% See comments in the implementation section for details.
 %
 % This package also privides a way to create and call new callbacks, in
 % addition to the default Lua\TeX\ callbacks.
+% See comments in the implementation section for details.
 %
 % \subsubsection*{Limitations}
 %

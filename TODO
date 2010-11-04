@@ -13,7 +13,7 @@ modutils
 - use tex.error for error reporting if available
 - review logic (see what LaTeX2e does)
 - General review of code and comments.
-- Update user documentation.
+- Update user documentation. Include template(s) for Lua modules.
 
 mcb
 ---
