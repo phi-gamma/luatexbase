@@ -44,6 +44,12 @@ See source file '\inFileName' for details.
   \file{luatexbase.sty}{\from{luatexbase.dtx}{texpackage}}%
 }
 
+\generate{%
+  \usedir{doc/luatex/luatexbase}%
+  \file{test-base-plain.tex}{\from{luatexbase.dtx}{testplain}}%
+  \file{test-base-latex.tex}{\from{luatexbase.dtx}{testlatex}}%
+}
+
 \obeyspaces
 \Msg{************************************************************************}
 \Msg{*}
@@ -251,6 +257,17 @@ See source file '\inFileName' for details.
 %    \begin{macrocode}
 \lltxb@core@AtEnd
 %</texpackage>
+%    \end{macrocode}
+%
+%    \section{Test file}
+%
+%    Very minimal, just check that the package correctly loads.
+%
+%    \begin{macrocode}
+%<testplain>\input luatexbase.sty
+%<testlatex>\RequirePackage{luatexbase}
+%<testplain>\bye
+%<testlatex>\stop
 %    \end{macrocode}
 %
 %
