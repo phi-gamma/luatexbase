@@ -428,7 +428,9 @@ end
 %    Here are the reporting functions for the modules. For errors, Lua's
 %    |error()| is used. For now, the error reports look less good than with
 %    \tex's |\errmessage|, but hopefully it will be improved in future
-%    versions of \luatex. We could invoke |\errmessage| using |tex.sprint()|,
+%    versions of \luatex.\footnote{Actually, \luatex 0.61 and higher provides
+%    |tex.error| but it's less usefull, since only the current line in the
+%    TeX file is reported.} We could invoke |\errmessage| using |tex.sprint()|,
 %    but it may cause problems on the \tex end,\footnote{Eg, it will not work
 %    inside an \cs{edef}.} and moreover |error()| will still be used by Lua
 %    for other errors, so it makes messages more consistent.
