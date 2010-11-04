@@ -302,7 +302,7 @@ See source file '\inFileName' for details.
 %
 %    \begin{macrocode}
 module('luatexbase', package.seeall)
-luatexbase.provides_module({
+local err, warning, info = luatexbase.provides_module({
     name          = "luamcallbacks",
     version       = 0.2,
     date          = "2010/05/12",
@@ -311,23 +311,6 @@ luatexbase.provides_module({
     copyright     = "Hans Hagen, Elie Roux and Manuel Pegourie-Gonnard",
     license       = "CC0",
 })
-%    \end{macrocode}
-%
-%    Shortcuts for error functions.
-%
-%    \begin{macrocode}
-local log = log or function(...)
-  luatexbase.module_log('luamcallbacks', string.format(...))
-end
-local info = info or function(...)
-  luatexbase.module_info('luamcallbacks', string.format(...))
-end
-local warning = warning or function(...)
-  luatexbase.module_warning('luamcallbacks', string.format(...))
-end
-local err = err or function(...)
-  luatexbase.module_error('luamcallbacks', string.format(...))
-end
 %    \end{macrocode}
 %
 %    \subsubsection{Initialisations}
@@ -620,7 +603,7 @@ function add_to_callback (name,func,description,priority)
         .."only the first function will be active.", name)
     end
     table.insert(l,priority,f)
-    log("inserting function '%s' at position %s in callback list for '%s'",
+    info("inserting function '%s' at position %s in callback list for '%s'",
       description, priority, name)
 end
 %    \end{macrocode}
@@ -653,7 +636,7 @@ function remove_from_callback (name, description)
     for k,v in ipairs(l) do
         if v.description == description then
             table.remove(l,k)
-            log("removing function '%s' from '%s'",description,name)
+            info("removing function '%s' from '%s'",description,name)
             if not next(l) then
               callbacklist[name] = nil
               if not lua_callbacks_defaults[name] then
@@ -683,7 +666,7 @@ function reset_callback (name)
     end
     local l = callbacklist[name]
     if l then
-        log("resetting callback list '%s'",name)
+        info("resetting callback list '%s'",name)
         callbacklist[name] = nil
     end
 end
