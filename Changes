@@ -1,5 +1,8 @@
                     Changes in the luatexbase package/bundle
 
+2010/10/04
+    various documentation updates/fixes uploaded to CTAN
+
 2010/05/27 v0.2a
     attr
         - allocate from 1 to avoid problems with some external code
