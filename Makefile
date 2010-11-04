@@ -170,7 +170,7 @@ manifest:
 
 clean: 
 	@latexmk -silent -c *.dtx >/dev/null
-	@# for tex-only runs
+	@#for non-latexmk runs
 	@$(RM) -- *.log
 
 mrproper: clean
