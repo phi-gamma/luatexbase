@@ -162,7 +162,7 @@ See source file '\inFileName' for details.
 % \item[first] functions with more complex signatures; functions in this type
 % of callback are \emph{not} combined: only the first one (according to
 % priorities) is executed.
-% \end{itemize}
+% \end{description}
 %
 % To add a function to a callback, use:
 % \begin{verbatim}
@@ -206,7 +206,27 @@ See source file '\inFileName' for details.
 %
 % This package also privides a way to create and call new callbacks, in
 % addition to the default Lua\TeX\ callbacks.
-% See comments in the implementation section for details.
+% \begin{verbatim}
+% luatexbase.create_callback(name, type, default)
+% \end{verbatim}
+% The first argument is the callback's name, it must be unique. Then, the type
+% goes as explained above, it is given as a string. Finally all user-defined
+% callbacks have a default function which must\footnote{You can obviously
+% provide a dummy function. If you're doing so often, please tell me, I may
+% want to make this argument optional.} be provided as the third
+% argument. It will be used when no other function is registered for this
+% callback.
+%
+% Functions are added to and removed from user-defined callbacks just the same
+% way as predefined callback, so the previous section still applies. There is
+% one difference, however: user-defined callbacks must be called explicitly at
+% some point in your code, while predefined callbacks are called automatically
+% by \luatex. To do so, use:
+% \begin{verbatim}
+% luatexbase.call_callback(name, arguments...)
+% \end{verbatim}
+% The functions registered for this callback (or teh default function) will be
+% called with |arguments...| as arguments.
 %
 % \subsubsection{Limitations}
 %
@@ -216,7 +236,7 @@ See source file '\inFileName' for details.
 % accept multiple functions. However, its seems risky and limited in use and
 % is therefore nor implemented.
 %
-% At some point, \pf{luatextra} used to split |open_read_file| that way, but
+% At some point, \pk{luatextra} used to split |open_read_file| that way, but
 % support for this was removed. It may be added back (as well as support for
 % other splitted callbacks) if it appears there is an actual need for it.
 %
@@ -357,7 +377,8 @@ local err, warning, info = luatexbase.provides_module({
 %    \subsubsection{Housekeeping}
 %
 %    The main table: keys are callback names, and values are the associated
-%    lists of functions.
+%    lists of functions. Only callbacks with a non-empty list of functions have
+%    an entry in this list.
 %
 %    \begin{macrocode}
 local callbacklist = callbacklist or { }
@@ -376,8 +397,7 @@ local types = {
 }
 %    \end{macrocode}
 %
-%    \texttt{callbacktypes} is the list that contains the callbacks as keys
-%    and the type (list or data) as values.
+%    Now, assign a type for each predefined callback.
 %
 %    \begin{macrocode}
 local callbacktypes = callbacktypes or {
