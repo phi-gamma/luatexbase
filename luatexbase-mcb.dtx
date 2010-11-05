@@ -363,10 +363,17 @@ local err, warning, info = luatexbase.provides_module({
 local callbacklist = callbacklist or { }
 %    \end{macrocode}
 %
-%    Numerical codes for callback types.
+%    Numerical codes for callback types, and name to value association (the
+%    table keys are strings, the values are numbers).
 %
 %    \begin{macrocode}
 local list, data, first, simple = 1, 2, 3, 4
+local types = {
+  list   = list,
+  data   = data,
+  first  = first,
+  simple = simple,
+}
 %    \end{macrocode}
 %
 %    \texttt{callbacktypes} is the list that contains the callbacks as keys
@@ -452,28 +459,6 @@ callback.register = function ()
 end
 %    \end{macrocode}
 %
-%    \subsubsection{Misc}
-%
-%    A simple function we'll use later to understand the arguments of the
-%    \texttt{create} function. It takes a string and returns the type
-%    corresponding to the string or nil.
-%
-%    \begin{macrocode}
-local function str_to_type(str)
-    if str == 'list' then
-        return list
-    elseif str == 'data' then
-        return data
-    elseif str == 'first' then
-        return first
-    elseif str == 'simple' then
-        return simple
-    else
-        return nil
-    end
-end
-%    \end{macrocode}
-%
 %    \subsubsection{Handlers}
 %
 %    Normal (as opposed to user-defined) callbacks have handlers depending on
@@ -482,6 +467,8 @@ end
 %    is called, then handler takes care of running all functions in the list.
 %    When the last function is removed from the callback's list, the handler
 %    is unregistered.
+%
+%    Handler for |list| callbacks.
 %
 %    \begin{macrocode}
 -- local
@@ -516,7 +503,7 @@ function listhandler (name)
 end
 %    \end{macrocode}
 %
-%     The handler for callbacks taking datas and returning modified ones.
+%    Handler for |data| callbacks.
 %
 %    \begin{macrocode}
 local function datahandler (name)
@@ -532,9 +519,7 @@ local function datahandler (name)
 end
 %    \end{macrocode}
 %
-%     This function is for the handlers that don't support more than one
-%     functions in them. In this case we only call the first function of the
-%     list.
+%    Handler for |first| callbacks.
 %
 %    \begin{macrocode}
 local function firsthandler (name)
@@ -550,7 +535,7 @@ local function firsthandler (name)
 end
 %    \end{macrocode}
 %
-%     Handler for simple functions that don't return anything.
+%    Handler for |simple| callbacks.
 %
 %    \begin{macrocode}
 local function simplehandler (name)
@@ -563,6 +548,17 @@ local function simplehandler (name)
         end
     end
 end
+%    \end{macrocode}
+%
+%    Finally, keep a handlers table for indexed access.
+%
+%    \begin{macrocode}
+local handlers = {
+  [list]   = listhandler,
+  [data]   = datahandler,
+  [first]  = firsthandler,
+  [simple] = simplehandler,
+}
 %    \end{macrocode}
 %
 %    \subsubsection{Public functions for functions management}
@@ -769,13 +765,12 @@ function create_callback(name, ctype, default)
         err("unable to create callback '%s':\ncallback already exists", name)
         return nil
     end
-    local temp = str_to_type(ctype)
-    if not temp then
+    ctype = types[ctype]
+    if not ctype then
         err("unable to create callback '%s':\ntype '%s' undefined", name, ctype)
         return nil
     end
     info("creating new callback '%s'", name)
-    ctype = temp
     lua_callbacks_defaults[name] = default
     callbacktypes[name] = ctype
 end
@@ -799,16 +794,10 @@ function call_callback(name, ...)
     if not l then
         f = lua_callbacks_defaults[name]
     else
-        if callbacktypes[name] == list then
-            f = listhandler(name)
-        elseif callbacktypes[name] == data then
-            f = datahandler(name)
-        elseif callbacktypes[name] == simple then
-            f = simplehandler(name)
-        elseif callbacktypes[name] == first then
-            f = firsthandler(name)
-        else
+        f = handlers[callbacktypes[name]]
+        if not f then
             err("unknown callback type")
+            return
         end
     end
     return f(...)
