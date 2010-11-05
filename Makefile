@@ -7,20 +7,21 @@ DTXSTY = lltxb-dtxstyle.tex
 
 # Files grouped by generation mode
 UNPACKED_MCB = luatexbase-mcb.sty mcb.lua \
-			   test-mcb-latex.tex test-mcb-plain.tex test-mcb.lua
+			test-mcb-latex.tex test-mcb-plain.tex \
+			test-mcb.lua test-mcb-aux.tex
 UNPACKED_REGS = luatexbase-regs.sty \
-				test-regs-plain.tex test-regs-latex.tex
+			test-regs-plain.tex test-regs-latex.tex
 UNPACKED_ATTR = luatexbase-attr.sty attr.lua \
-				test-attr-plain.tex test-attr-latex.tex
+			test-attr-plain.tex test-attr-latex.tex
 UNPACKED_CCTB = luatexbase-cctb.sty cctb.lua \
-				test-cctb-plain.tex test-cctb-latex.tex
+			test-cctb-plain.tex test-cctb-latex.tex
 UNPACKED_LOADER = luatexbase-loader.sty luatexbase.loader.lua \
-				test-loader-plain.tex test-loader-latex.tex \
-				$(TEST_LOADER).lua test-loader.sub.lua
+			test-loader-plain.tex test-loader-latex.tex \
+			$(TEST_LOADER).lua test-loader.sub.lua
 UNPACKED_MODUTILS = luatexbase-modutils.sty modutils.lua test-modutils.lua \
-				test-modutils-plain.tex test-modutils-latex.tex
+			test-modutils-plain.tex test-modutils-latex.tex
 UNPACKED_COMPAT = luatexbase-compat.sty \
-				test-compat-plain.tex test-compat-latex.tex
+			test-compat-plain.tex test-compat-latex.tex
 UNPACKED_BASE = luatexbase.sty test-base-plain.tex test-base-latex.tex
 UNPACKED = $(UNPACKED_MCB) $(UNPACKED_REGS) $(UNPACKED_ATTR) $(UNPACKED_CCTB) \
 		   $(UNPACKED_LOADER) $(UNPACKED_MODUTILS) $(UNPACKED_COMPAT) \

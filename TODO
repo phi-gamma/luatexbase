@@ -1,3 +1,9 @@
+all
+---
+
+- regression checks on the results of the tests (sed+diff the log)
+- add debug messages (to be used in the test suite)?
+
 modutils
 --------
 
@@ -11,7 +17,8 @@ declaration and no declaration?
 mcb
 ---
 
-- test: make each handler run at least once
 - doc: make an "example" section
 - doc: add a word about compatibility
 - code: verify that the return value of callback.register is checked
+- code: fix listhandler logic again
+- check type of all callbacks (& list)

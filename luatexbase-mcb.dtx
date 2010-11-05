@@ -53,6 +53,7 @@ See source file '\inFileName' for details.
   \usedir{doc/luatex/luatexbase}%
   \file{test-mcb-plain.tex}{\from{luatexbase-mcb.dtx}{testplain}}%
   \file{test-mcb-latex.tex}{\from{luatexbase-mcb.dtx}{testlatex}}%
+  \file{test-mcb-aux.tex}{\from{luatexbase-mcb.dtx}{testaux}}%
 }
 
 \def\MetaPrefix{-- }
@@ -434,7 +435,7 @@ local callbacktypes = callbacktypes or {
   stop_run = simple,
   hyphenate = simple,
   ligaturing = simple,
-  kerning = data,
+  kerning = data, -- FIXME
   find_write_file = first,
   find_read_file = first,
   find_vf_file = data,
@@ -876,6 +877,107 @@ luatexbase.reset_callback("fooback")
 luatexbase.call_callback("fooback", "default")
 %    \end{macrocode}
 %
+%    Now, we want to make each handler run at least once. So, define dummy
+%    functions and register them in various callbacks. We will make sure the
+%    callbacks are executed on the \tex end. Also, we want to check that
+%    everything works when we unload the functions either one by one, or using
+%    reset.
+%
+%    A |list| callback.
+%
+%    \begin{macrocode}
+function add_hpack_filter()
+    luatexbase.add_to_callback('hpack_filter', function(head, ...)
+            texio.write_nl("I'm a dummy hpack_filter")
+            return head
+        end,
+        'dummy hpack filter')
+    luatexbase.add_to_callback('hpack_filter', function(head, ...)
+            texio.write_nl("I'm an optimized dummy hpack_filter")
+            return true
+        end,
+        'optimized dummy hpack filter')
+end
+function rm_one_hpack_filter()
+    luatexbase.remove_from_callback('hpack_filter', 'dummy hpack filter')
+end
+function rm_two_hpack_filter()
+    luatexbase.remove_from_callback('hpack_filter',
+        'optimized dummy hpack filter')
+end
+%    \end{macrocode}
+%
+%    A |simple| callback.
+%
+%    \begin{macrocode}
+function add_hyphenate()
+    luatexbase.add_to_callback('hyphenate', function(head, tail)
+            texio.write_nl("I'm a dummy hyphenate")
+        end,
+        'dummy hyphenate')
+    luatexbase.add_to_callback('hyphenate', function(head, tail)
+            texio.write_nl("I'm an other dummy hyphenate")
+        end,
+        'other dummy hyphenate')
+end
+function rm_one_hyphenate()
+    luatexbase.remove_from_callback('hyphenate', 'dummy hyphenate')
+end
+function rm_two_hyphenate()
+    luatexbase.remove_from_callback('hyphenate', 'other dummy hyphenate')
+end
+%    \end{macrocode}
+%
+%    A |first| callback.
+%
+%    \begin{macrocode}
+function add_find_write_file()
+    luatexbase.add_to_callback('find_write_file', function(id, name)
+            texio.write_nl("I'm a dummy find_write_file")
+            return "dummy-"..name
+        end,
+        'dummy find_write_file')
+    luatexbase.add_to_callback('find_write_file', function(id, name)
+            texio.write_nl("I'm an other dummy find_write_file")
+            return "dummy-other-"..name
+        end,
+        'other dummy find_write_file')
+end
+function rm_one_find_write_file()
+    luatexbase.remove_from_callback('find_write_file',
+        'dummy find_write_file')
+end
+function rm_two_find_write_file()
+    luatexbase.remove_from_callback('find_write_file',
+        'other dummy find_write_file')
+end
+%    \end{macrocode}
+%
+%    A |data| callback.
+%
+%    \begin{macrocode}
+function add_process_input_buffer()
+    luatexbase.add_to_callback('process_input_buffer', function(buffer)
+            texio.write_nl("I'm a dummy process_input_buffer")
+            return buffer.."\\msg{dummy}"
+        end,
+        'dummy process_input_buffer')
+    luatexbase.add_to_callback('process_input_buffer', function(buffer)
+            texio.write_nl("I'm an other dummy process_input_buffer")
+            return buffer.."\\msg{otherdummy}"
+        end,
+        'other dummy process_input_buffer')
+end
+function rm_one_process_input_buffer()
+    luatexbase.remove_from_callback('process_input_buffer',
+        'dummy process_input_buffer')
+end
+function rm_two_process_input_buffer()
+    luatexbase.remove_from_callback('process_input_buffer',
+        'other dummy process_input_buffer')
+end
+%    \end{macrocode}
+%
 %    \begin{macrocode}
 %</testlua>
 %    \end{macrocode}
@@ -885,7 +987,67 @@ luatexbase.call_callback("fooback", "default")
 %<testlatex>\RequirePackage{luatexbase-mcb}
 %<*testplain,testlatex>
 \catcode 64 11
+\def\msg{\immediate\write16}
+\msg{===== BEGIN =====}
+%    \end{macrocode}
+%
+%    Loading the lua files tests that the management functions can be called
+%    without raising errors.
+%
+%    \begin{macrocode}
 \luatexbase@directlua{dofile('test-mcb.lua')}
+%    \end{macrocode}
+%
+%    We now want to load and unload stuff from the various callbacks have them
+%    called to test the handlers. Here is a helper macro for that.
+%
+%    \begin{macrocode}
+\def\test#1{%
+  \msg{^^J*****^^J* Testing #1^^J*****}
+  \msg{* Add two functions}
+  \luatexbase@directlua{add_#1()}
+  \csname test_#1\endcsname
+  \msg{* Remove one}
+  \luatexbase@directlua{rm_one_#1()}
+  \csname test_#1\endcsname
+  \msg{* Remove the second}
+  \luatexbase@directlua{rm_two_#1()}
+  \csname test_#1\endcsname
+  \msg{* Add two functions again}
+  \luatexbase@directlua{add_#1()}
+  \csname test_#1\endcsname
+  \msg{* Remove all functions}
+  \luatexbase@directlua{luatexbase.reset_callback("#1")}
+  \csname test_#1\endcsname
+}
+%    \end{macrocode}
+%
+%    For each callback, we need a specific macro that triggers it. For the
+%    hyphenate test, we need to untrap |\everypar| first, in the \latex case.
+%
+%    \begin{macrocode}
+\catcode`\_ 11
+%<testlatex>\everypar{}
+\def\test_hpack_filter{\setbox0=\hbox{bla}}
+\def\test_hyphenate{\setbox0=\vbox{\hsize\z@ blablabla}}
+\def\test_find_write_file{\immediate\openout15 test-mcb-out.log}
+\def\test_process_input_buffer{\input test-mcb-aux.tex}
+%<testaux>\relax
+%    \end{macrocode}
+%
+%    Now actually test them
+%
+%    \begin{macrocode}
+\test{hpack_filter}
+\test{hyphenate}
+\test{find_write_file}
+\test{process_input_buffer}
+%    \end{macrocode}
+%
+%    Done.
+%
+%    \begin{macrocode}
+\msg{=====  END =====}
 %</testplain,testlatex>
 %<testplain>\bye
 %<testlatex>\stop
