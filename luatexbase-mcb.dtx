@@ -69,6 +69,11 @@ See source file '\inFileName' for details.
   \file{mcb.lua}{\from{luatexbase-mcb.dtx}{lua}}%
 }
 
+\generate{%
+  \usedir{doc/luatex/luatexbase}%
+  \file{test-mcb.lua}{\from{luatexbase-mcb.dtx}{testlua}}%
+}
+
 \obeyspaces
 \Msg{************************************************************************}
 \Msg{*}
@@ -820,51 +825,67 @@ end
 %
 %    \section{Test files}
 %
-%    A few basic tests for Plain and LaTeX.
+%    A few basic tests for Plain and LaTeX. Use a separate Lua file for
+%    convenience, since this package works on the Lua side of the force.
+%
+%    \begin{macrocode}
+%<*testlua>
+%    \end{macrocode}
+%
+%    Test the management functions with a predefined callback.
+%
+%    \begin{macrocode}
+local function sample(head,...)
+    return head, true
+end
+local prio = luatexbase.priority_in_callback
+luatexbase.add_to_callback("hpack_filter", sample, "sample one", 1)
+luatexbase.add_to_callback("hpack_filter", sample, "sample two", 2)
+luatexbase.add_to_callback("hpack_filter", sample, "sample three", 1)
+assert(prio("hpack_filter", "sample three"))
+luatexbase.remove_from_callback("hpack_filter", "sample three")
+assert(not prio("hpack_filter", "sample three"))
+luatexbase.reset_callback("hpack_filter")
+assert(not prio("hpack_filter", "sample one"))
+%    \end{macrocode}
+%
+%    Create a callback, and check that the managment functions work with this
+%    callback too.
+%
+%    \begin{macrocode}
+local function data_one(s)
+  texio.write_nl("I'm data 1 whith argument: "..s)
+  return s
+end
+local function data_two(s)
+  texio.write_nl("I'm data 2 whith argument: "..s)
+  return s
+end
+local function data_three(s)
+  texio.write_nl("I'm data 3 whith argument: "..s)
+  return s
+end
+luatexbase.create_callback("fooback", "data", data_one)
+luatexbase.call_callback("fooback", "default")
+luatexbase.add_to_callback("fooback", data_two, " function two", 2)
+luatexbase.add_to_callback("fooback", data_three, " function three", 1)
+luatexbase.call_callback("fooback", "all")
+luatexbase.remove_from_callback("fooback", " function three")
+luatexbase.call_callback("fooback", "all but three")
+luatexbase.reset_callback("fooback")
+luatexbase.call_callback("fooback", "default")
+%    \end{macrocode}
+%
+%    \begin{macrocode}
+%</testlua>
+%    \end{macrocode}
 %
 %    \begin{macrocode}
 %<testplain>\input luatexbase-mcb.sty
 %<testlatex>\RequirePackage{luatexbase-mcb}
 %<*testplain,testlatex>
 \catcode 64 11
-\luatexbase@directlua{
-  local function sample(head,...)
-      return head, true
-  end
-
-  local prio = luatexbase.priority_in_callback
-  luatexbase.add_to_callback("hpack_filter", sample, "sample function one", 1)
-  luatexbase.add_to_callback("hpack_filter", sample, "sample function two", 2)
-  luatexbase.add_to_callback("hpack_filter", sample, "sample function three", 1)
-  assert(prio("hpack_filter", "sample function three"))
-  luatexbase.remove_from_callback("hpack_filter", "sample function three")
-  assert(not prio("hpack_filter", "sample function three"))
-  luatexbase.reset_callback("hpack_filter")
-  assert(not prio("hpack_filter", "sample function one"))
-
-  local function data_one(s)
-    texio.write_nl("I'm data 1 whith argument: "..s)
-    return s
-  end
-  local function data_two(s)
-    texio.write_nl("I'm data 2 whith argument: "..s)
-    return s
-  end
-  local function data_three(s)
-    texio.write_nl("I'm data 3 whith argument: "..s)
-    return s
-  end
-
-  luatexbase.create_callback("fooback", "data", data_one)
-  luatexbase.call_callback("fooback", "default")
-  luatexbase.add_to_callback("fooback", data_two, "my sample function two", 2)
-  luatexbase.add_to_callback("fooback", data_three, "my sample function three", 1)
-  luatexbase.call_callback("fooback", "all")
-  luatexbase.remove_from_callback("fooback", "my sample function three")
-  luatexbase.call_callback("fooback", "all but three")
-  luatexbase.reset_callback("fooback")
-  luatexbase.call_callback("fooback", "default")
-}
+\luatexbase@directlua{dofile('test-mcb.lua')}
 %</testplain,testlatex>
 %<testplain>\bye
 %<testlatex>\stop
