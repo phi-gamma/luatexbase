@@ -122,16 +122,20 @@ See source file '\inFileName' for details.
 % \maketitle
 %
 % \begin{abstract}
-% This package manages the callback adding and removing, by providing new
-% functions and overwriting \texttt{callback.register}. It also allows to
-% create and call new callbacks.\par
-% The user part of this documentation is currently very incomplete, and will
-% be expanded later.  Sorry for this and thanks for your patience.\par
+% The primary feature of this package is to allow many functions to be
+% registered in the same callback. Depending of the type of the callback, the
+% functions will be combined in some way when the callback is called. Functions
+% are provided for addition and removal of individual functions from a
+% callback's list, with a priority system.\par
+% Additionally, you can create new callbacks that will be handled the same way
+% as predefined callbacks, except that they must be called explicitely.
 % \end{abstract}
 %
 % \tableofcontents
 %
 % \section{Documentation}
+%
+% \subsection{Managing functions in callbacks}
 %
 % Lua\TeX\ provides an extremely interesting feature, named callbacks. It
 % allows to call some lua functions at some points of the \TeX\ algorithm (a
@@ -139,24 +143,53 @@ See source file '\inFileName' for details.
 % The Lua\TeX\ core offers a function called \texttt{callback.register} that
 % enables to register a function in a callback.
 %
-% The problem with \texttt{callback.register} is that is registers only one
-% function in a callback. For a lot of callbacks it can be common to have
-% several packages registering their function in a callback, and thus it is
-% impossible with them to be compatible with each other.
+% The problem with |callback.register| is that is registers only one function
+% in a callback. This package solves the problem by disabling
+% |callback.register| and providing a new interface allowing many functions to
+% be registered in a single callback.
 %
-% This package solves this problem by adding mainly one new function
-% \verb+luatexbase.add_to_callback+ that adds a function in a callback. With
-% this function it is possible for packages to register their function in a
-% callback without overwriting the functions of the other packages. There are
-% also functions to remove one or all functions from a callback.
-% See comments in the implementation section for details.
+% The way the functions are combined together depends on
+% the type of the callback. There are currently 4 types of callback, depending
+% on the signature of the functions that can be registered in it:
+% \begin{description}
+% \item[list] functions taking a list of nodes and returning a boolean and
+% possibly a new head: (TODO);
+% \item[data] functions taking datas and returning it modified: the functions
+% are called in order and passed the return value of the previous function as
+% an argument, the return value is that of the last function;
+% \item[simple] functions that don't return anything: they are called in
+% order, all with the same argument;
+% \item[first] functions with more complex signatures; functions in this type
+% of callback are \emph{not} combined: only the first one (according to
+% priorities) is executed.
+% \end{itemize}
 %
-% The functions are called in a certain order, and when a package registers a
-% callback it can assign a priority to its function. Conflicts can still
-% remain even with the priority mechanism, for example in the case where two
-% packages want to have the highest priority. In these cases the packages have
-% to solve the conflicts themselves.
-% See comments in the implementation section for details.
+% To add a function to a callback, use:
+% \begin{verbatim}
+% luatexbase.add_to_callback(name, func, description, priority)
+% \end{verbatim}
+% The first argument is the name of the callback, the second is a function,
+% the third one is a string used to identify the function later, and the
+% optional priority is a postive integer, representing the rank of the
+% function in the list of functions to be executing for this callback. So,
+% |1| is the highest priority. If no priority is specified, the function is
+% appended to the list, that is, its priority is the one of the last function
+% plus one.
+%
+% The priority system is intended to help resolving conflicts between packages
+% competing on the same callback, but it cannot solve every possible issue. If
+% two packages request priority |1| on the same callback, then the last one
+% loaded will win.
+%
+% To remove a function from a callback, use:
+% \begin{verbatim}
+% luatexbase.remove_from_callback(name, description)
+% \end{verbatim}
+% The first argument must be the name of the callback, and the second one the
+% description used when adding the function to this callback.
+%
+%
+% \subsection{Creating new callbacks}
 %
 % This package also privides a way to create and call new callbacks, in
 % addition to the default Lua\TeX\ callbacks.
@@ -329,22 +362,10 @@ local callbacklist = callbacklist or { }
 local lua_callbacks_defaults = { }
 %    \end{macrocode}
 %
-%    There are 4 types of callback:
-%    \begin{itemize}
-%    \item the ones taking a list of nodes and returning a boolean and
-%    eventually a new head (\texttt{list})
-%    \item the ones taking datas and returning the modified ones
-%    (\texttt{data})
-%    \item the ones that can't have multiple functions registered in them
-%    (\texttt{first})
-%    \item the ones for functions that don't return anything (\texttt{simple})
-%    \end{itemize}
+%    Numerical codes for callback types.
 %
 %    \begin{macrocode}
-local list = 1
-local data = 2
-local first = 3
-local simple = 4
+local list, data, first, simple = 1, 2, 3, 4
 %    \end{macrocode}
 %
 %    \texttt{callbacktypes} is the list that contains the callbacks as keys
@@ -529,30 +550,12 @@ end
 %
 %    \subsubsection{Public functions}
 %
-%    The main function. The signature is \texttt{add (name,
-%    func, description, priority)} with \texttt{name} being the name of the
-%    callback in which the function is added; \texttt{func} is the added
-%    function; \texttt{description} is a small character string describing the
-%    function, and \texttt{priority} an optional argument describing the
-%    priority the function will have.
-%
-%    The functions for a callbacks are added in a list (in
-%    \texttt{callbacklist\\.callbackname}). If they have no
-%    priority or a high priority number, they will be added at the end of the
-%    list, and will be called after the others. If they have a low priority
-%    number, the will be added at the beginning of the list and will be called
-%    before the others.
-%
-%    Something that must be made clear, is that there is absolutely no
-%    solution for packages conflicts: if two packages want the top priority on
-%    a certain callback, they will have to decide the priority they will give
-%    to their function themselves. Most of the time, the priority is not needed.
+%    Add a function to a callback. First check arguments.
 %
 %    \begin{macrocode}
 function add_to_callback (name,func,description,priority)
     if type(func) ~= "function" then
-        err("unable to add function:\nno proper function passed")
-        return
+        return err("unable to add function:\nno proper function passed")
     end
     if not name or name == "" then
         err("unable to add function:\nno proper callback name passed")
@@ -567,9 +570,16 @@ function add_to_callback (name,func,description,priority)
         return
     end
     if priority_in_callback(name, description) then
-        warning("function '%s' already registered\nin callback '%s'",
+        err("function '%s' already registered\nin callback '%s'",
           description, name)
+        return
     end
+%    \end{macrocode}
+%
+%    Then test if this callback is already in use. If not, initialise its list
+%    and register the proper handler.
+%
+%    \begin{macrocode}
     local l = callbacklist[name]
     if not l then
         l = {}
@@ -588,6 +598,11 @@ function add_to_callback (name,func,description,priority)
             end
         end
     end
+%    \end{macrocode}
+%
+%    Actually register the function.
+%
+%    \begin{macrocode}
     local f = {
         func = func,
         description = description,
@@ -598,20 +613,22 @@ function add_to_callback (name,func,description,priority)
     elseif priority < 1 then
         priority = 1
     end
+    table.insert(l,priority,f)
+%    \end{macrocode}
+%
+%    Keep user informed.
+%
+%    \begin{macrocode}
     if callbacktypes[name] == first and (priority ~= 1 or #l ~= 0) then
         warning("several callbacks registered in callback '%s',\n"
         .."only the first function will be active.", name)
     end
-    table.insert(l,priority,f)
     info("inserting function '%s'\nat position %s in callback list\nfor '%s'",
       description, priority, name)
 end
 %    \end{macrocode}
 %
-%    The function that removes a function from a callback. The signature is
-%    \texttt{remove (name, description)} with \texttt{name} being
-%    the name of callbacks, and description the description passed to
-%    \texttt{add}.
+%    Remove a function from a callback. First check arguments.
 %
 %    \begin{macrocode}
 function remove_from_callback (name, description)
@@ -633,20 +650,33 @@ function remove_from_callback (name, description)
         err("no callback list for '%s'",name)
         return
     end
+%    \end{macrocode}
+%
+%    Then loop over the callback's function list until we find a matching
+%    entry. Remove it and check if the list gets empty: if so, unregister the
+%    callback unless it is user-defined.
+%
+%    \begin{macrocode}
+    local index = false
     for k,v in ipairs(l) do
         if v.description == description then
-            table.remove(l,k)
-            info("removing function '%s'\nfrom '%s'",description,name)
-            if not next(l) then
-              callbacklist[name] = nil
-              if not lua_callbacks_defaults[name] then
-                internalregister(name, nil)
-              end
-            end
-            return
+            index = k
+            break
         end
     end
-    warning("unable to remove function '%s'\nfrom '%s'",description,name)
+    if not index then
+        err("unable to remove function '%s'\nfrom '%s'", description, name)
+        return
+    end
+    table.remove(l, index)
+    info("removing function '%s'\nfrom '%s'", description, name)
+    if table.maxn(l) == 0 then
+        callbacklist[name] = nil
+        if not lua_callbacks_defaults[name] then
+            internalregister(name, nil)
+        end
+    end
+    return
 end
 %    \end{macrocode}
 %
