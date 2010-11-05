@@ -210,8 +210,16 @@ See source file '\inFileName' for details.
 % description used when adding the function to this callback. You can also
 % remove all functions from a callback at once using
 % \begin{verbatim}
-% luatexbase.reset_callback(name)
+% luatexbase.reset_callback(name, make_false)
 % \end{verbatim}
+% The |make_false| argument is optional. If it is |true| (repeat: |true|, not
+% |false|) then the value |false| is registered in the callback, which has a
+% special meaning for some callback.
+%
+% Note that |reset_callback| is very invasive since it removes all functions
+% possibly installed by other packages in this callback. So, use it with care
+% if there is any chance that another package wants to share this callback
+% with you.
 %
 % When new functions are added at the beginning of the list, other functions
 % are shifted down the list. To get the current rank of a function in a
@@ -731,7 +739,7 @@ end
 %    callback handler unless the callback is user-defined.
 %
 %    \begin{macrocode}
-function reset_callback (name)
+function reset_callback (name, make_false)
     if not name or name == "" then
         err("unable to reset:\nno proper callback name passed")
         return
@@ -740,7 +748,11 @@ function reset_callback (name)
         return
     end
     if not lua_callbacks_defaults[name] then
-        internalregister(name, nil)
+        if make_false == true then
+            internalregister(name, false)
+        else
+            internalregister(name, nil)
+        end
     end
     local l = callbacklist[name]
     if l then
