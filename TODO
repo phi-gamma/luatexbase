@@ -1,6 +1,7 @@
 modutils
 --------
 
+- use string for version, and check only date?
 - review logic: should this module be mandatory?
   if not, what should happen with mixed require(), require_module(),
 declaration and no declaration?
@@ -10,4 +11,7 @@ declaration and no declaration?
 mcb
 ---
 
-- remaining bit: understand and explain 'list' callback conventions
+- test: make each handler run at least once
+- doc: make an "example" section
+- doc: add a word about compatibility
+- code: verify that the return value of callback.register is checked

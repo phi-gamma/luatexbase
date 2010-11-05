@@ -128,7 +128,7 @@ See source file '\inFileName' for details.
 % are provided for addition and removal of individual functions from a
 % callback's list, with a priority system.\par
 % Additionally, you can create new callbacks that will be handled the same way
-% as predefined callbacks, except that they must be called explicitely.
+% as predefined callbacks, except that they must be called explicitly.
 % \end{abstract}
 %
 % \tableofcontents
@@ -137,10 +137,10 @@ See source file '\inFileName' for details.
 %
 % \subsection{Managing functions in callbacks}
 %
-% Lua\TeX\ provides an extremely interesting feature, named callbacks. It
-% allows to call some lua functions at some points of the \TeX\ algorithm (a
+% \luatex provides an extremely interesting feature, named callbacks. It
+% allows to call some Lua functions at some points of the \TeX\ algorithm (a
 % \emph{callback}), like when \TeX\ breaks likes, puts vertical spaces, etc.
-% The Lua\TeX\ core offers a function called \texttt{callback.register} that
+% The \luatex core offers a function called \texttt{callback.register} that
 % enables to register a function in a callback.
 %
 % The problem with |callback.register| is that is registers only one function
@@ -150,18 +150,27 @@ See source file '\inFileName' for details.
 %
 % The way the functions are combined together depends on
 % the type of the callback. There are currently 4 types of callback, depending
-% on the signature of the functions that can be registered in it:
+% on the calling convention of the functions the callback can hold:
 % \begin{description}
-% \item[list] functions taking a list of nodes and returning a boolean and
-% possibly a new head: (TODO);
-% \item[data] functions taking datas and returning it modified: the functions
-% are called in order and passed the return value of the previous function as
-% an argument, the return value is that of the last function;
-% \item[simple] functions that don't return anything: they are called in
-% order, all with the same argument;
-% \item[first] functions with more complex signatures; functions in this type
-% of callback are \emph{not} combined: only the first one (according to
-% priorities) is executed.
+%   \item[simple] is for functions that don't return anything: they are called
+%     in order, all with the same argument;
+%   \item[data] is for functions receiving a piece of data of nay type
+%     except node list head (and possibly other arguments) and returning it
+%     (possibly modified): the functions are called in order, and each is
+%     passed the return value of the previous (and the other arguments
+%     untouched, if any). The return value is that of the last function;
+%   \item[list] is for functions taking the head of a node list as their first
+%     argument (and possibly other arguments) and returning either a modified
+%     node list or |true| or |false|. If a function returns a node
+%     list, then this node list is passed as the first argument to the next
+%     function, along with the original remaining arguments; if it returns
+%     |true|, the original node list is passed to the next function; if it
+%     returns false, then no the other functions are \emph{not} called, a
+%     warning is issued and |false| is immediately returned. Otherwise, the
+%     return value of the last function is returned.
+%   \item[first] is for functions with more complex signatures; functions in
+%     this type of callback are \emph{not} combined: only the first one
+%     (according to priorities) is executed.
 % \end{description}
 %
 % To add a function to a callback, use:
@@ -170,7 +179,7 @@ See source file '\inFileName' for details.
 % \end{verbatim}
 % The first argument is the name of the callback, the second is a function,
 % the third one is a string used to identify the function later, and the
-% optional priority is a postive integer, representing the rank of the
+% optional priority is a positive integer, representing the rank of the
 % function in the list of functions to be executing for this callback. So,
 % |1| is the highest priority. If no priority is specified, the function is
 % appended to the list, that is, its priority is the one of the last function
@@ -204,8 +213,8 @@ See source file '\inFileName' for details.
 %
 % \subsection{Creating new callbacks}
 %
-% This package also privides a way to create and call new callbacks, in
-% addition to the default Lua\TeX\ callbacks.
+% This package also provides a way to create and call new callbacks, in
+% addition to the default \luatex callbacks.
 % \begin{verbatim}
 % luatexbase.create_callback(name, type, default)
 % \end{verbatim}
@@ -225,7 +234,7 @@ See source file '\inFileName' for details.
 % \begin{verbatim}
 % luatexbase.call_callback(name, arguments...)
 % \end{verbatim}
-% The functions registered for this callback (or teh default function) will be
+% The functions registered for this callback (or the default function) will be
 % called with |arguments...| as arguments.
 %
 % \subsubsection{Limitations}
@@ -238,7 +247,7 @@ See source file '\inFileName' for details.
 %
 % At some point, \pk{luatextra} used to split |open_read_file| that way, but
 % support for this was removed. It may be added back (as well as support for
-% other splitted callbacks) if it appears there is an actual need for it.
+% other split callbacks) if it appears there is an actual need for it.
 %
 %    \section{Implementation}
 %
@@ -488,37 +497,27 @@ end
 %    When the last function is removed from the callback's list, the handler
 %    is unregistered.
 %
+%    More precisely, the functions below are used to generate a specialized
+%    function (closure) for a given callback, which is the actual handler.
+%
 %    Handler for |list| callbacks.
 %
 %    \begin{macrocode}
--- local
-function listhandler (name)
+local function listhandler (name)
     return function(head,...)
-        local l = callbacklist[name]
-        if l then
-            local done = true
-            for _, f in ipairs(l) do
-                -- the returned value is either true or a new head plus true
-                rtv1, rtv2 = f.func(head,...)
-                if type(rtv1) == 'boolean' then
-                    done = rtv1
-                elseif type (rtv1) == 'userdata' then
-                    head = rtv1
-                end
-                if type(rtv2) == 'boolean'  then
-                    done = rtv2
-                elseif type(rtv2) == 'userdata' then
-                    head = rtv2
-                end
-                if done == false then
-                    err("function '%s' returned false\nin callback '%s'",
-                      f.description, name)
-                end
+        local ret
+        for _, f in ipairs(callbacklist[name]) do
+            ret = f.func(head, ...)
+            if ret == false then
+                warn("function '%s' returned false\nin callback '%s'",
+                    f.description, name)
+                break
             end
-            return head, done
-        else
-            return head, false
+            if ret ~= true then
+                head = ret
+            end
         end
+        return ret
     end
 end
 %    \end{macrocode}
@@ -527,11 +526,11 @@ end
 %
 %    \begin{macrocode}
 local function datahandler (name)
-    return function(data,...)
+    return function(data, ...)
         local l = callbacklist[name]
         if l then
             for _, f in ipairs(l) do
-                data = f.func(data,...)
+                data = f.func(data, ...)
             end
         end
         return data

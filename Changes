@@ -1,20 +1,29 @@
                     Changes in the luatexbase package/bundle
 
+The [BI] tag signals backward-incompatible changes.
+After  v0.3, the only possible source of such changes will be the upcoming
+merge with luatex.sty. Afterwards, no such changes are expected.
 
-(current changes)
+(current changes) v0.3
     attr
-        - Name changes: \*luatexattribute -> \*attribute.
+        - [BI] Name changes: \*luatexattribute -> \*attribute.
     modutils
-        - \luatexUseModule and \luatexRequireModule replaced by
+        - [BI] \luatexUseModule and \luatexRequireModule replaced by
           \RequireLuaModule with a unified syntax.
-        - luatexbase.use_module removed (use luatexbase.require_module with
+        - [BI] luatexbase.use_module removed (use luatexbase.require_module with
           a single argument instead).
+        - [BI] rm module_log & module_term functions.
         - change formatting of messages.
-        - rm module_log & module_term functions.
         - luatexbase.require_module now returns curstom err/war/inf functions.
+    mcb
+        - [BI] rationalise "list" type handling. The new calling convention
+          differs from the old one only in edge cases.
+        - add user documentation
+        - misc code tuning (more locals, etc)
 
 2010/10/04
-    various documentation updates/fixes uploaded to CTAN
+    - various documentation updates/fixes uploaded to CTAN
+    - luatexbase.sty used to be broken on CTAN (bad docstrip)
 
 2010/05/27 v0.2a
     attr
@@ -25,7 +34,7 @@
     luatexbase
         - new, loads: compat,loader,regs,attr,cctb.
 
-Summary of backwards-incompatible interface changes between 0.1 and 0.2:
+[BI] Summary of backwards-incompatible interface changes between 0.1 and 0.2:
     - Lua objects are now in table luatexbase, not luatextra.
     - Lua tables tex.attributenumber and tex.catcodetablenumber are not
       created any more, use their couterparts in luatexbase.
