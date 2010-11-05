@@ -141,6 +141,11 @@ See source file '\inFileName' for details.
 %
 % \section{Documentation}
 %
+% Before we start, let me mention that test files are provided (they should be
+% in the same directory as this PDF file). You can have a look at them,
+% compile them and have a look at the log, if you want examples of how this
+% module works.
+%
 % \subsection{Managing functions in callbacks}
 %
 % \luatex provides an extremely interesting feature, named callbacks. It
@@ -255,6 +260,18 @@ See source file '\inFileName' for details.
 % At some point, \pk{luatextra} used to split |open_read_file| that way, but
 % support for this was removed. It may be added back (as well as support for
 % other split callbacks) if it appears there is an actual need for it.
+%
+% \subsection{Compatibility}
+%
+% Some callbacks have a calling convention that varies depending on the
+% version of \luatex used. This package \emph{does not} try to track the type
+% of the callbacks in every possible version of \luatex. The types are based
+% on the last stable beta version (0.60.2 at the time this doc is written).
+%
+% However, for callbacks that have the same calling convention for every
+% version of \luatex, this package should work with the same range of \luatex
+% version as other packages in the \pk{luatexbase} bundle (currently, 0.25.4
+% to 0.60.2).
 %
 %    \section{Implementation}
 %
