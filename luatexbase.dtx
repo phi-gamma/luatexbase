@@ -105,8 +105,8 @@ See source file '\inFileName' for details.
 % \maketitle
 %
 % \begin{abstract}
-% This convenience package loads all of the (stable) packages in the
-% \pk{luatexbase} bundle.
+% This convenience package loads all of the packages in the \pk{luatexbase}
+% bundle.
 % \end{abstract}
 %
 % \tableofcontents
@@ -124,25 +124,20 @@ See source file '\inFileName' for details.
 %   \emph{\`a la} \pk{etex}.
 %   \subpk{cctb} catcode table allocation.
 %   \subpk{attr} attribute allocation.
+%   \subpk{mcb} callbacks extensions allowing to register many functions in a
+%   single callback, and declare new callbacks for packages.
+%   \subpk{modutils} Lua module declaration, including version checks.
 % \end{description}
 %
 % These packages are almost stable: it is unlikely that backward-incompatible
-% changes will be made in the future (other than necessary for merging with
-% \pk{luatex.sty}, which strongly overlaps with the above). If they happen,
+% changes will be made in the future, other than necessary for merging with
+% \pk{luatex.sty}, which strongly overlaps with the first five. If they happen,
 % such changes will be announced on \email{lualatex-dev@tug.org} before they
 % are pushed to the master branch and then CTAN.
 %
-% Other packages included in the bundle, but currently not loaded by the
-% present package, are:
-% \begin{description}
-%   \subpk{modutils} Lua module declaration, including version checks.
-%   \subpk{mcb} callbacks extensions allowing to register many functions in a
-%   single callback, and declare new callbacks for packages.
-% \end{description}
-%
-% All packages in this bundle are supposed to work with \luatex 0.25.4 to
-% 0.60.x, with formats based on \plaintex or \latex, as included in \texlive
-% 2008, 2009, and 2010.
+% All packages in this bundle are tested with \luatex 0.25.4 to 0.60.x, with
+% formats based on \plaintex or \latex, as included in \texlive 2008, 2009,
+% and 2010.
 %
 %    \section{Implementation}
 %
@@ -243,12 +238,16 @@ See source file '\inFileName' for details.
   \input luatexbase-regs.sty
   \input luatexbase-attr.sty
   \input luatexbase-cctb.sty
+  \input luatexbase-mcb.sty
+  \input luatexbase-modutils.sty
 \else
   \RequirePackage{luatexbase-compat}
   \RequirePackage{luatexbase-loader}
   \RequirePackage{luatexbase-regs}
   \RequirePackage{luatexbase-attr}
   \RequirePackage{luatexbase-cctb}
+  \RequirePackage{luatexbase-mcb}
+  \RequirePackage{luatexbase-modutils}
 \fi
 %    \end{macrocode}
 %

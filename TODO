@@ -10,5 +10,4 @@ declaration and no declaration?
 mcb
 ---
 
-- General review of code and comments.
-- Update user documentation.
+- remaining bit: understand and explain 'list' callback conventions
