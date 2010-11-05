@@ -165,15 +165,16 @@ See source file '\inFileName' for details.
 %     (possibly modified): the functions are called in order, and each is
 %     passed the return value of the previous (and the other arguments
 %     untouched, if any). The return value is that of the last function;
-%   \item[list] is for functions taking the head of a node list as their first
-%     argument (and possibly other arguments) and returning either a modified
-%     node list or |true| or |false|. If a function returns a node
-%     list, then this node list is passed as the first argument to the next
-%     function, along with the original remaining arguments; if it returns
-%     |true|, the original node list is passed to the next function; if it
-%     returns false, then no the other functions are \emph{not} called, a
-%     warning is issued and |false| is immediately returned. Otherwise, the
-%     return value of the last function is returned.
+%   \item[list] is a specialized variant of \emph{data} for functions
+%     filtering node lists. Such functions may return either the head of a
+%     modified node list, or the boolean values |true| or |false|. The
+%     functions are chained the same way as for \emph{data} except that for
+%     the following. If
+%     one function returns |false|, then |false| is immediately return and the
+%     following functions are \emph{not} called. If one function returns
+%     |true|, then the same head is passed to the next function. If all
+%     functions return |true|, then |true| is returned, otherwise the return
+%     value of the last function not returning |true| is used.
 %   \item[first] is for functions with more complex signatures; functions in
 %     this type of callback are \emph{not} combined: only the first one
 %     (according to priorities) is executed.
@@ -512,6 +513,7 @@ end
 local function listhandler (name)
     return function(head,...)
         local ret
+        local alltrue = true
         for _, f in ipairs(callbacklist[name]) do
             ret = f.func(head, ...)
             if ret == false then
@@ -520,10 +522,11 @@ local function listhandler (name)
                 break
             end
             if ret ~= true then
+                alltrue = false
                 head = ret
             end
         end
-        return ret
+        return alltrue and true or head
     end
 end
 %    \end{macrocode}
