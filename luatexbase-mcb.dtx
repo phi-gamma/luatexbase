@@ -640,17 +640,7 @@ function add_to_callback (name,func,description,priority)
         l = {}
         callbacklist[name] = l
         if not lua_callbacks_defaults[name] then
-            if callbacktypes[name] == list then
-                internalregister(name, listhandler(name))
-            elseif callbacktypes[name] == data then
-                internalregister(name, datahandler(name))
-            elseif callbacktypes[name] == simple then
-                internalregister(name, simplehandler(name))
-            elseif callbacktypes[name] == first then
-                internalregister(name, firsthandler(name))
-            else
-                err("unknown callback type")
-            end
+            internalregister(name, handlers[callbacktypes[name]](name))
         end
     end
 %    \end{macrocode}
