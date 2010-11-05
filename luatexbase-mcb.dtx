@@ -186,8 +186,21 @@ See source file '\inFileName' for details.
 % luatexbase.remove_from_callback(name, description)
 % \end{verbatim}
 % The first argument must be the name of the callback, and the second one the
-% description used when adding the function to this callback.
+% description used when adding the function to this callback. You can also
+% remove all functions from a callback at once using
+% \begin{verbatim}
+% luatexbase.reset_callback(name)
+% \end{verbatim}
 %
+% When new functions are added at the beginning of the list, other functions
+% are shifted down the list. To get the current rank of a function in a
+% callback's list, use:
+% \begin{verbatim}
+% priority = luatexbase.priority_in_callback(name, description)
+% \end{verbatim}
+% Again, the description is the string used when adding the function. If the
+% function identified by this string is not in this callback's list, the
+% priority returned is the boolean value |false|.
 %
 % \subsection{Creating new callbacks}
 %
@@ -195,22 +208,17 @@ See source file '\inFileName' for details.
 % addition to the default Lua\TeX\ callbacks.
 % See comments in the implementation section for details.
 %
-% \subsubsection*{Limitations}
+% \subsubsection{Limitations}
 %
-% This package only works for callbacks where it's safe to add multiple
-% functions without changing the functions' signatures. There are callbacks,
-% though, where registering several functions is not possible without changing
-% the function's signatures, like for example the readers callbacks. These
-% callbacks take a filename and give the datas in it. One solution would be to
-% change the functions' signature to open it when the function is the first,
-% and to take the datas and modify them eventually if they are called after
-% the first. But it seems rather fragile and useless, so it's not implemented.
-% With these callbacks, in this package we simply execute the first function
-% in the list.
+% For callbacks of type |first|, our new management system isn't actually
+% better than good old |callback.register|. For some of them, is may be
+% possible to split them into many callbacks, so that these callbacks can
+% accept multiple functions. However, its seems risky and limited in use and
+% is therefore nor implemented.
 %
-% Other callbacks in this case are \texttt{define\_font} and
-% \texttt{open\_read\_file}. There is though a solution for several packages
-% to use these callbacks, see the implementation of \texttt{luatextra}.
+% At some point, \pf{luatextra} used to split |open_read_file| that way, but
+% support for this was removed. It may be added back (as well as support for
+% other splitted callbacks) if it appears there is an actual need for it.
 %
 %    \section{Implementation}
 %
@@ -654,7 +662,7 @@ function remove_from_callback (name, description)
 %
 %    Then loop over the callback's function list until we find a matching
 %    entry. Remove it and check if the list gets empty: if so, unregister the
-%    callback unless it is user-defined.
+%    callback handler unless the callback is user-defined.
 %
 %    \begin{macrocode}
     local index = false
@@ -680,7 +688,8 @@ function remove_from_callback (name, description)
 end
 %    \end{macrocode}
 %
-%    This function removes all the functions registered in a callback.
+%    Remove all the functions registered in a callback. Unregisters the
+%    callback handler unless the callback is user-defined.
 %
 %    \begin{macrocode}
 function reset_callback (name)
@@ -699,6 +708,27 @@ function reset_callback (name)
         info("resetting callback list '%s'",name)
         callbacklist[name] = nil
     end
+end
+%    \end{macrocode}
+%
+%    Get a function's priority in a callback list, or false if the function is
+%    not in the list.
+%
+%    \begin{macrocode}
+function priority_in_callback (name, description)
+    if not name or name == ""
+            or not callbacktypes[name]
+            or not description then
+        return false
+    end
+    local l = callbacklist[name]
+    if not l then return false end
+    for p, f in pairs(l) do
+        if f.description == description then
+            return p
+        end
+    end
+    return false
 end
 %    \end{macrocode}
 %
@@ -771,29 +801,6 @@ function call_callback(name, ...)
         end
     end
     return f(...)
-end
-%    \end{macrocode}
-%
-%    This function tells if a function has already been registered in a
-%    callback, and gives its current priority. The arguments are the name of
-%    the callback and the description of the function. If it has already been
-%    registered, it gives its priority, and if not it returns false.
-%
-%    \begin{macrocode}
-function priority_in_callback (name, description)
-    if not name or name == ""
-            or not callbacktypes[name]
-            or not description then
-        return false
-    end
-    local l = callbacklist[name]
-    if not l then return false end
-    for p, f in pairs(l) do
-        if f.description == description then
-            return p
-        end
-    end
-    return false
 end
 %    \end{macrocode}
 %
