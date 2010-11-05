@@ -527,29 +527,21 @@ end
 %    \begin{macrocode}
 local function datahandler (name)
     return function(data, ...)
-        local l = callbacklist[name]
-        if l then
-            for _, f in ipairs(l) do
-                data = f.func(data, ...)
-            end
+        for _, f in ipairs(callbacklist[name]) do
+            data = f.func(data, ...)
         end
-        return data
     end
 end
 %    \end{macrocode}
 %
-%    Handler for |first| callbacks.
+%    Handler for |first| callbacks. We can assume |callbacklist[name]| is not
+%    empty: otherwise, the function wouldn't be registered in the callback any
+%    more.
 %
 %    \begin{macrocode}
 local function firsthandler (name)
     return function(...)
-        local l = callbacklist[name]
-        if l then
-            local f = l[1].func
-            return f(...)
-        else
-            return nil, false
-        end
+        return callbacklist[name][1].func(...)
     end
 end
 %    \end{macrocode}
@@ -559,11 +551,8 @@ end
 %    \begin{macrocode}
 local function simplehandler (name)
     return function(...)
-        local l = callbacklist[name]
-        if l then
-            for _, f in ipairs(l) do
-                f.func(...)
-            end
+        for _, f in ipairs(callbacklist[name]) do
+            f.func(...)
         end
     end
 end
