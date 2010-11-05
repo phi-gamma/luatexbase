@@ -354,20 +354,13 @@ local err, warning, info = luatexbase.provides_module({
 })
 %    \end{macrocode}
 %
-%    \subsubsection{Initialisations}
+%    \subsubsection{Housekeeping}
 %
-%    \texttt{callbacklist} is the main list, that contains the callbacks as
-%    keys and a table of the registered functions a values.
+%    The main table: keys are callback names, and values are the associated
+%    lists of functions.
 %
 %    \begin{macrocode}
 local callbacklist = callbacklist or { }
-%    \end{macrocode}
-%
-%    A table with the default functions of the created callbacks. See
-%    \texttt{create} for further informations.
-%
-%    \begin{macrocode}
-local lua_callbacks_defaults = { }
 %    \end{macrocode}
 %
 %    Numerical codes for callback types.
@@ -441,14 +434,25 @@ if luatexbase.luatexversion > 42 then
 end
 %    \end{macrocode}
 %
-%    As we overwrite \texttt{callback.register}, we save it as
-%    \texttt{internalregister}.
+%    All user-defined callbacks have a default function: this property is used
+%    to identify them as being user-defined. Those are kept in the following
+%    table.
+%
+%    \begin{macrocode}
+local lua_callbacks_defaults = { }
+%    \end{macrocode}
+%
+%    Overwrite |callback.register|, but save it first.
 %
 %    \begin{macrocode}
 local internalregister = internalregister or callback.register
+callback.register = function ()
+  err("function callback.register has been trapped,\n"
+  .."please use luatexbase.add_to_callback instead.")
+end
 %    \end{macrocode}
 %
-%    \subsubsection{Unsorted stuff}
+%    \subsubsection{Misc}
 %
 %    A simple function we'll use later to understand the arguments of the
 %    \texttt{create} function. It takes a string and returns the type
@@ -470,9 +474,14 @@ local function str_to_type(str)
 end
 %    \end{macrocode}
 %
-%     This function and the following ones are only internal. This one is the
-%     handler for the first type of callbacks: the ones that take a list head
-%     and return true, false, or a new list head.
+%    \subsubsection{Handlers}
+%
+%    Normal (as opposed to user-defined) callbacks have handlers depending on
+%    their type. The handler function is registered into the callback when the
+%    first function is added to this callback's list. Then, when the callback
+%    is called, then handler takes care of running all functions in the list.
+%    When the last function is removed from the callback's list, the handler
+%    is unregistered.
 %
 %    \begin{macrocode}
 -- local
@@ -556,7 +565,7 @@ local function simplehandler (name)
 end
 %    \end{macrocode}
 %
-%    \subsubsection{Public functions}
+%    \subsubsection{Public functions for functions management}
 %
 %    Add a function to a callback. First check arguments.
 %
@@ -732,6 +741,8 @@ function priority_in_callback (name, description)
 end
 %    \end{macrocode}
 %
+%    \subsubsection{Public functions for user-defined callbacks}
+%
 %    This first function creates a new callback. The signature is
 %    \texttt{create(name, ctype, default)} where \texttt{name} is the name of
 %    the new callback to create, \texttt{ctype} is the type of callback, and
@@ -801,15 +812,6 @@ function call_callback(name, ...)
         end
     end
     return f(...)
-end
-%    \end{macrocode}
-%
-%    Finally, overwrite |callback.register| so that bails out in error.
-%
-%    \begin{macrocode}
-callback.register = function ()
-  err("function callback.register has been trapped,\n"
-  .."please use luatexbase.add_to_callback instead.")
 end
 %    \end{macrocode}
 %
