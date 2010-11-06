@@ -14,7 +14,3 @@ declaration and no declaration?
 - Update user documentation including template(s) for Lua modules once the
   preceding question is decided.
 
-mcb
----
-
-- check type of all callbacks (& list)

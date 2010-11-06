@@ -418,8 +418,10 @@ local err, warning, info = luatexbase.provides_module({
 %    \subsubsection{Housekeeping}
 %
 %    The main table: keys are callback names, and values are the associated
-%    lists of functions. Only callbacks with a non-empty list of functions have
-%    an entry in this list.
+%    lists of functions. More precisely, the entries in the list are tables
+%    holding the actual function as |func| and the identifying description as
+%    |description|. Only callbacks with a non-empty list of functions have an
+%    entry in this list.
 %
 %    \begin{macrocode}
 local callbacklist = callbacklist or { }
@@ -431,80 +433,103 @@ local callbacklist = callbacklist or { }
 %    \begin{macrocode}
 local list, data, first, simple = 1, 2, 3, 4
 local types = {
-  list   = list,
-  data   = data,
-  first  = first,
-  simple = simple,
+    list   = list,
+    data   = data,
+    first  = first,
+    simple = simple,
 }
 %    \end{macrocode}
 %
-%    Now, assign a type for each predefined callback.
+%    Now, list all predefined callbacks with their current type, based on the
+%    LuaTeX manual version 0.60.2.
 %
 %    \begin{macrocode}
 local callbacktypes = callbacktypes or {
-  buildpage_filter = simple,
-  token_filter = first,
-  pre_output_filter = list,
-  hpack_filter = list,
-  process_input_buffer = data,
-  mlist_to_hlist = list,
-  vpack_filter = list,
-  define_font = first,
-  open_read_file = first,
-  linebreak_filter = list,
-  post_linebreak_filter = list,
-  pre_linebreak_filter = list,
-  start_page_number = simple,
-  stop_page_number = simple,
-  start_run = simple,
-  show_error_hook = simple,
-  stop_run = simple,
-  hyphenate = simple,
-  ligaturing = simple,
-  kerning = data, -- FIXME
-  find_write_file = first,
-  find_read_file = first,
-  find_vf_file = data,
-  find_map_file = data,
-  find_format_file = data,
-  find_opentype_file = data,
-  find_output_file = data,
-  find_truetype_file = data,
-  find_type1_file = data,
-  find_data_file = data,
-  find_pk_file = data,
-  find_font_file = data,
-  find_image_file = data,
-  find_ocp_file = data,
-  find_sfd_file = data,
-  find_enc_file = data,
-  read_sfd_file = first,
-  read_map_file = first,
-  read_pk_file = first,
-  read_enc_file = first,
-  read_vf_file = first,
-  read_ocp_file = first,
-  read_opentype_file = first,
-  read_truetype_file = first,
-  read_font_file = first,
-  read_type1_file = first,
-  read_data_file = first,
+%    \end{macrocode}
+%
+%    Section 4.1.1: file discovery callbacks.
+%
+%    \begin{macrocode}
+    find_read_file     = first,
+    find_write_file    = first,
+    find_font_file     = data,
+    find_output_file   = data,
+    find_format_file   = data,
+    find_vf_file       = data,
+    find_ocp_file      = data,
+    find_map_file      = data,
+    find_enc_file      = data,
+    find_sfd_file      = data,
+    find_pk_file       = data,
+    find_data_file     = data,
+    find_opentype_file = data,
+    find_truetype_file = data,
+    find_type1_file    = data,
+    find_image_file    = data,
+%    \end{macrocode}
+%
+%    Section 4.1.2: file reading callbacks.
+%
+%    \begin{macrocode}
+    open_read_file     = first,
+    read_font_file     = first,
+    read_vf_file       = first,
+    read_ocp_file      = first,
+    read_map_file      = first,
+    read_enc_file      = first,
+    read_sfd_file      = first,
+    read_pk_file       = first,
+    read_data_file     = first,
+    read_truetype_file = first,
+    read_type1_file    = first,
+    read_opentype_file = first,
+%    \end{macrocode}
+%
+%    Section 4.1.3: data processing callbacks.
+%
+%    \begin{macrocode}
+    process_input_buffer  = data,
+    process_output_buffer = data,
+    token_filter          = first,
+%    \end{macrocode}
+%
+%    Section 4.1.4: node list processiong callbacks.
+%
+%    \begin{macrocode}
+    buildpage_filter      = simple,
+    pre_linebreak_filter  = list,
+    linebreak_filter      = list,
+    post_linebreak_filter = list,
+    hpack_filter          = list,
+    vpack_filter          = list,
+    pre_output_filter     = list,
+    hyphenate             = simple,
+    ligaturing            = simple,
+    kerning               = simple,
+    mlist_to_hlist        = list,
+%    \end{macrocode}
+%
+%    Section 4.1.5: information reporting callbacks.
+%
+%    \begin{macrocode}
+    start_run         = simple,
+    stop_run          = simple,
+    start_page_number = simple,
+    stop_page_number  = simple,
+    show_error_hook   = simple,
+%    \end{macrocode}
+%
+%    Section 4.1.6: font-related callbacks.
+%
+%    \begin{macrocode}
+    define_font = first,
 }
 %    \end{macrocode}
 %
-%    In Lua\TeX\ version 0.43, a new callback called |process_output_buffer|
-%    appeared, so we enable it. Test the version using the compat package for,
-%    well, compatibility.
-%
-%    \begin{macrocode}
-if luatexbase.luatexversion > 42 then
-    callbacktypes["process_output_buffer"] = data
-end
-%    \end{macrocode}
-%
-%    All user-defined callbacks have a default function: this property is used
-%    to identify them as being user-defined. Those are kept in the following
-%    table.
+%    All user-defined callbacks have a default function. The following table's
+%    keys are the names of the user-defined callback, the associated value is
+%    the default functon for this callback. This table is also used to
+%    identify the user-defined callbacks.
 %
 %    \begin{macrocode}
 local lua_callbacks_defaults = { }
