@@ -692,7 +692,7 @@ function add_to_callback (name,func,description,priority)
 %    Keep user informed.
 %
 %    \begin{macrocode}
-    if callbacktypes[name] == first and (priority ~= 1 or #l ~= 0) then
+    if callbacktypes[name] == first and #l ~= 1 then
         warning("several functions in '%s',\n"
         .."only one will be active.", name)
     end
@@ -832,7 +832,7 @@ function create_callback(name, ctype, default)
         err("unable to create callback '%s':\ntype '%s' undefined", name, ctype)
         return nil
     end
-    info("creating callback '%s'", name)
+    info("creating '%s' type %s", name, ctype)
     lua_callbacks_defaults[name] = default
     callbacktypes[name] = ctype
 end
@@ -1061,8 +1061,8 @@ end
 %    called to test the handlers. Here is a helper macro for that.
 %
 %    \begin{macrocode}
-\def\test#1{%
-  \msg{^^J*********^^J* Testing #1^^J*********}
+\def\test#1#2{%
+  \msg{^^J*********^^J* Testing #1 (type #2)^^J*********}
   \msg{* Add two functions}
   \luatexbase@directlua{add_#1()}
   \csname test_#1\endcsname
@@ -1088,7 +1088,7 @@ end
 \catcode`\_ 11
 %<testlatex>\everypar{}
 \def\test_hpack_filter{\setbox0=\hbox{bla}}
-\def\test_hyphenate{\setbox0=\vbox{\hsize\z@ blablabla}}
+\def\test_hyphenate{\showhyphens{hyphenation}}
 \def\test_find_write_file{\immediate\openout15 test-mcb-out.log}
 \def\test_process_input_buffer{\input test-mcb-aux.tex}
 %    \end{macrocode}
@@ -1096,10 +1096,10 @@ end
 %    Now actually test them
 %
 %    \begin{macrocode}
-\test{hpack_filter}
-\test{hyphenate}
-\test{find_write_file}
-\test{process_input_buffer}
+\test{hpack_filter}{list}
+\test{hyphenate}{simple}
+\test{find_write_file}{first}
+\test{process_input_buffer}{data}
 %    \end{macrocode}
 %
 %    Done.
