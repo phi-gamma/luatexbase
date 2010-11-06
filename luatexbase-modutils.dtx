@@ -443,7 +443,7 @@ end
 local function msg_format(msg_type, mod_name, ...)
   local cont = '('..mod_name..')' .. ('Module: '..msg_type):gsub('.', ' ')
   return 'Module '..mod_name..' '..msg_type..': '
-    .. string.format(...):gsub('\n', '\n'..cont)
+    .. string.format(...):gsub('\n', '\n'..cont) .. '\n'
 end
 local function module_error_int(mod, ...)
   error(msg_format('error', mod, ...), 3)
