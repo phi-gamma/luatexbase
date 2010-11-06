@@ -856,7 +856,7 @@ function call_callback(name, ...)
     if not l then
         f = lua_callbacks_defaults[name]
     else
-        f = handlers[callbacktypes[name]]
+        f = handlers[callbacktypes[name]](name)
         if not f then
             err("unknown callback type")
             return
@@ -922,12 +922,12 @@ luatexbase.create_callback("fooback", "data", data_one)
 msg("* call it")
 luatexbase.call_callback("fooback", "default")
 msg("* add two functions")
-luatexbase.add_to_callback("fooback", data_two, " function two", 2)
-luatexbase.add_to_callback("fooback", data_three, " function three", 1)
+luatexbase.add_to_callback("fooback", data_two, "function two", 2)
+luatexbase.add_to_callback("fooback", data_three, "function three", 1)
 msg("* call")
 luatexbase.call_callback("fooback", "all")
 msg("* rm one function")
-luatexbase.remove_from_callback("fooback", " function three")
+luatexbase.remove_from_callback("fooback", "function three")
 msg("* call")
 luatexbase.call_callback("fooback", "all but three")
 msg("* reset")
