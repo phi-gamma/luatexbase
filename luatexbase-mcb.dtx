@@ -592,6 +592,7 @@ local function datahandler (name)
         for _, f in ipairs(callbacklist[name]) do
             data = f.func(data, ...)
         end
+        return data
     end
 end
 %    \end{macrocode}
@@ -1017,12 +1018,10 @@ end
 %    \begin{macrocode}
 function add_process_input_buffer()
     luatexbase.add_to_callback('process_input_buffer', function(buffer)
-            texio.write_nl("I'm a dummy process_input_buffer")
             return buffer.."\\msg{dummy}"
         end,
         'dummy process_input_buffer')
     luatexbase.add_to_callback('process_input_buffer', function(buffer)
-            texio.write_nl("I'm an other dummy process_input_buffer")
             return buffer.."\\msg{otherdummy}"
         end,
         'other dummy process_input_buffer')
