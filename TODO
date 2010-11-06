@@ -17,5 +17,4 @@ declaration and no declaration?
 mcb
 ---
 
-- code: verify that the return value of callback.register is checked
 - check type of all callbacks (& list)

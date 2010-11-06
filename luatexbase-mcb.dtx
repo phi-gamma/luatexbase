@@ -510,13 +510,17 @@ end
 local lua_callbacks_defaults = { }
 %    \end{macrocode}
 %
-%    Overwrite |callback.register|, but save it first.
+%    Overwrite |callback.register|, but save it first. Also define a wrapper
+%    that automatically raise an error when something goes wrong.
 %
 %    \begin{macrocode}
-local internalregister = internalregister or callback.register
+local original_register = original_register or callback.register
 callback.register = function ()
   err("function callback.register has been trapped,\n"
   .."please use luatexbase.add_to_callback instead.")
+end
+local function register_callback(...)
+    return assert(original_register(...))
 end
 %    \end{macrocode}
 %
@@ -640,7 +644,7 @@ function add_to_callback (name,func,description,priority)
         l = {}
         callbacklist[name] = l
         if not lua_callbacks_defaults[name] then
-            internalregister(name, handlers[callbacktypes[name]](name))
+            register_callback(name, handlers[callbacktypes[name]](name))
         end
     end
 %    \end{macrocode}
@@ -718,7 +722,7 @@ function remove_from_callback (name, description)
     if table.maxn(l) == 0 then
         callbacklist[name] = nil
         if not lua_callbacks_defaults[name] then
-            internalregister(name, nil)
+            register_callback(name, nil)
         end
     end
     return
@@ -739,9 +743,9 @@ function reset_callback (name, make_false)
     end
     if not lua_callbacks_defaults[name] then
         if make_false == true then
-            internalregister(name, false)
+            register_callback(name, false)
         else
-            internalregister(name, nil)
+            register_callback(name, nil)
         end
     end
     local l = callbacklist[name]
