@@ -879,6 +879,7 @@ end
 %
 %    \begin{macrocode}
 %<*testlua>
+local msg = texio.write_nl
 %    \end{macrocode}
 %
 %    Test the management functions with a predefined callback.
@@ -888,6 +889,7 @@ local function sample(head,...)
     return head, true
 end
 local prio = luatexbase.priority_in_callback
+msg("\n*********\n* Testing management functions\n*********")
 luatexbase.add_to_callback("hpack_filter", sample, "sample one", 1)
 luatexbase.add_to_callback("hpack_filter", sample, "sample two", 2)
 luatexbase.add_to_callback("hpack_filter", sample, "sample three", 1)
@@ -914,14 +916,23 @@ local function data_three(s)
   texio.write_nl("I'm data 3 whith argument: "..s)
   return s
 end
+msg("\n*********\n* Testing user-defined callbacks\n*********")
+msg("* create one")
 luatexbase.create_callback("fooback", "data", data_one)
+msg("* call it")
 luatexbase.call_callback("fooback", "default")
+msg("* add two functions")
 luatexbase.add_to_callback("fooback", data_two, " function two", 2)
 luatexbase.add_to_callback("fooback", data_three, " function three", 1)
+msg("* call")
 luatexbase.call_callback("fooback", "all")
+msg("* rm one function")
 luatexbase.remove_from_callback("fooback", " function three")
+msg("* call")
 luatexbase.call_callback("fooback", "all but three")
+msg("* reset")
 luatexbase.reset_callback("fooback")
+msg("* call")
 luatexbase.call_callback("fooback", "default")
 %    \end{macrocode}
 %
@@ -1051,7 +1062,7 @@ end
 %
 %    \begin{macrocode}
 \def\test#1{%
-  \msg{^^J*****^^J* Testing #1^^J*****}
+  \msg{^^J*********^^J* Testing #1^^J*********}
   \msg{* Add two functions}
   \luatexbase@directlua{add_#1()}
   \csname test_#1\endcsname
