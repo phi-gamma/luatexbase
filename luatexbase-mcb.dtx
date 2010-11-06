@@ -53,7 +53,6 @@ See source file '\inFileName' for details.
   \usedir{doc/luatex/luatexbase}%
   \file{test-mcb-plain.tex}{\from{luatexbase-mcb.dtx}{testplain}}%
   \file{test-mcb-latex.tex}{\from{luatexbase-mcb.dtx}{testlatex}}%
-  \file{test-mcb-aux.tex}{\from{luatexbase-mcb.dtx}{testaux}}%
 }
 
 \def\MetaPrefix{-- }
@@ -1083,7 +1082,6 @@ end
 \def\test_hyphenate{\setbox0=\vbox{\hsize\z@ blablabla}}
 \def\test_find_write_file{\immediate\openout15 test-mcb-out.log}
 \def\test_process_input_buffer{\input test-mcb-aux.tex}
-%<testaux>\relax
 %    \end{macrocode}
 %
 %    Now actually test them

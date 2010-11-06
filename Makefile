@@ -8,7 +8,7 @@ DTXSTY = lltxb-dtxstyle.tex
 # Files grouped by generation mode
 UNPACKED_MCB = luatexbase-mcb.sty mcb.lua \
 			test-mcb-latex.tex test-mcb-plain.tex \
-			test-mcb.lua test-mcb-aux.tex
+			test-mcb.lua $(TEST_MCB)
 UNPACKED_REGS = luatexbase-regs.sty \
 			test-regs-plain.tex test-regs-latex.tex
 UNPACKED_ATTR = luatexbase-attr.sty attr.lua \
@@ -33,6 +33,7 @@ SOURCE = $(DTX) $(DTXSTY) README TODO Changes Makefile
 # used for check
 TEST_LOADER = test-loader
 TMP_LOADER = $(TEST_LOADER).tex
+TEST_MCB = test-mcb-aux.tex
 
 # Files grouped by installation location
 RUNFILES = $(filter-out test-%, $(UNPACKED))
@@ -81,6 +82,7 @@ luatexbase.%.lua: %.lua
 
 $(UNPACKED_MCB): luatexbase-mcb.dtx
 	$(DO_TEX)
+	echo \\\\relax > $(TEST_MCB)
 
 $(UNPACKED_REGS): luatexbase-regs.dtx
 	$(DO_TEX)
@@ -124,7 +126,7 @@ check-modutils: install-runfiles
 	$(TESTENV) luatex --interaction=batchmode test-modutils-plain.tex >/dev/null
 	$(TESTENV) lualatex --interaction=batchmode test-modutils-latex.tex >/dev/null
 
-check-mcb: install-runfiles
+check-mcb: install-runfiles $(UNPACKED_MCB)
 	$(TESTENV) luatex --interaction=batchmode test-mcb-plain.tex >/dev/null
 	$(TESTENV) lualatex --interaction=batchmode test-mcb-latex.tex >/dev/null
 
