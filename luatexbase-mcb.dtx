@@ -693,10 +693,10 @@ function add_to_callback (name,func,description,priority)
 %
 %    \begin{macrocode}
     if callbacktypes[name] == first and (priority ~= 1 or #l ~= 0) then
-        warning("several callbacks registered in callback '%s',\n"
-        .."only the first function will be active.", name)
+        warning("several functions in '%s',\n"
+        .."only one will be active.", name)
     end
-    info("inserting function '%s'\nat position %s in callback list\nfor '%s'",
+    info("inserting '%s'\nat position %s in '%s'",
       description, priority, name)
 end
 %    \end{macrocode}
@@ -738,11 +738,11 @@ function remove_from_callback (name, description)
         end
     end
     if not index then
-        err("unable to remove function '%s'\nfrom '%s'", description, name)
+        err("unable to remove '%s'\nfrom '%s'", description, name)
         return
     end
     table.remove(l, index)
-    info("removing function '%s'\nfrom '%s'", description, name)
+    info("removing '%s'\nfrom '%s'", description, name)
     if table.maxn(l) == 0 then
         callbacklist[name] = nil
         if not lua_callbacks_defaults[name] then
@@ -762,20 +762,18 @@ function reset_callback (name, make_false)
         err("unable to reset:\nno proper callback name passed")
         return
     elseif not callbacktypes[name] then
-        err("reset error: '%s'\nis not a valid callback", name)
+        err("unable to reset '%s':\nis not a valid callback", name)
         return
     end
+    info("resetting callback '%s'", name)
+    callbacklist[name] = nil
     if not lua_callbacks_defaults[name] then
         if make_false == true then
+            info("setting '%s' to false", name)
             register_callback(name, false)
         else
             register_callback(name, nil)
         end
-    end
-    local l = callbacklist[name]
-    if l then
-        info("resetting callback list '%s'",name)
-        callbacklist[name] = nil
     end
 end
 %    \end{macrocode}
@@ -834,7 +832,7 @@ function create_callback(name, ctype, default)
         err("unable to create callback '%s':\ntype '%s' undefined", name, ctype)
         return nil
     end
-    info("creating new callback '%s'", name)
+    info("creating callback '%s'", name)
     lua_callbacks_defaults[name] = default
     callbacktypes[name] = ctype
 end
