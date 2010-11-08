@@ -1,41 +1,43 @@
 % preamble for dtx documentations of the luatexbase package/bundle.
 
+% packages
 \usepackage[T1]{fontenc}
+\usepackage{textcomp}
 \usepackage{lmodern}
-\usepackage{geometry}
 \usepackage{xspace}
+\usepackage[a4paper]{geometry}
 \usepackage[english]{babel}
 \usepackage[colorlinks]{hyperref}
 \usepackage{bookmark}
 
 % logos
 \makeatletter
-\newcommand\eTeX{$\m@th\varepsilon$-\TeX}
-\newcommand\LuaTeX{Lua\TeX}
-\renewcommand\PlainTeX{Plain\thinspace\TeX}
-\newcommand\TeXe{\TeX\thinspace82}
-\newcommand\TeXLive{\TeX\thinspace Live}
+\newcommand \eTeX       {$\m@th\varepsilon$-\TeX}
+\newcommand \LuaTeX     {Lua\TeX}
+\renewcommand \PlainTeX {Plain\thinspace\TeX}
+\newcommand \TeXe       {\TeX\thinspace82}
+\newcommand \TeXLive    {\TeX\thinspace Live}
 \makeatother
 
 % logos for the lazy me (mpg)
-\newcommand\tex{\TeX\xspace}
-\newcommand\latex{\LaTeX\xspace}
-\newcommand\etex{\eTeX\xspace}
-\newcommand\luatex{\LuaTeX\xspace}
-\newcommand\texe{\TeXe\xspace}
-\newcommand\texlive{\TeXLive\xspace}
-\newcommand\plaintex{\PlainTeX\xspace}
+\newcommand \tex      {\TeX\xspace}
+\newcommand \latex    {\LaTeX\xspace}
+\newcommand \etex     {\eTeX\xspace}
+\newcommand \luatex   {\LuaTeX\xspace}
+\newcommand \texe     {\TeXe\xspace}
+\newcommand \texlive  {\TeXLive\xspace}
+\newcommand \plaintex {\PlainTeX\xspace}
 
 % special elements of text
-\newcommand\file{\nolinkurl}
-\newcommand\email[1]{\href{mailto:#1}{#1}}
-\newcommand\pk{\textsf}
-\newcommand\cmdname{\texttt}
+\newcommand*\email [1] {<\href{mailto:#1}{#1}>}
+\newcommand \file       {\nolinkurl}
+\newcommand \pk         {\textsf}
+\newcommand \cmdname    {\texttt}
 
 % for hyperref
 \pdfstringdefDisableCommands{%
   \def\cs#1{\@backslashchar #1}%
-  }
+}
 
 % easy verbatim
 \MakeShortVerb\|

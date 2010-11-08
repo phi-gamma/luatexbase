@@ -1,8 +1,5 @@
-all
----
-
-- regression checks on the results of the tests (sed+diff the log)
-- add debug messages (to be used in the test suite)?
+Version 0.3
+===========
 
 modutils
 --------
@@ -14,3 +11,25 @@ declaration and no declaration?
 - Update user documentation including template(s) for Lua modules once the
   preceding question is decided.
 
+general
+-------
+
+- `make check` for luaotfload & fontspec (lltxb branch)
+- synchronize release
+
+
+Later
+=====
+
+all
+---
+
+- discuss merge with Heiko...
+
+- regression checks on the results of the tests (sed+diff the log)
+- add debug messages to be used in the test suite?
+
+modutils
+--------
+
+- make `\listfiles` show Lua modules?
