@@ -508,6 +508,7 @@ end
 %    Plain TeX.
 %
 %    \begin{macrocode}
+%<testplain,testlatex>\catcode00 15
 %<testplain>\input luatexbase-cctb.sty
 %<testlatex>\RequirePackage{luatexbase-cctb}
 %<*testplain,testlatex>
@@ -527,13 +528,29 @@ end
 \lua{assert(luatexbase.catcodetables.anothercctb)}
 %    \end{macrocode}
 %
-%    Now, play a little bit with predefined tables.
+%    Now, play a little bit with predefined tables. Be careful to change
+%    catcodes only inside a group to avoid chaos.
 %
 %    \begin{macrocode}
-\luatexcatcodetable\CatcodeTableLaTeXAtLetter
-\ifnum\catcode64=11 \else \ERROR \fi
-\luatexcatcodetable\CatcodeTableLaTeX
-\ifnum\catcode64=12 \else \ERROR \fi
+\def\test#1#2#3{%
+  \begingroup
+  \ifcsname CatcodeTable#1\endcsname \else \INTERR \fi
+  \luatexcatcodetable\csname CatcodeTable#1\endcsname
+  \ifnum\catcode#2=#3 \else \ERROR \fi
+  \endgroup}
+\test {IniTeX}        {00} {09}
+\test {IniTeX}        {92} {00}
+\test {IniTeX}        {64} {12}
+\test {IniTeX}        {65} {11}
+\test {String}        {92} {12}
+\test {String}        {65} {12}
+\test {String}        {32} {10}
+\test {Other}         {92} {12}
+\test {Other}         {65} {12}
+\test {Other}         {32} {12}
+\test {LaTeXAtLetter} {64} {11}
+\test {LaTeX}         {64} {12}
+\test {Expl}          {32} {09}
 %<testlatex>\documentclass{minimal}
 \lua{%
   tex.sprint('\string\\setbox0=\string\\hbox{')
