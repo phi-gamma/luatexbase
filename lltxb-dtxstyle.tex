@@ -29,7 +29,7 @@
 \newcommand \plaintex {\PlainTeX\xspace}
 
 % special elements of text
-\newcommand*\email [1] {<\href{mailto:#1}{#1}>}
+\newcommand*\email [1] {\href{mailto:#1}{#1}}
 \newcommand \file       {\nolinkurl}
 \newcommand \pk         {\textsf}
 \newcommand \cmdname    {\texttt}
@@ -46,5 +46,22 @@
   \def\cs#1{\@backslashchar #1}%
 }
 
-% easy verbatim
-\MakeShortVerb\|
+% constant metadata
+\author{%
+  Manuel P\'egouri\'e-Gonnard \& \'Elie Roux \\
+  Support: \email{lualatex-dev@tug.org}%
+}
+\hypersetup{%
+  pdfauthor = {Manuel Pegourie-Gonnard and Elie Roux},
+}
+
+% other metadata
+\newcommand*\pkdate [2] {%
+  \title{The \pk{#1} package}
+  \date{#2}
+  \hypersetup{pdftitle={The #1 package}}
+}
+
+
+% ltxdoc setup
+\DisableCrossrefs

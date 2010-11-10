@@ -1,13 +1,11 @@
                     Changes in the luatexbase package/bundle
 
 The [BI] tag signals backward-incompatible changes.
-After  v0.3, the only possible source of such changes will be the upcoming
-merge with luatex.sty. Afterwards, no such changes are expected.
+Starting with  v0.3, the only possible source of such changes is the upcoming
+merge with luatex.sty. Afterwards, no other BI change is to be expected.
 
 (current changes) v0.3
     all   not using LuaTeX results in an error (formerly a warning)
-    attr
-        - [BI] Name changes: \*luatexattribute -> \*attribute.
     modutils
         - [BI] \luatexUseModule and \luatexRequireModule replaced by
           \RequireLuaModule with a unified syntax.
