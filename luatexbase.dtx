@@ -101,15 +101,15 @@ See source file '\inFileName' for details.
 % \maketitle
 %
 % \begin{abstract}
-% This convenience package loads all of the packages in the \pk{luatexbase}
-% bundle.
+% This package provides resource management for the LuaTeX macro programmer.
+% It is divided in sub-packages which can be used independantly if desired.
 % \end{abstract}
 %
 % \tableofcontents
 %
 % \section{Documentation}
 %
-% The \pk{luatexbase} package loads the following packages:
+% The \pk{luatexbase} package consists of the following sub-packages:
 % \begin{description}
 %   \subpk{compat} compatibility helpers for \verb+\directlua+, primitive
 %   names and version information from Lua.
@@ -125,15 +125,14 @@ See source file '\inFileName' for details.
 %   \subpk{modutils} Lua module declaration, including version checks.
 % \end{description}
 %
-% These packages are almost stable: it is unlikely that backward-incompatible
+% The package is mostly stable: it is unlikely that backward-incompatible
 % changes will be made in the future, other than necessary for merging with
-% \pk{luatex.sty}, which strongly overlaps with the first five. If they happen,
-% such changes will be announced on \email{lualatex-dev@tug.org} before they
-% are pushed to the master branch and then CTAN.
+% \pk{luatex.sty}, with which a few sub-packages strongly overlap. If they do
+% happen, such changes will be announced on the development list, and clearly
+% identified in the \file{Changes} file.
 %
-% All packages in this bundle are tested with \luatex 0.25.4 to 0.60.x, with
-% formats based on \plaintex or \latex, as included in \texlive 2008, 2009,
-% and 2010.
+% All sub-packages are tested with \luatex 0.25.4 to 0.60.x and formats based
+% on \plaintex or \latex, as included in \texlive 2008, 2009, and 2010.
 %
 %    \section{Implementation}
 %

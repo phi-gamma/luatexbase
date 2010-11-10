@@ -1,8 +1,9 @@
-                          The luatexbase generic bundle
+                  The luatexbase generic package for LuaTeX
 
 
-The bundle provides basic facilities for LuaTeX macro programmers, mostly
-resource allocation and convenience packages. Provided are:
+This package provides resource management for the LuaTeX macro programmer.
+It is composed of the following sub-packages, which can be used independantly
+if desired:
 
 – luatexbase-compat: compatibility helpers;
 – luatexbase-loader: Lua module loading;
@@ -11,9 +12,6 @@ resource allocation and convenience packages. Provided are:
 – luatexbase-cctb: catcode table allocation;
 – luatexbase-modutils: Lua module declaration; and
 - luatexbase-mcb: callbacks extensions.
-
-Additionally, a `luatexbase' package loads all of the above in one step (and
-does nothing else) for your convenience.
 
 Installation
 ------------
