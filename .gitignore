@@ -1,4 +1,13 @@
+# generated
 *.lua
 *.pdf
-*.sty
+luatexbase*.sty
 test-*
+texmf/
+
+# temp
+*.log
+*.aux
+*.toc
+*.idx
+*.fdb_latexmk
