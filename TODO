@@ -8,8 +8,6 @@ modutils
 - review logic: should this module be mandatory?
   if not, what should happen with mixed require(), require_module(),
 declaration and no declaration?
-- Update user documentation including template(s) for Lua modules once the
-  preceding question is decided.
 
 general
 -------
@@ -38,3 +36,9 @@ cctb
 ----
 
 - support for unicode-letters?
+
+bytecode registers
+------------------
+
+- create submodule for that
+- only lua interface, most probably

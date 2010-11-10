@@ -34,6 +34,13 @@
 \newcommand \pk         {\textsf}
 \newcommand \cmdname    {\texttt}
 
+% no so nice, but anyway...
+\newenvironment{qcode}{%
+  \quote \ttfamily \catcode`\_ 12\relax
+}{%
+  \endquote
+}
+
 % for hyperref
 \pdfstringdefDisableCommands{%
   \def\cs#1{\@backslashchar #1}%

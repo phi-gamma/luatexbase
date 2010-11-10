@@ -129,14 +129,15 @@ See source file '\inFileName' for details.
 % \cs{documentclass} and \cs{RequirePackage} or \cs{ProvidesClass} and
 % \cs{ProvidesFiles}} or more precisely the part of these macros that deals
 % with identification and version checking (no attempt is done at implementing
-% an option mechanism). Functions for error reporting are provided too.
-%
-% It also loads \pk{luatexbase-loader}.
+% an option mechanism). It also provides functions for reporting errors and
+% warnings in a standardised format.
 % \end{abstract}
 %
 % \tableofcontents
 %
 % \section{Documentation}
+%
+% \subsection{Scope of this package}
 %
 % Lua's standard function |require()| is similar to \tex's |\input| primitive
 % but is somehow more evolved in that it makes a few checks to avoid loading
@@ -147,55 +148,139 @@ See source file '\inFileName' for details.
 % implements a complex option system, and does some identification and version
 % checking. The present package doesn't try to provide anything for options,
 % but implements a system for identification and version checking similar to
-% \latex's system. Both \tex macros and Lua functions are provided.
+% \latex's system.
 %
-% This package also provides Lua functions for reporting errors, warnings,
-% etc.
+% \medskip
 %
 % It is important to notice that Lua's standard function |module()| is
-% completely unrelated to the present package. It has nothing to do with
-% identification and deals only with namespaces.\footnote{More precisely, it
-% modifies the current environment.} So, you should continue to
-% use it normally, unlike the |require()| function which can be replaced with
-% this package's |luatexbase.require_module()|.
+% completely orthogonal with the present package. It has nothing to do with
+% identification and deals only with namespaces: more precisely, it
+% modifies the current environment. So, you should continue to
+% use it normally regardless of whether you chose to use this package's
+% features for identification.
+%
+% It is recommended to always use |module()| or any other method that ensure
+% the global name space remains clean. For example, you may heavily use the
+% |local| keyword and explicitly qualify the name of every non-local symbol.
+% Chapter 15 of \href{http://www.lua.org/pil/}{Programming in Lua, 1st ed.}
+% discusses various methods for managing packages.
 %
 % \subsection{\tex macros}
 %
-% The macro |\RequireLuaModule| is and interface to the Lua function
-% |require_module|. Just as the underlying Lua function, this macro takes
-% the module name as its first, mandatory argument, and version information as
-% a second, optional argument (using the usual \latex convention for optional
-% arguments, even under \plaintex).
+% \begin{qcode}
+% \cs{RequireLuaModule}\marg{name}\oarg{date}
+% \end{qcode}
+%
+% The macro |\RequireLuaModule| is an interface to the Lua function
+% |require_module|; it take the same arguments with the same meaning. The
+% second argument is optional.
 %
 % \subsection{Lua functions}
 %
-% The main function is |luatexbase.require_module| which may be used as a
-% replacement to |require()|, but also checks that the module correctly
-% identified itself, and accepts a second, optional argument containing
-% version information to be checked against the similar information provided
-% by the loaded module.  The version can be given either as a (floating point)
-% number or as a date in YYYY/MM/DD format.
+% \begin{qcode}
+% luatexbase.require_module({\meta{name}} [, \meta{required date}])
+% \end{qcode}
 %
-% Modules identify themselves using |luatexbase.provides_module|, whose only
-% argument is a table with some information about the module. The mandatory
-% fields are |name| (a string), |version| (a number), |date| (a string) and
-% |description| (a string). Other fields are optional and ignored, and usually
-% include |copyright|, |author| and |license|.
+% The function |luatexbase.require_module()| may be used as a replacement to
+% |require()|. If only one argument is given, the only difference with
+% |require()| is it checks that the module properly identifies itself (as
+% explained below) with the same name.
 %
-% \bigskip
+% The second argument is optional; if used, it must be a
+% string\footnote{Previous versions of the package supported floating-point
+% version numbers as well, but it caused confusion with authors trying to use
+% version strings such as |0.3a| and probably isn't worth the trouble.}
+% containing a date in |YYYY//MM/DD| format which specifies the minimum
+% version of the module required.
 %
-% Functions for reporting are provided; similarly to \latex's |\PackageError|
-% etc. they take the module name as their first argument and include it in the
-% printed message in an appropriate way. The remaining arguments are passed to
-% |string.format()|, and the package name is prepended to each line of the
-% resulting string before it is output.
+% \begin{qcode}
+% luatexbase.provides_module(\meta{info})
+% \end{qcode}
+% This function is used by modules to identify themselves; the argument is a
+% table containing information about the module. The required field |name|
+% must contain the name of the module. It is recommended to provide a field
+% |date| with the same format as above. Optional fields |version| (number or
+% string) and |description| may be used if present. Other fields are ignored.
 %
-% The functions provided (all found in the |luatexbase| table) are
-% |module_error|, |module_warning|, |module_info| (writes to terminal and
-% log). Custom versions of this functions, not needing the first argument, are
-% returned (in the order: error, warning, info) by
-% |luatexbase.errwarinf|\parg{name} and by the |luatexbase.provides_module()|
-% functions.
+% If a date was required and a date is declared, then a warning is issued if
+% the required date is strictly newer than the declared date. A list of loaded
+% modules and their associated information is kept, and used to check the date
+% without reloading the module (since |require()| won't relaod it anyway).
+%
+% \begin{qcode}
+% luatexbase.module_error(\meta{name}, \meta{message}, ...)
+% luatexbase.module_warning(\meta{name}, \meta{message}, ...)
+% luatexbase.module_info(\meta{name}, \meta{message}, ...)
+% \end{qcode}
+% These functions are similar to \latex's |\PackageError|,
+% |\PackageWarningNoLine| and |\PackageInfo| in the way they format the
+% output. The first argument is the name of the current module; the remaining
+% arguments are passed to |string.format()|. No automatic line breaking is
+% done, you may still use |\n| as usual for that, and the name of the package
+% will be prepended to each output line.
+%
+% \begin{qcode}
+% local err, warn, info = luatexbase.errwarinf(\meta{name})
+% local err, warn, info = luatexbase.provides_module(\meta{name})
+% \end{qcode}
+% Customised versions of the above commands maybe obtained by invoking
+% |errwarinf()| and are also returned by |provides_module()|. They don't take
+% the name of the module as their first argument any more, so that you don't
+% need to repeat it all over the place. (Notice that |error| is the name of a
+% standard Lua function, so you may want to avoid overwriting it, hence the
+% use of |err| in the above example.)
+%
+% \subsection{Templates}
+%
+% Let me emphasize again that, while |luatexbase.require_module()| is meant to
+% be used as a replacement for |require()|, the function
+% |luatexbase.provides_module()| \emph{is not} a replacement for |module()|:
+% they just don't do the same thing (declaring information vs changing the
+% current name space).
+%
+% Now, here is how you module may begin:
+% \begin{verbatim}
+% local err, warn, info = luatexbase.provides_module({
+%     -- required
+%     -- recommended
+%     name = 'mymodule',
+%     date = '1970/01/01',
+%     version = 0.0, -- or version = '0.0a',
+%     description = 'a Lua module template',
+%     author = 'A. U. Thor',
+%     licence = 'LPPL v1.3+',
+% })
+%
+% module('mynamespace', package.seeall)
+% -- or any other method (see chapter 15 of PIL for examples)
+% \end{verbatim}
+%
+% Alternatively, if you don't want to assume \pk{luatexbase-modutils} is
+% loaded, you may load your module with:
+% \begin{verbatim}
+% (luatexbase.require_module or require)('mymodule')
+% \end{verbatim}
+% and begin your module's code with:
+% \begin{verbatim}
+% if luatexbase._provides_module then
+%     luatexbase.provides_module({
+%         -- required
+%         -- recommended
+%         name = 'mymodule',
+%         date = '1970/01/01',
+%         version = 0.0, -- or version = '0.0a',
+%         description = 'a Lua module template',
+%         author = 'A. U. Thor',
+%         licence = 'LPPL v1.3+',
+%     })
+% end
+%
+% module('mynamespace', package.seeall)
+% -- or any other method (see chapter 15 of PIL for examples)
+%
+% local function err(msg)
+%    -- etc.
+% \end{verbatim}
 %
 %    \section{Implementation}
 %
@@ -291,22 +376,16 @@ See source file '\inFileName' for details.
 \fi
 %    \end{macrocode}
 %
-%    Load \pk{luatexbase-loader} (hence \pk{luatexbase-compat}) and require
-%    supporting Lua module.
+%    Load \pk{luatexbase-loader} (hence \pk{luatexbase-compat}), require the
+%    supporting Lua module and make sure |luaescapestring| is available.
 %
 %    \begin{macrocode}
-\begingroup\expandafter\expandafter\expandafter\endgroup
-\expandafter\ifx\csname RequirePackage\endcsname\relax
-  \input luatexbase-loader.sty
-\else
+\ifdefined\RequirePackage
   \RequirePackage{luatexbase-loader}
+\else
+  \input luatexbase-loader.sty
 \fi
 \luatexbase@directlua{require('luatexbase.modutils')}
-%    \end{macrocode}
-%
-%    Make sure the primitives we need are available.
-%
-%    \begin{macrocode}
 \luatexbase@ensure@primitive{luaescapestring}
 %    \end{macrocode}
 %
@@ -357,7 +436,8 @@ See source file '\inFileName' for details.
 %
 %    \subsubsection{User macro}
 %
-%    Interface to the Lua function for module loading.
+%    Interface to the Lua function for module loading. Avoid passing a second
+%    argument to the function if empty (most probably not specified).
 %
 %    \begin{macrocode}
 \def\RequireLuaModule#1{%
