@@ -208,21 +208,23 @@ See source file '\inFileName' for details.
 % luatexbase.module_error(\meta{name}, \meta{message}, ...)
 % luatexbase.module_warning(\meta{name}, \meta{message}, ...)
 % luatexbase.module_info(\meta{name}, \meta{message}, ...)
+% luatexbase.module_log(\meta{name}, \meta{message}, ...)
 % \end{qcode}
-% These functions are similar to \latex's |\PackageError|,
-% |\PackageWarning| and |\PackageInfo| in the way they format the
-% output. The first argument is the name of the current module; the remaining
-% arguments are passed to |string.format()|. No automatic line breaking is
-% done, you may still use |\n| as usual for that, and the name of the package
-% will be prepended to each output line.
+% These functions are similar to \latex's |\PackageError|, |\PackageWarning|
+% and |\PackageInfo| in the way they format the output.  No automatic line
+% breaking is done, you may still use |\n| as usual for that, and the name of
+% the package will be prepended to each output line (except for |log| which is
+% intended for short messages in a non-verbose format).  The first argument
+% is the name of the current module; the remaining arguments are passed to
+% |string.format()|.
 %
 % Note that |module_error| raises an actual Lua error with |error()|, which
 % currently means a call stack will be dumped. While this may not look pretty,
 % at least it provides useful information for tracking the error down.
 %
 % \begin{qcode}
-% local err, warn, info = luatexbase.errwarinf(\meta{name})
-% local err, warn, info = luatexbase.provides_module(\meta{name})
+% local err, warn, info, log = luatexbase.errwarinf(\meta{name})
+% local err, warn, info, log = luatexbase.provides_module(\meta{name})
 % \end{qcode}
 % Customised versions of the above commands maybe obtained by invoking
 % |errwarinf()| and are also returned by |provides_module()|. They don't take
@@ -241,15 +243,16 @@ See source file '\inFileName' for details.
 %
 % Now, here is how you module may begin:
 % \begin{verbatim}
-% local err, warn, info = luatexbase.provides_module({
+% local err, warn, info, log = luatexbase.provides_module({
 %     -- required
+%     name        = 'mymodule',
 %     -- recommended
-%     name = 'mymodule',
-%     date = '1970/01/01',
-%     version = 0.0, -- or version = '0.0a',
+%     date        = '1970/01/01',
+%     version     = 0.0,            -- or version = '0.0a',
 %     description = 'a Lua module template',
-%     author = 'A. U. Thor',
-%     licence = 'LPPL v1.3+',
+%     -- optional and ignored
+%     author      = 'A. U. Thor',
+%     licence     = 'LPPL v1.3+',
 % })
 %
 % module('mynamespace', package.seeall)
@@ -266,13 +269,14 @@ See source file '\inFileName' for details.
 % if luatexbase._provides_module then
 %     luatexbase.provides_module({
 %         -- required
+%         name        = 'mymodule',
 %         -- recommended
-%         name = 'mymodule',
-%         date = '1970/01/01',
-%         version = 0.0, -- or version = '0.0a',
+%         date        = '1970/01/01',
+%         version     = 0.0,            -- or version = '0.0a',
 %         description = 'a Lua module template',
-%         author = 'A. U. Thor',
-%         licence = 'LPPL v1.3+',
+%         -- optional and ignored
+%         author      = 'A. U. Thor',
+%         licence     = 'LPPL v1.3+',
 %     })
 % end
 %
@@ -487,7 +491,7 @@ end
 %    Here are the reporting functions for the modules. An internal function is
 %    used for error messages, so that the calling level (last argument of
 %    |error()| remains constant using either |module_error()| or a custom
-%    version as return by |errwarinf()|.
+%    version as returned by |errwarinf()|.
 %
 %    \begin{macrocode}
 local function msg_format(msg_type, mod_name, ...)
@@ -519,13 +523,22 @@ function module_info(mod, ...)
 end
 %    \end{macrocode}
 %
+%    No line splitting or advanced formating here.
+%
+%    \begin{macrocode}
+function module_log(mod, msg, ...)
+  texio.write_nl('log', mod..': '..msg:format(...))
+end
+%    \end{macrocode}
+%
 %    Produce custom versions of the reporting functions.
 %
 %    \begin{macrocode}
 function errwarinf(name)
   return function(...) module_error_int(name, ...) end,
     function(...) module_warning(name, ...) end,
-    function(...) module_info(name, ...) end
+    function(...) module_info(name, ...) end,
+    function(...) module_log(name, ...) end
 end
 %    \end{macrocode}
 %
@@ -582,13 +595,14 @@ end
 %
 %    \begin{macrocode}
 %<*testdummy>
-local err, warn, info = luatexbase.provides_module {
+local err, warn, info, log = luatexbase.provides_module {
   name        = 'test-modutils',
   date        = '2000/01/01',
   version     = 1,
   description = 'dummy test package',
 }
 info('It works!\nOh, rly?\nYeah rly!')
+log("I'm a one-line info.")
 %</testdummy>
 %    \end{macrocode}
 %

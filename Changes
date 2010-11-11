@@ -11,9 +11,11 @@ merge with luatex.sty. Afterwards, no other BI change is to be expected.
           \RequireLuaModule with a unified syntax.
         - [BI] luatexbase.use_module removed (use luatexbase.require_module with
           a single argument instead).
-        - [BI] removed module_log & module_term functions.
+        - [BI] luatexbase.module_term removed.
         - [BI] removed support for version check using a floating point
           number, only date is supported now.
+        - module_{error,warning,info,log} now apply string.format
+          automatically
         - date, version and description are now optional.
         - improved formatting of messages.
         - luatexbase.require_module now returns curstom err/war/inf functions.
