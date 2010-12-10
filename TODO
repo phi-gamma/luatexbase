@@ -1,16 +1,3 @@
-Version 0.3
-===========
-
-general
--------
-
-- `make check` for luaotfload & fontspec (lltxb branch)
-- synchronize release
-
-
-Later
-=====
-
 all
 ---
 
@@ -28,6 +15,12 @@ cctb
 ----
 
 - support for unicode-letters?
+- logic from Heiko's luatex.sty?
+
+mcb
+---
+
+- add an analogue of `callback.find()`, see #4
 
 bytecode registers
 ------------------
