@@ -6,6 +6,11 @@ all
 - regression checks on the results of the tests (sed+diff the log)
 - add debug messages to be used in the test suite?
 
+compat
+------
+
+- clarify doc/comments about relying on etex/pdf primitives
+
 modutils
 --------
 
