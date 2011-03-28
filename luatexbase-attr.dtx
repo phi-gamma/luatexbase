@@ -152,12 +152,12 @@ See source file '\inFileName' for details.
 % as |tex.atrribute.fooattr|, but not the attribute number).
 %
 % There are several ways to work around this. For example, it is possible to
-% extract the number at any time from the |\meaning| of |\foobar|.
+% extract the number at any time from the |\meaning| of |\fooattr|.
 % Alternatively, one could look at |\the\allocationnumber| just after the
 % definition of |\fooattr| and remember it in a Lua variable. For your
 % convenience, this is automatically done by |\newluatexattribute|: the number
 % is remembered in a dedicated Lua table so that you can get it as
-% |luatexbase.attributes.foobar| (mind the absence of backslash here) at any
+% |luatexbase.attributes.fooattr| (mind the absence of backslash here) at any
 % time.
 %
 % Also, two Lua functions are provided that are analogous to the above \tex
@@ -399,8 +399,8 @@ end
 %    \section{Test files}
 %
 %    The tests done are very basic: we just make sure that the package loads
-%    correctly and the macros don't generate any error, under both LaTeX en
-%    Plain TeX. We also check that the attribute's number is remembered well,
+%    correctly and the macros don't generate any error, under both \latex and
+%    Plain \tex. We also check that the attribute's number is remembered well,
 %    independently of the current value of |\escapechar|.
 %
 %    \begin{macrocode}
