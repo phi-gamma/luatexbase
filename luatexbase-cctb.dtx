@@ -289,18 +289,8 @@ See source file '\inFileName' for details.
 %
 %    \subsubsection{Primitives needed}
 %
-%    Load \pk{luatexbase-compat}.
-%
-%    \begin{macrocode}
-\begingroup\expandafter\expandafter\expandafter\endgroup
-\expandafter\ifx\csname RequirePackage\endcsname\relax
-  \input luatexbase-compat.sty
-\else
-  \RequirePackage{luatexbase-compat}
-\fi
-%    \end{macrocode}
-%
-%    Make sure the primitives we need are available.
+%    \pk{luatexbase-compat} is already loaded; just make sure the primitives
+%    we need are available.
 %
 %    \begin{macrocode}
 \luatexbase@ensure@primitive{luaescapestring}
@@ -312,14 +302,15 @@ See source file '\inFileName' for details.
 %    \subsubsection{User macros}
 %
 %    The allocation macro. Allocate tables starting with 1, since table 0 is
-%    reserved for IniTeX catcodes by LuaTeX.
+%    the default table. Allocate only odd numbers to allow using even numbers
+%    as a stack.
 %
 %    \begin{macrocode}
 \newcount\lltxb@catcodetable@alloc
-\lltxb@catcodetable@alloc\z@
+\lltxb@catcodetable@alloc\m@ne
 \def\newluatexcatcodetable#1{%
   \ifnum\lltxb@catcodetable@alloc<65535\relax
-    \global\advance\lltxb@catcodetable@alloc\@ne
+    \global\advance\lltxb@catcodetable@alloc\tw@
     \allocationnumber\lltxb@catcodetable@alloc
     \global\chardef#1\allocationnumber
     \luatexinitcatcodetable\allocationnumber
