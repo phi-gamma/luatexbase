@@ -4,6 +4,8 @@
 \usepackage[T1]{fontenc}
 \usepackage{textcomp}
 \usepackage{lmodern}
+\usepackage{booktabs}
+\usepackage{enumitem}
 \usepackage{xspace}
 \usepackage[a4paper]{geometry}
 \usepackage[english]{babel}
@@ -34,14 +36,9 @@
 \newcommand \pk         {\textsf}
 \newcommand \cmdname    {\texttt}
 
-% compact version of itemize
-\newenvironment{itemize*}{%
-  \itemize
-  \setlength\itemsep{0pt}%
-  \setlength\parskip{0pt}%
-}{%
-  \enditemize
-}
+% compact lists
+\setitemize{itemsep=0pt, parsep=0pt}
+\setdescription{itemsep=0pt, parsep=0pt}
 
 % no so nice, but anyway...
 \newenvironment{qcode}{%

@@ -11,13 +11,6 @@ test suite
 - add debug messages to be used in the test suite?
 - import test files from luatex.sty
 
-luatex.sty
-----------
-
-- do it (depends on cctb update)
-- provide \newcatcodetable & all for now, used in l3luatex.sty (to be
-  investigated), with a depcracation warning
-
 compat
 ------
 

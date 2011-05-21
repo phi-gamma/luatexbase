@@ -151,7 +151,7 @@ See source file '\inFileName' for details.
 % used as a basis).
 %
 % For your convenience, a few catcode tables are predefined:
-% \begin{itemize*}
+% \begin{itemize}
 % \item |\CatcodeTableIniTeX|: Ini\tex catcodes.
 % \item |\CatcodeTableString|: the catcode regime used by |\string| and
 % |\meaning|: everything has catcode 12, except space (U+0020) that has
@@ -163,7 +163,7 @@ See source file '\inFileName' for details.
 % Be aware that this does not provide the exact same environment as
 % |\ExplSyntaxOn|: most noticibly, some booleans are not set, and
 % |\endlinechar| is not adjusted (it should be 32).
-% \end{itemize*}
+% \end{itemize}
 %
 % \subsection{Access from Lua}
 %
@@ -187,14 +187,14 @@ See source file '\inFileName' for details.
 % rest of your Lua code.
 %
 % Also, nicknames are available for the predefined catcode tables:
-% \begin{itemize*}
+% \begin{itemize}
 % \item |CatcodeTableIniTeX| = |ini|,
 % \item |CatcodeTableString| = |string|,
 % \item |CatcodeTableOther| = |other|,
 % \item |CatcodeTableLaTeX| = |latex|,
 % \item |CatcodeTableLaTeXAtLetter| = |latex-atletter| = |latex-package|,
 % \item |CatcodeTableExpl| = |expl| = |expl3|,
-% \end{itemize*}
+% \end{itemize}
 %
 % \subsection{High-level stack interface}
 %

@@ -1,19 +1,17 @@
 % \iffalse meta-comment
 %
-% Written in 2009, 2010 by Manuel Pégourié-Gonnard and Élie Roux.
-%     <mpg@elzevir.fr>
-%     <elie.roux@telecom-bretagne.eu>
+% Written in 2011 by Manuel Pégourié-Gonnard <mpg@elzevir.fr>
 %
 % This work is under the CC0 license.
 %
-% This work consists of the main source file luatexbase.dtx
+% This work consists of the main source file luatex.dtx
 % and the derived files
-%    luatexbase.sty
+%    luatex.sty
 %
 % Unpacking:
-%    tex luatexbase.dtx
+%    tex luatex.dtx
 % Documentation:
-%    pdflatex luatexbase.dtx
+%    pdflatex luatex.dtx
 %
 %<*ignore>
 \begingroup
@@ -38,13 +36,13 @@ See source file '\inFileName' for licence and contact information.
 
 \generate{%
   \usedir{tex/luatex/luatexbase}%
-  \file{luatexbase.sty}{\from{luatexbase.dtx}{texpackage}}%
+  \file{luatex.sty}{\from{luatex.dtx}{texpackage}}%
 }
 
 \generate{%
   \usedir{doc/luatex/luatexbase}%
-  \file{test-base-plain.tex}{\from{luatexbase.dtx}{testplain}}%
-  \file{test-base-latex.tex}{\from{luatexbase.dtx}{testlatex}}%
+  \file{test-luatex-plain.tex}{\from{luatex.dtx}{testplain}}%
+  \file{test-luatex-latex.tex}{\from{luatex.dtx}{testlatex}}%
 }
 
 \obeyspaces
@@ -53,7 +51,7 @@ See source file '\inFileName' for licence and contact information.
 \Msg{* To finish the installation you have to move the following}
 \Msg{* files into a directory searched by TeX:}
 \Msg{*}
-\Msg{*     luatexbase.sty}
+\Msg{*     luatex.sty}
 \Msg{*}
 \Msg{* Happy TeXing!}
 \Msg{*}
@@ -70,7 +68,7 @@ See source file '\inFileName' for licence and contact information.
 \newcommand\subpk[1]{%
   \item[\href{luatexbase-#1.pdf}{luatexbase-#1}\normalfont:]}
 \begin{document}
-  \DocInput{luatexbase.dtx}%
+  \DocInput{luatex.dtx}%
 \end{document}
 %</driver>
 % \fi
@@ -93,20 +91,31 @@ See source file '\inFileName' for licence and contact information.
 %   Grave accent  \`     Left brace    \{     Vertical bar  \|
 %   Right brace   \}     Tilde         \~}
 %
-% \pkdate{luatexbase}{v0.3 2010-05-27}
+% \author{%
+%   Heiko Oberdiek \& Manuel P\'egouri\'e-Gonnard\\
+%   Support: \email{lualatex-dev@tug.org}%
+% }
+% \hypersetup{%
+%   pdfauthor = {Manuel Pegourie-Gonnard and Heiko Oberdiek},
+% }
+% \pkdate{luatex}{v0.5 2011-05-21}
 %
 % \maketitle
 %
 % \begin{abstract}
 % This package provides resource management for the LuaTeX macro programmer.
-% It is divided in sub-packages which can be used independantly if desired.
+%
+% It is now a wrapper around \pk{luatexbase} subpackages, with additinal names
+% for some macros in order to ensure compatibility with previous versions of
+% this package. You are encouraged to use \pk{luatexbase} directly and switch
+% to the new names.
 % \end{abstract}
 %
 % \tableofcontents
 %
 % \section{Documentation}
 %
-% The \pk{luatexbase} package consists of the following sub-packages:
+% The \pk{luatex} package loads the following sub-packages of \pk{luatexbase}:
 % \begin{description}
 %   \subpk{compat} compatibility helpers for \verb+\directlua+, primitive
 %   names and version information from Lua.
@@ -117,19 +126,24 @@ See source file '\inFileName' for licence and contact information.
 %   \emph{\`a la} \pk{etex}.
 %   \subpk{cctb} catcode table allocation.
 %   \subpk{attr} attribute allocation.
-%   \subpk{mcb} callbacks extensions allowing to register many functions in a
-%   single callback, and declare new callbacks for packages.
-%   \subpk{modutils} Lua module declaration, including version checks.
 % \end{description}
 %
-% The package is mostly stable: it is unlikely that backward-incompatible
-% changes will be made in the future, other than necessary for merging with
-% \pk{luatex.sty}, with which a few sub-packages strongly overlap. If they do
-% happen, such changes will be announced on the development list, and clearly
-% identified in the \file{Changes} file.
+% In addition, it defines the following synonyms:
+% \begin{center}
+% \begin{tabular}{rl}
+% \toprule
+% Deprecated name & New name \\
+% \midrule
+% \cs{newattribute} & \cs{newluatexattribute} \\
+% \cs{setattribute} & \cs{setluatexattribute} \\
+% \cs{unsetattribute} & \cs{unsetluatexattribute} \\
+% \cs{newcatcodetable} & \cs{newluatexcatcodetable} \\
+% \bottomrule
+% \end{tabular}
+% \end{center}
+% The deprecated names trigger a warning and will be removed in a future
+% version.
 %
-% All sub-packages are tested with \luatex 0.25.4 to 0.60.x and formats based
-% on \plaintex or \latex, as included in \texlive 2008, 2009, and 2010.
 %
 %    \section{Implementation}
 %
@@ -142,8 +156,8 @@ See source file '\inFileName' for licence and contact information.
 %    Reload protection, especially for \plaintex.
 %
 %    \begin{macrocode}
-                \csname lltxb@core@loaded\endcsname
-\expandafter\let\csname lltxb@core@loaded\endcsname\endinput
+                \csname lltxb@luatex@loaded\endcsname
+\expandafter\let\csname lltxb@luatex@loaded\endcsname\endinput
 %    \end{macrocode}
 %
 %    Catcode defenses.
@@ -180,7 +194,7 @@ See source file '\inFileName' for licence and contact information.
   \y  95 12 % _ (other)
   \y  96 12 % `
   \edef\y#1{\endgroup\edef#1{\the\toks0\relax}\x}%
-\expandafter\y\csname lltxb@core@AtEnd\endcsname
+\expandafter\y\csname lltxb@luatex@AtEnd\endcsname
 %    \end{macrocode}
 %
 %    Package declaration.
@@ -193,7 +207,7 @@ See source file '\inFileName' for licence and contact information.
     \let\x\ProvidesPackage
   \fi
 \expandafter\endgroup
-\x{luatexbase}[2010/10/06 v0.3 Module utilities for LuaTeX]
+\x{luatex}[2010/10/06 v0.3 Module utilities for LuaTeX]
 %    \end{macrocode}
 %
 %    Make sure \luatex is used.
@@ -214,11 +228,11 @@ See source file '\inFileName' for licence and contact information.
       \let\x\PackageError
     \fi
   \expandafter\endgroup
-  \x{luatexbase}{LuaTeX is required for this package. Aborting.}{%
+  \x{luatex}{LuaTeX is required for this package. Aborting.}{%
     This package can only be used with the LuaTeX engine^^J%
     (command `lualatex' or `luatex').^^J%
     Package loading has been stopped to prevent additional errors.}
-  \lltxb@core@AtEnd
+  \lltxb@luatex@AtEnd
   \expandafter\endinput
 \fi
 %    \end{macrocode}
@@ -233,23 +247,52 @@ See source file '\inFileName' for licence and contact information.
   \input luatexbase-regs.sty
   \input luatexbase-attr.sty
   \input luatexbase-cctb.sty
-  \input luatexbase-mcb.sty
-  \input luatexbase-modutils.sty
 \else
   \RequirePackage{luatexbase-compat}
   \RequirePackage{luatexbase-loader}
   \RequirePackage{luatexbase-regs}
   \RequirePackage{luatexbase-attr}
   \RequirePackage{luatexbase-cctb}
-  \RequirePackage{luatexbase-mcb}
-  \RequirePackage{luatexbase-modutils}
 \fi
+%    \end{macrocode}
+%
+%    \subsection{Compatibility names}
+%
+%    Defined a synonym, triggerring a one-time warning.
+%
+%    \begin{macrocode}
+\def\lltxb@synonym#1#2{%
+  \def#1{%
+    \begingroup
+    \ifdefined\PackageWarning
+      \let\x\PackageWarning
+    \else
+      \def\x####1####2{%
+        \begingroup \endlinechar10
+        \message{Package ####1 warning: ####2}}%
+        \endgroup
+    \fi
+    \expandafter\endgroup
+    \x{luatex}{\string#1 is deprecated^^J%
+      and will be removed in the next version of the package.^^J%
+      Please use \string#2 instead.}
+    \let#1#2%
+    #1}}
+%    \end{macrocode}
+%
+%    Now the list of synonyms.
+%
+%    \begin{macrocode}
+\lltxb@synonym \newattribute    \newluatexattribute
+\lltxb@synonym \setattribute    \setluatexattribute
+\lltxb@synonym \unsetattribute  \unsetluatexattribute
+\lltxb@synonym \newcatcodetable \newluatexcatcodetable
 %    \end{macrocode}
 %
 %    This is the end, my friend\dots the end.
 %
 %    \begin{macrocode}
-\lltxb@core@AtEnd
+\lltxb@luatex@AtEnd
 %</texpackage>
 %    \end{macrocode}
 %
@@ -258,8 +301,8 @@ See source file '\inFileName' for licence and contact information.
 %    Very minimal, just check that the package correctly loads.
 %
 %    \begin{macrocode}
-%<testplain>\input luatexbase.sty
-%<testlatex>\RequirePackage{luatexbase}
+%<testplain>\input luatex.sty
+%<testlatex>\RequirePackage{luatex}
 %<testplain>\bye
 %<testlatex>\stop
 %    \end{macrocode}
