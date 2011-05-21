@@ -143,8 +143,8 @@ check-base: $(UNPACKED_BASE)
 	lualatex --interaction=batchmode test-base-latex.tex >/dev/null
 
 check-luatex: install-runfiles
-	#$(TESTENV) lualatex --interaction=batchmode test-luatex1.tex >/dev/null
-	#$(TESTENV) lualatex --interaction=batchmode test-luatex2.tex >/dev/null
+	$(TESTENV) luatex --interaction=batchmode test-luatex1.tex >/dev/null
+	$(TESTENV) lualatex --interaction=batchmode test-luatex2.tex >/dev/null
 	#$(TESTENV) lualatex --interaction=batchmode test-luatex3.tex >/dev/null
 	#$(TESTENV) lualatex --interaction=batchmode test-luatex4.tex >/dev/null
 	$(TESTENV) luatex --interaction=batchmode test-luatex5.tex >/dev/null
