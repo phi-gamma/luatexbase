@@ -23,7 +23,8 @@ UNPACKED_MODUTILS = luatexbase-modutils.sty modutils.lua test-modutils.lua \
 UNPACKED_COMPAT = luatexbase-compat.sty \
 			test-compat-plain.tex test-compat-latex.tex
 UNPACKED_BASE = luatexbase.sty test-base-plain.tex test-base-latex.tex
-UNPACKED_LUATEX = luatex.sty test-luatex-plain.tex test-luatex-latex.tex
+UNPACKED_LUATEX = luatex.sty test-luatex1.tex test-luatex2.tex \
+		  test-luatex3.tex test-luatex4.tex test-luatex5.tex
 UNPACKED = $(UNPACKED_MCB) $(UNPACKED_REGS) $(UNPACKED_ATTR) $(UNPACKED_CCTB) \
 		   $(UNPACKED_LOADER) $(UNPACKED_MODUTILS) $(UNPACKED_COMPAT) \
 		   $(UNPACKED_BASE) $(UNPACKED_LUATEX)
