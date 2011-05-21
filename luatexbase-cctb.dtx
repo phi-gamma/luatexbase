@@ -136,7 +136,7 @@ See source file '\inFileName' for details.
 % (once they are allocated), two helper macros are available.
 %
 % \begin{quote}
-% \cs{setcatcoderange}\marg{from}\marg{to}\marg{value}
+% \cs{SetCatcodeRange}\marg{from}\marg{to}\marg{value}
 % \end{quote}
 % Set all characters code in the range \meta{from}--\meta{to} to the given
 % catcode \meta{value}.
@@ -456,7 +456,7 @@ See source file '\inFileName' for details.
 %    Set the catcodes for a range of characters.
 %
 %    \begin{macrocode}
-\def\setcatcoderange#1#2#3{%
+\def\SetCatcodeRange#1#2#3{%
   \edef\luaSCR@temp{%
     \noexpand\@tempcnta=\the\@tempcnta
     \noexpand\@tempcntb=\the\@tempcntb
@@ -470,6 +470,29 @@ See source file '\inFileName' for details.
     \advance\@tempcnta\@ne
   \repeat
   \luaSCR@temp}
+%    \end{macrocode}
+%
+%    Make \cs{SetCatcodeRange} available with its old name.
+%
+%    \begin{macrocode}
+\def\lltxb@synonym#1#2{%
+  \def#1{%
+    \begingroup
+    \ifdefined\PackageWarning
+      \let\x\PackageWarning
+    \else
+      \def\x####1####2{%
+        \begingroup \endlinechar10
+        \message{Package ####1 warning: ####2}%
+        \endgroup}
+    \fi
+    \expandafter\endgroup
+    \x{luatex}{\string#1 is deprecated^^J%
+      and will be removed in the next version of the package.^^J%
+      Please use \string#2 instead.}
+    \let#1#2%
+    #1}}
+\lltxb@synonym \setcatcoderange \SetCatcodeRange
 %    \end{macrocode}
 %
 %    Set a catcode table.
@@ -499,8 +522,8 @@ See source file '\inFileName' for details.
   \catcode0   12 % nul
   \catcode13  12 % carriage return
   \catcode37  12 % percent
-  \setcatcoderange{65}{90}{12}% A-Z
-  \setcatcoderange{97}{122}{12}% a-z
+  \SetCatcodeRange{65}{90}{12}% A-Z
+  \SetCatcodeRange{97}{122}{12}% a-z
   \catcode92  12 % backslash
   \catcode127 12 }
 %    \end{macrocode}
@@ -518,7 +541,7 @@ See source file '\inFileName' for details.
 \newluatexcatcodetable\CatcodeTableLaTeX
 \setluatexcatcodetable\CatcodeTableLaTeX{%
   \luatexcatcodetable\CatcodeTableIniTeX
-  \setcatcoderange{0}{31}{15}%
+  \SetCatcodeRange{0}{31}{15}%
   \catcode9   10 % tab
   \catcode12  13 % form feed
   \catcode13  5  % carriage return

@@ -272,8 +272,8 @@ See source file '\inFileName' for licence and contact information.
     \else
       \def\x####1####2{%
         \begingroup \endlinechar10
-        \message{Package ####1 warning: ####2}}%
-        \endgroup
+        \message{Package ####1 warning: ####2}%
+        \endgroup}%
     \fi
     \expandafter\endgroup
     \x{luatex}{\string#1 is deprecated^^J%
