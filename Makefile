@@ -142,9 +142,12 @@ check-base: $(UNPACKED_BASE)
 	luatex --interaction=batchmode test-base-plain.tex >/dev/null
 	lualatex --interaction=batchmode test-base-latex.tex >/dev/null
 
-check-luatex: $(UNPACKED_LUATEX)
-	luatex --interaction=batchmode test-luatex-plain.tex >/dev/null
-	lualatex --interaction=batchmode test-luatex-latex.tex >/dev/null
+check-luatex: install-runfiles
+	#$(TESTENV) lualatex --interaction=batchmode test-luatex1.tex >/dev/null
+	#$(TESTENV) lualatex --interaction=batchmode test-luatex2.tex >/dev/null
+	#$(TESTENV) lualatex --interaction=batchmode test-luatex3.tex >/dev/null
+	#$(TESTENV) lualatex --interaction=batchmode test-luatex4.tex >/dev/null
+	#$(TESTENV) luatex --interaction=batchmode test-luatex5.tex >/dev/null
 
 $(CTAN_ZIP): $(SOURCE) $(COMPILED) $(TDS_ZIP)
 	@echo "Making $@ for CTAN upload."
