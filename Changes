@@ -4,6 +4,10 @@ The [BI] tag signals backward-incompatible changes.
 Starting with  v0.3, the only possible source of such changes is the upcoming
 merge with luatex.sty. Afterwards, no other BI change is to be expected.
 
+2011/05/21 v0.31
+    attr
+        - Bugfix: \unsetluatexattribute didn't work (reported by Dohyun Kim)
+
 2010/10/10 v0.3
     all   not using LuaTeX results in an error (formerly a warning)
     modutils
