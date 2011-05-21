@@ -501,7 +501,7 @@ See source file '\inFileName' for licence and contact information.
 %    \begin{macrocode}
 \begin{qstest}{CatcodeTableNumStack}{CatcodeTableNumStack}
   \def\TestStack#1{%
-    \Expect*{\LuT@NumStack}{#1}%
+    \Expect*{\lltxb@cctb@numstack}{#1}%
   }%
   \TestStack{0}%
   \PushCatcodeTableNumStack
@@ -517,7 +517,7 @@ See source file '\inFileName' for licence and contact information.
       \PopCatcodeTableNumStack
       \TestStack{0}%
       \def\TestWarning{Missing empty stack warning}%
-      \def\@PackageWarning#1#2{\def\TestWarning{empty stack}}%
+      \def\PackageWarning#1#2{\def\TestWarning{empty stack}}%
       \PopCatcodeTableNumStack
       \TestStack{0}%
       \Expect*{\TestWarning}{empty stack}%
@@ -554,7 +554,7 @@ See source file '\inFileName' for licence and contact information.
   \TestStack{0}%
   \begingroup
     \def\TestError{Missing error}%
-    \def\@PackageError#1#2#3{%
+    \def\errmessage#1{%
       \def\TestError{Empty stack}%
     }%
     \DecCatcodeTableStack
@@ -571,7 +571,7 @@ See source file '\inFileName' for licence and contact information.
   \def\TestStacks#1#2#3{%
     \Expect*{\the\luatexcatcodetable}{#1}%
     \Expect*{\the\CatcodeTableStack}{#2}%
-    \Expect*{\LuT@NumStack}{#3}%
+    \Expect*{\lltxb@cctb@numstack}{#3}%
   }%
   \TestStacks{0}{0}{0}%
   \catcode`\|=7 %
@@ -591,14 +591,14 @@ See source file '\inFileName' for licence and contact information.
   \newattribute\TestAttr
   \Expect*{\meaning\TestAttr}%
          *{\string\attribute\number\allocationnumber}%
-  \Expect*{\the\allocationnumber}{0}%
+  \Expect*{\the\allocationnumber}{1}%
   \begingroup
     \newattribute\TestAttr
-    \Expect*{\the\allocationnumber}{1}%
+    \Expect*{\the\allocationnumber}{2}%
   \endgroup
-  \Expect*{\the\allocationnumber}{0}%
-  \Expect*{\meaning\TestAttr}*{\string\attribute1}%
-  \Expect*{\the\TestAttr}*{\number\LuT@UnsetAttributeValue}%
+  \Expect*{\the\allocationnumber}{1}%
+  \Expect*{\meaning\TestAttr}*{\string\attribute2}%
+  \Expect*{\the\TestAttr}*{\number\lltxb@attr@unsetvalue}%
   \def\Test#1{%
     \setattribute\TestAttr{#1}%
     \Expect*{\the\TestAttr}{#1}%
@@ -608,12 +608,12 @@ See source file '\inFileName' for licence and contact information.
   \Test{-1}%
   \Test{123}%
   \unsetattribute\TestAttr
-  \Expect*{\the\TestAttr}*{\number\LuT@UnsetAttributeValue}%
+  \Expect*{\the\TestAttr}*{\number\lltxb@attr@unsetvalue}%
   \begingroup
-    \Expect*{\the\TestAttr}*{\number\LuT@UnsetAttributeValue}%
+    \Expect*{\the\TestAttr}*{\number\lltxb@attr@unsetvalue}%
     \Test{1234}%
   \endgroup
-  \Expect*{\the\TestAttr}*{\number\LuT@UnsetAttributeValue}%
+  \Expect*{\the\TestAttr}*{\number\lltxb@attr@unsetvalue}%
 \end{qstest}
 %    \end{macrocode}
 %

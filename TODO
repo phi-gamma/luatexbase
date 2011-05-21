@@ -1,15 +1,13 @@
 Next actions
 ------------
 
-- pass the test suite of luatex.sty
-- Coordinate release with Heiko.
+- Coordinate release with Heiko (luatex-loader?)
 
 test suite
 ----------
 
 - regression checks on the results of the tests (sed+diff the log)
 - add debug messages to be used in the test suite?
-- import test files from luatex.sty
 
 compat
 ------
