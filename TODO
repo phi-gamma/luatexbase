@@ -1,7 +1,6 @@
 Next actions
 ------------
 
-1. Do the catcode table stack à la luatex.sty.
 2. Merge with luatex.sty (inc test suite).
 3. Coordinate release with Heiko.
 
@@ -33,7 +32,6 @@ modutils
 cctb
 ----
 
-- stack à la luatex.sty
 - support for unicode-letters?
 
 mcb
