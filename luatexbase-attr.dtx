@@ -320,14 +320,13 @@ See source file '\inFileName' for details.
   \fi}
 %    \end{macrocode}
 %
-%    Helper macro |\unsetluatexattribute|: wrapper around the Lua function.
+%    Helper macro |\unsetluatexattribute|.
 %
 %    \begin{macrocode}
+\newcount\lltxb@attr@unsetvalue
+\lltxb@attr@unsetvalue=\ifnum\luatexversion<37 -1\else -2147483647\fi\relax
 \def\unsetluatexattribute#1{%
-  \begingroup\escapechar\m@ne \edef\x{\endgroup
-    \noexpand\luatexbase@directlua{%
-      luatexbase.unset_attribute("\luatexluaescapestring{\string#1}")}%
-  }\x}
+  #1\lltxb@attr@unsetvalue}
 %    \end{macrocode}
 %
 %    And now the trivial helper macro.
