@@ -2,6 +2,7 @@
 *.lua
 *.pdf
 luatexbase*.sty
+luatex.sty
 test-*
 texmf/
 
