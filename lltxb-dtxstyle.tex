@@ -34,6 +34,15 @@
 \newcommand \pk         {\textsf}
 \newcommand \cmdname    {\texttt}
 
+% compact version of itemize
+\newenvironment{itemize*}{%
+  \itemize
+  \setlength\itemsep{0pt}%
+  \setlength\parskip{0pt}%
+}{%
+  \enditemize
+}
+
 % no so nice, but anyway...
 \newenvironment{qcode}{%
   \quote \ttfamily \catcode`\_=12\relax \obeylines

@@ -120,15 +120,18 @@ See source file '\inFileName' for details.
 % \begin{abstract}
 % In addition to the registers existing in \tex and \etex, \luatex introduces
 % a new concept: catcode tables. This package takes care of catcode table
-% allocation just like Plain TeX and LaTeX do for other registers.
+% allocation just like Plain TeX and LaTeX do for other registers. It also
+% provides a few handy macros from common use cases.
 % \end{abstract}
 %
 % \tableofcontents
 %
 % \section{Documentation}
 %
+% \subsection{Allocation and setting}
+%
 % The main macro defined here is |\newluatexcatcodetable|. It behaves the same
-% as |\newbox|. Additonally, the newly allocated catcode table is initialised
+% as |\newbox|. Additionally, the newly allocated catcode table is initialised
 % to the catcodes of Ini\tex.  In order to help you define the catcode tables
 % (once they are allocated), two helper macros are available.
 %
@@ -144,10 +147,11 @@ See source file '\inFileName' for details.
 % Set a previously allocated \meta{table} to the catcodes given by executing
 % \meta{catcode statements}. Note that \meta{table} must not be the current
 % active catcode table. You may, however, load another catcode table in your
-% \meta{catcode statements}.
+% \meta{catcode statements} (if you don't, then the current catcodes will be
+% used as a basis).
 %
-% For your convenience, a few catcode tables are prefined:
-% \begin{itemize}
+% For your convenience, a few catcode tables are predefined:
+% \begin{itemize*}
 % \item |\CatcodeTableIniTeX|: Ini\tex catcodes.
 % \item |\CatcodeTableString|: the catcode regime used by |\string| and
 % |\meaning|: everything has catcode 12, except space (U+0020) that has
@@ -159,24 +163,108 @@ See source file '\inFileName' for details.
 % Be aware that this does not provide the exact same environment as
 % |\ExplSyntaxOn|: most noticibly, some booleans are not set, and
 % |\endlinechar| is not adjusted (it should be 32).
-% \end{itemize}
+% \end{itemize*}
 %
-% Various Lua function accept a catcode table number as argument. In order to
-% use them, the package writer needs to know the number of an allocated
-% catcode table. Since |\chardef| is used for the definition of the control
-% sequence, this is rather easy to do. However, for extra ease of use, the
-% numbers are also directly accessible from Lua as the value of the table
-% |luatexbase.catcodetables|, whose keys is the name of the control sequence
-% (without any leading backslash). Moreover, nickames are available for the
-% predefined catcode tables:
-% \begin{itemize}
+% \subsection{Access from Lua}
+%
+% Various Lua functions, such as |tex.print| accept a catcode table number as
+% argument. In order to use in Lua the catcode tables allocated in \tex, the
+% package writer needs to know their number.  Since |\chardef| is used for the
+% definition of the control sequence, this is rather easy to do. However, for
+% extra ease of use, the numbers are also directly accessible from Lua as the
+% value of the table |luatexbase.catcodetables|, whose keys is the name of the
+% control sequence (without any leading backslash). For example, after
+% \begin{quote}
+% |\newluatexcatcodetable\mycatcodes|
+% \end{quote}
+% the variable |luatexbase.catcodetables.mycatcodes| will hold the number of
+% the catcode table |\mycatcodes|. You will usually want to do
+% \begin{quote}
+% |local mycatcodes = luatexbase.catcodetables.mycatcodes|
+% \end{quote}
+% at the beginning of your Lua module (assuming it is loaded after the catcode
+% table has been allocated) and then use |tex.print(mycatcodes, ...)| in the
+% rest of your Lua code.
+%
+% Also, nicknames are available for the predefined catcode tables:
+% \begin{itemize*}
 % \item |CatcodeTableIniTeX| = |ini|,
 % \item |CatcodeTableString| = |string|,
 % \item |CatcodeTableOther| = |other|,
 % \item |CatcodeTableLaTeX| = |latex|,
 % \item |CatcodeTableLaTeXAtLetter| = |latex-atletter| = |latex-package|,
 % \item |CatcodeTableExpl| = |expl| = |expl3|,
-% \end{itemize}
+% \end{itemize*}
+%
+% \subsection{High-level stack interface}
+%
+% In many situations, you want to ensure a proper set of catcodes for some
+% time, then go back to the previous catcodes without using a group. The
+% obvious use case is a package, which may be loaded while unexpected
+% catcodes are active. A pair of macros is provided to deal precisely with
+% this situation.
+% \begin{quote}
+% \cs{BeginCatcodeRegime}\marg{catcode table}\\
+% \meta{code}\\
+% \cs{EndCatcodeRegime}
+% \end{quote}
+% \cs{BeginCatcodeRegime} remembers the current catcode table, then
+% initializes a new one with a copy of the \meta{catcode table} given (so that
+% this table is not changed by anything in \meta{code}), and makes it the
+% active table. \cs{EndCatcodeRegime} restores the previous catcode table.
+%
+% For example, a \latex package might do:
+% \begin{quote}
+% |\BeginCatcodeRegime\CatcodeTableLaTeXAtLetter|\\
+% |% package code|\\
+% |\EndCatcodeRegime|
+% \end{quote}
+% Every catcode change made in the package code will be lost avec
+% \cs{EndCatcodeRegime}; if you want them to survive, please use
+% \cs{AtEndOfPackage} or \cs{AtBeginDocument}.
+%
+% By the way, you may add catcode statements in the argument of
+% \cs{BeginCatcodeRegime} after the name of a catcode table. So the first line
+% of the previous example is equivalent to
+% \begin{quote}
+% |\BeginCatcodeRegime{\CatcodeTableLaTeX \makeatletter}|
+% \end{quote}
+%
+% \subsection{Low-level stack interface}
+%
+% The previous macros use internally two stacks : the first on holds the
+% numbers of the active catcodes tables, so remembering the current table
+% means pushing its number on the stack, and restoring the previously active
+% table means popping it off the stack. This is done with:
+% \begin{quote}
+% \cs{PushCatcodeTableNumStack}\\
+% \cs{PopCatcodeTableNumStack}
+% \end{quote}
+% Note that \cs{PushCatcodeTableNumStack} doesn't change current catcodes
+% but \cs{PopCatcodeTableNumStack} does.
+%
+% The second stack consists of temporary tables, mainly used to hold copies of
+% existing tables. A temporary table are allocated with
+% \cs{IncCatcodeTableStack}, accessed with \cs{CatcodeTableStack} and the
+% freed with \cs{DecCatcodeTableStack}, none of which changes the current
+% table.
+%
+% As an illustration, \cs{BeginCatcodeRegime} does
+% \begin{quote}
+% |\PushCatcodeTableNumStack|\\
+% |\IncCatcodeTableStack|\\
+% |\setluatexcatcodetable\CatcodeTableStack{\catcodetable#1}%|\\
+% |\catcodetable\CatcodeTableStack|
+% \end{quote}
+% and \cs{EndCatcodeRegime} is defined as
+% \begin{quote}
+% |\DecCatcodeTableStack|\\
+% |\PopCatcodeTableNumStack|
+% \end{quote}
+%
+% If you choose to use this low-level interface, it is your responsibility to
+% ensure proper balancing of push-pop and inc-dec, as well as making sure that
+% a temporary table is never used after it has been freed.
 %
 %    \section{Implementation}
 %
