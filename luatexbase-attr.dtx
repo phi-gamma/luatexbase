@@ -409,7 +409,9 @@ end
 %<*testplain,testlatex>
 \newluatexattribute\testattr
 \setluatexattribute\testattr{1}
+\ifnum\testattr=1 \else \ERROR \fi
 \unsetluatexattribute\testattr
+\ifnum\testattr<0 \else \ERROR \fi
 \catcode64 11
 \luatexbase@directlua{assert(luatexbase.attributes.testattr)}
 \luatexbase@directlua{luatexbase.new_attribute('luatestattr')}
