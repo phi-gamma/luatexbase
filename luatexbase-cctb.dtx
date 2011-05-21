@@ -351,7 +351,7 @@ See source file '\inFileName' for details.
       \let\x\PackageError
     \fi
   \expandafter\endgroup
-  \x{luatexbase-attr}{LuaTeX is required for this package. Aborting.}{%
+  \x{luatexbase-cctb}{LuaTeX is required for this package. Aborting.}{%
     This package can only be used with the LuaTeX engine^^J%
     (command `lualatex' or `luatex').^^J%
     Package loading has been stopped to prevent additional errors.}
@@ -609,7 +609,17 @@ See source file '\inFileName' for details.
   \expandafter\lltxb@cctb@numstack@pop\lltxb@cctb@numstack\@nil}
 \def\lltxb@cctb@numstack@pop#1#2\@nil{%
   \ifx\empty#2\empty
-    \errormessage{Popping from and empty CatcoteTableNumStack}%
+    \begingroup
+    \ifdefined\PackageWarning
+      \let\x\PackageWarning
+    \else
+      \def\x####1####2{%
+        \begingroup \endlinechar10
+        \message{Package ####1 warning: ####2}%
+        \endgroup}%
+    \fi
+    \expandafter\endgroup
+    \x{luatexbase-cctb}{Popping from an empty CatcodeTableNumStack}%
     \luatexcatcodetable\z@
   \else
     \gdef\lltxb@cctb@numstack{#2}%
