@@ -599,7 +599,7 @@ See source file '\inFileName' for details.
 %
 %    \begin{macrocode}
 \def\PushCatcodeTableNumStack{%
-  \xdef\lltxb@cctb@numstack{{\the\catcodetable}\lltxb@cctb@numstack}}
+  \xdef\lltxb@cctb@numstack{{\the\luatexcatcodetable}\lltxb@cctb@numstack}}
 %    \end{macrocode}
 %
 %    Popping a number off the stack means shifting it.
@@ -612,7 +612,7 @@ See source file '\inFileName' for details.
     \errormessage{Popping from and empty CatcoteTableNumStack}%
     \luatexcatcodetable\z@
   \else
-    \def\lltxb@numstack@pop{#2}%
+    \gdef\lltxb@cctb@numstack{#2}%
     \luatexcatcodetable#1\relax
   \fi}
 %    \end{macrocode}
