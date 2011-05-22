@@ -286,48 +286,42 @@ See source file '\inFileName' for details.
 %
 %    \subsubsection{Preliminaries}
 %
-%    Reload protection, especially for \plaintex.
+%    Catcode defenses and reload protection.
 %
 %    \begin{macrocode}
-                \csname lltxb@mcb@loaded\endcsname
-\expandafter\let\csname lltxb@mcb@loaded\endcsname\endinput
-%    \end{macrocode}
-%
-%    Catcode defenses.
-%
-%    \begin{macrocode}
-\begingroup
+\begingroup\catcode61\catcode48\catcode32=10\relax% = and space
   \catcode123 1 % {
   \catcode125 2 % }
   \catcode 35 6 % #
-  \toks0{}%
-  \def\x{}%
+  \toks0\expandafter{\expandafter\endlinechar\the\endlinechar}%
+  \edef\x{\endlinechar13}%
   \def\y#1 #2 {%
     \toks0\expandafter{\the\toks0 \catcode#1 \the\catcode#1}%
     \edef\x{\x \catcode#1 #2}}%
-  \y 123 1  % {
-  \y 125 2  % }
-  \y  35 6  % #
-  \y  10 12 % ^^J
-  \y  34 12 % "
-  \y  36 3  % $ $
+  \y  13  5 % carriage return
+  \y  61 12 % =
+  \y  32 10 % space
+  \y 123  1 % {
+  \y 125  2 % }
+  \y  35  6 % #
+  \y  64 11 % @ (letter)
   \y  39 12 % '
   \y  40 12 % (
   \y  41 12 % )
-  \y  42 12 % *
-  \y  43 12 % +
-  \y  44 12 % ,
   \y  45 12 % -
   \y  46 12 % .
   \y  47 12 % /
-  \y  60 12 % <
-  \y  61 12 % =
-  \y  64 11 % @ (letter)
-  \y  62 12 % >
-  \y  95 12 % _ (other)
+  \y  58 12 % :
+  \y  91 12 % [
+  \y  93 12 % ]
+  \y  94  7 % ^
   \y  96 12 % `
-  \edef\y#1{\endgroup\edef#1{\the\toks0\relax}\x}%
-\expandafter\y\csname lltxb@mcb@AtEnd\endcsname
+  \toks0\expandafter{\the\toks0 \relax\noexpand\endinput}%
+  \edef\y#1{\noexpand\expandafter\endgroup%
+    \noexpand\ifx#1\relax \edef#1{\the\toks0}\x\relax%
+    \noexpand\else \noexpand\expandafter\noexpand\endinput%
+    \noexpand\fi}%
+\expandafter\y\csname luatexbase@mcb@sty@endinput\endcsname%
 %    \end{macrocode}
 %
 %    Package declaration.
@@ -365,8 +359,7 @@ See source file '\inFileName' for details.
     This package can only be used with the LuaTeX engine^^J%
     (command `lualatex' or `luatex').^^J%
     Package loading has been stopped to prevent additional errors.}
-  \lltxb@mcb@AtEnd
-  \expandafter\endinput
+  \expandafter\luatexbase@mcb@sty@endinput%
 \fi
 %    \end{macrocode}
 %
@@ -388,7 +381,7 @@ See source file '\inFileName' for details.
 %    That's all folks!
 %
 %    \begin{macrocode}
-\lltxb@mcb@AtEnd
+\luatexbase@mcb@sty@endinput%
 %</texpackage>
 %    \end{macrocode}
 %
