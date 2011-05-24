@@ -3,11 +3,17 @@ Next actions
 
 - Coordinate release with Heiko (luatex-loader?)
 
-test suite
-----------
+all
+---
 
+- use infwarerr
+- use ltxcmds?
+- \lltxb as a prefix means nothing
 - regression checks on the results of the tests (sed+diff the log)
+    or generalise use of qstest
 - add debug messages to be used in the test suite?
+- mark all occurences of version-dependent stuff in the code
+- drop compat for 0.25 when tl2010 is frozen
 
 compat
 ------
@@ -18,7 +24,7 @@ compat
 modutils
 --------
 
-- make `\listfiles` show Lua modules?
+- make `\listfiles` show Lua modules? or provide \listluafiles for that
 
 cctb
 ----
@@ -29,9 +35,16 @@ mcb
 ---
 
 - add an analogue of `callback.find()`, see #4
+- revise priority system: use real numbers and don't change them
+- provide a list()?
+- allow temporary disabling of callbacks
+- do something with open_read_file etc
+- make callback.register = luatexbase_add_to_callback
+- check if there are functions in the callbacks before luatexbase is loaded
+  and import them
 
 bytecode registers
 ------------------
 
-- create submodule for that
+- create submodule for that (really? is it useful at all?)
 - only lua interface, most probably
