@@ -316,7 +316,7 @@ end
 %    present, so we do the same.
 %
 %    \begin{macrocode}
-function find_file_lua_emul(name)
+local function find_file_lua_emul(name)
   local search_list = {}
   for _, suffix in ipairs(lua_suffixes) do
     if ends_with(suffix, name) then
