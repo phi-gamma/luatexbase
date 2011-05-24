@@ -1,14 +1,22 @@
                     Changes in the luatexbase package/bundle
 
-The [BI] tag signals backward-incompatible changes.
-Starting with  v0.3, the only possible source of such changes is the upcoming
-merge with luatex.sty. Afterwards, no other BI change is to be expected.
+2011/00/24 v0.4
+    cctb
+        - implement catcode table stacks à la luatex.sty
+        - fix \CatcodeTableLaTeX(Package): 10 (newline aka ^^J) was catcoded
+          15 instead of 12
+        - rename \setcatcoderange to \SetCatcodeRange (the old name remains
+          for compatibility but  will be removed in the next version)
+    luatex 0.5
+        - new package replacing luatex.sty from the oberdiek bundle
+          (see luatex.pdf for details)
 
 2011/05/21 v0.31
     attr
         - Bugfix: \unsetluatexattribute didn't work (reported by Dohyun Kim)
 
 2010/10/10 v0.3
+    [BI] marks backward-incompatible changes
     all   not using LuaTeX results in an error (formerly a warning)
     modutils
         - [BI] \luatexUseModule and \luatexRequireModule replaced by
