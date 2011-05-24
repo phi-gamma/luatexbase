@@ -5,6 +5,7 @@ luatexbase*.sty
 luatex.sty
 test-*
 texmf/
+luatexbase*.zip
 
 # temp
 *.log
