@@ -122,10 +122,9 @@ See source file '\inFileName' for details.
 %
 % \begin{abstract}
 % Lua modules are loaded using the |require()| function which, similarly to
-% \tex's |\input|, takes care of locating the file and load it, but also makes
-% a few supplementary checks, for example to avoid loading the same module
-% twice. This package adapts the way the files are searched in order to
-% accommodate the TDS as well as usual Lua naming conventions.
+% \tex's |\input|, takes care of locating the file to be loaded.  This package
+% adapts the way the files are searched in order to accommodate the TDS as
+% well as usual Lua naming conventions.
 %
 % For higher-level functions related to Lua modules, see
 % \href{file:luatexbase-modutils.pdf}{\pk{luatexbase-modutils}}, which also
@@ -134,13 +133,11 @@ See source file '\inFileName' for details.
 %
 % \section{Documentation}
 %
-% Starting with \luatex 0.45.0, |require()| uses Kpathsea for file searching
+% Starting with \luatex 0.45, |require()| uses Kpathsea for file searching
 % when the library is initialised (which is always the case in \tex mode,
-% unless explicitly disabled by the user). However, it does not respect the
-% Lua convention that |require("foo.bar")| should look for |foo/bar.lua|.
-% \footnote{Support for that has been added in rev 3558 of \luatex, currently
-% unreleased but probably part of \luatex 0.54.} This package implements such
-% behaviour. 
+% unless explicitly disabled by the user). However, it did not respect the
+% Lua convention that |require("foo.bar")| should look for |foo/bar.lua| until
+% version 0.60. This package adds such behaviour to older versions of \luatex.
 %
 % More precisely, it implements a new kpse searcher that looks for file
 % |foo/bar| using Kpathsea with the format |lua| (that is, search along
@@ -151,7 +148,7 @@ See source file '\inFileName' for details.
 % Also, older versions of \luatex, such as 0.25.4 (\texlive 2008), don't know
 % about the |lua| format for kpse searching. So, an emulator for this function
 % is provided. The emulator is not perfect, in particular it may find more
-% results than the normal |lua| format search.\footnote{An may also fail to
+% results than the normal |lua| format search.\footnote{And may also fail to
 % find the file in particular cases, see comments in the implementation for
 % details.} In order to ensure more homogeneous results across versions, this
 % emulator is used as a fall-back when the real |lua| format search doesn't
