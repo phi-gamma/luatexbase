@@ -101,7 +101,7 @@ See source file '\inFileName' for licence and contact information.
 % \hypersetup{%
 %   pdfauthor = {Manuel Pegourie-Gonnard and Heiko Oberdiek},
 % }
-% \pkdate{luatex}{v0.5 2011-05-21}
+% \pkdate{luatex}{v0.5 2011-05-24}
 %
 % \maketitle
 %
@@ -204,7 +204,7 @@ See source file '\inFileName' for licence and contact information.
     \let\x\ProvidesPackage
   \fi
 \expandafter\endgroup
-\x{luatex}[2010/10/06 v0.3 Module utilities for LuaTeX]
+\x{luatex}[2011/05/24 v0.5 Resource management for LuaTeX]
 %    \end{macrocode}
 %
 %    Make sure \luatex is used.
@@ -301,7 +301,7 @@ See source file '\inFileName' for licence and contact information.
 %<*test2>
 \documentclass{article}
 \def\LoadCommand{%
-  \RequirePackage{luatex}[2010/03/09]%
+  \RequirePackage{luatex}[2011/05/24]%
 }
 %</test2>
 %    \end{macrocode}
@@ -309,7 +309,7 @@ See source file '\inFileName' for licence and contact information.
 %<*test3>
 \documentclass{article}
 \def\LoadCommand{%
-  \RequirePackage{luatex-loader}[2010/03/09]%
+  \RequirePackage{luatex-loader}[2011/05/24]%
 }
 %</test3>
 %    \end{macrocode}
@@ -441,7 +441,7 @@ See source file '\inFileName' for licence and contact information.
   \advance\count0 by 1 %
 \repeat
 \documentclass{minimal}
-\usepackage{luatex}[2010/03/09]
+\usepackage{luatex}[2011/05/24]
 \usepackage{qstest}
 \IncludeTests{*}
 \LogTests{log}{*}{*}
