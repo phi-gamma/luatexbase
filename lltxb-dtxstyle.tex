@@ -1,6 +1,7 @@
 % preamble for dtx documentations of the luatexbase package/bundle.
 
 % packages
+\usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage{textcomp}
 \usepackage{lmodern}
@@ -53,12 +54,21 @@
 }
 
 % constant metadata
+\newif\ifluatexbase
 \author{%
-  Manuel P\'egouri\'e-Gonnard \& \'Elie Roux \\
-  Support: \email{lualatex-dev@tug.org}%
+  Heiko Oberdiek (primary author of \pk{luatex}) \\
+  Élie Roux (primary author of \pk{luatextra}) \\
+  Manuel Pégourié-Gonnard (current developper)\thanks{%
+    See ``History''
+    \ifluatexbase\else in \href{luatexbase.pdf}{\file{luatexbase.pdf}} \fi
+    for details.}%
+  \\[1ex]
+  \url{https://github.com/mpg/luatexbase} \\
+  \email{lualatex-dev@tug.org}%
 }
 \hypersetup{%
-  pdfauthor = {Manuel Pegourie-Gonnard and Elie Roux},
+  pdfsubject = {Basic resource management for LuaTeX},
+  pdfauthor = {Manuel Pégourié-Gonnard, Élie Roux, Heiko Oberdiek},
 }
 
 % other metadata

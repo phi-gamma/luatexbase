@@ -66,6 +66,7 @@ See the aforementioned source file(s) for copyright and licensing information.
 %<*driver>
 \documentclass{ltxdoc}
 \input{lltxb-dtxstyle}
+\luatexbasetrue
 \newcommand\subpk[1]{%
   \item[\href{luatexbase-#1.pdf}{luatexbase-#1}\normalfont:]}
 \begin{document}
@@ -128,6 +129,27 @@ See the aforementioned source file(s) for copyright and licensing information.
 % Currently the oldest version supported is 0.25.4 with formats from \texlive
 % 2008; the next release of this package will only support 0.40.6 and greater
 % with formats from \texlive 2009 and greater.
+%
+% \subsection{History}
+%
+% The first package for managing \luatex's new resources was the \pk{luatex}
+% by Heiko Oberdiek. Later, Élie Roux wrote \pk{luatextra} which reprised many
+% features of \pk{luatex} with little extensions to some of them and added
+% independant low-level features (currently found in the \pk{modutils} and
+% \pk{mcb} subpackages), as well as user-level things. Later, \pk{luatexbase}
+% was created by Manuel Pégourié-Gonnard by isolating the general low-level
+% features of \pk{luatextra}, and later expanding on them.
+%
+% For some time there was two conflicting packages controling access to
+% \luatex's resources: \pk{luatex} and \pk{luatexbase}, neither of which was a
+% subset of the other, and with small differences in their overlapping parts
+% (mainly macro names).
+%
+% Then \pk{luatexbase} was expanded by absorbing the features of \pk{luatex}
+% that were previously missing (essentially the advanced scheme for catcode
+% table management). It currently provides the \pk{luatex} package as a
+% wrapper around the relevant subpackages, so that the two are no longer in
+% conflict.
 %
 %    \section{Implementation}
 %
