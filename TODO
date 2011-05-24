@@ -18,8 +18,7 @@ all
 compat
 ------
 
-- clarify doc/comments about relying on etex/pdf primitives
-- import some error checking from Heiko's \LuT@MakeLuatexPrimitive
+- import some error checking from Heiko's \LuT@MakeLuatexPrimitive?
 
 modutils
 --------

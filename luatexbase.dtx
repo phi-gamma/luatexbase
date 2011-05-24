@@ -122,14 +122,13 @@ See source file '\inFileName' for licence and contact information.
 %   \subpk{modutils} Lua module declaration, including version checks.
 % \end{description}
 %
-% The package is mostly stable: it is unlikely that backward-incompatible
-% changes will be made in the future, other than necessary for merging with
-% \pk{luatex.sty}, with which a few sub-packages strongly overlap. If they do
-% happen, such changes will be announced on the development list, and clearly
-% identified in the \file{Changes} file.
-%
-% All sub-packages are tested with \luatex 0.25.4 to 0.60.x and formats based
-% on \plaintex or \latex, as included in \texlive 2008, 2009, and 2010.
+% This package collection is considered stable: no backward-incompatible
+% change should happen in the future, except the removal of the deprecated
+% commands (currently only \cs{setcatcoderange}). It works with the Plain and
+% \latex formats adapted for \luatex as provided by \texlive and MiK\tex.
+% Currently the oldest version supported is 0.25.4 with formats from \texlive
+% 2008; the next release of this package will only support 0.40.6 and greater
+% with formats from \texlive 2009 and greater.
 %
 %    \section{Implementation}
 %

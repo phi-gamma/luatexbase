@@ -109,8 +109,13 @@ See source file '\inFileName' for details.
 % \begin{abstract}
 % The \luatex manual is very clear: everything may change. This package
 % provides tools to help package writers deal with the changes. It helps
-% supporting \luatex versions down to 0.25.4, and is regularly tested with
-% \luatex 0.40.6 (\texlive 2009) and from trunk.
+% supporting \luatex versions down to 0.25.4, and is tested with
+% \luatex 0.40.6 (\texlive 2009), \luatex 0.60.2 (\texlive 2010) and current
+% beta versions.
+%
+% The supported formats are Plain and \latex adapted for \luatex as provided
+% by \texlive and MiK\tex (see \file{lualatex-doc.pdf} section~4 for details
+% about these formats).
 % \end{abstract}
 %
 % \tableofcontents
@@ -119,7 +124,8 @@ See source file '\inFileName' for details.
 %
 % Three problems are currently addressed by this package: changes in the
 % syntax of |\directlua|, version information, and variable policies for
-% primitives activation and naming (in \luatex itself as well as in \texlive).
+% primitives activation and naming (in \luatex itself as well as in the
+% formats provided by distributions).
 %
 % \medskip
 %
@@ -132,8 +138,8 @@ See source file '\inFileName' for details.
 %
 % This package provides a macro |\luatexbase@directlua| that expands to
 % |\directlua0| on \luatex 0.35 and lower (where the number is mandatory), and
-% to |\directlua| otherwise. It is a macro in both case so that the number of
-% expansion steps remains constant.
+% to |\directlua| otherwise. It is a macro in both cases so that it always
+% expands in exactly two steps.
 %
 % \medskip
 %
@@ -161,16 +167,16 @@ See source file '\inFileName' for details.
 % So, starting with \texlive 2009, the situation is clear: the prefixed
 % version of the \luatex primitives is always available. But in earlier
 % versions (\texlive 2008, \luatex 0.25.4) those primitives were available
-% only with their natural names. Also, it is theoretically possible, however
-% unlikely, that the prefixed primitives are not available for some reason.
+% only with their natural names. The primitives provided by \etex and pdf\tex
+% on the other hand, are always available.
 %
 % \begin{quote}
 % \cs{luatexbase@ensure@primitive}\marg{name}
 % \end{quote}
 % The tool provided to deal with that is \cs{luatexbase@ensure@primitive},
-% whose argument is a primitive name (without a leading backslash nor any
-% |luatex| prefix, eg just |{latelua}|). It makes sure that the primitive gets
-% available as \cs{luatex\meta{name}}.
+% whose argument is a \luatex primitive name (without a leading backslash nor
+% any |luatex| prefix, eg just |{latelua}|). It makes sure that the primitive
+% gets available as \cs{luatex\meta{name}}.
 %
 % \textbf{Warning.} In particular circumstances, this macro may fail silently
 % for primitives whose natural name starts with |luatex|, hence such
@@ -189,7 +195,7 @@ See source file '\inFileName' for details.
 % to use (except |\directlua| again).
 %
 % This package doesn't try to activate every primitive, since it would require
-% and extensive list of primitives for each version of \luatex, so it seems
+% an extensive list of primitives for each version of \luatex, so it seems
 % simpler to leave that burden on package writers.
 %
 %    \section{Implementation}
