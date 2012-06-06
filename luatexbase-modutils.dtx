@@ -474,7 +474,7 @@ local modules = modules or {}
 %
 %    \begin{macrocode}
 local function date_to_int(date)
-    numbers = string.gsub(date, "(%d+)/(%d+)/(%d+)", "%1%2%3")
+    local numbers = string.gsub(date, "(%d+)/(%d+)/(%d+)", "%1%2%3")
     return tonumber(numbers)
 end
 %    \end{macrocode}
@@ -552,7 +552,7 @@ function require_module(name, req_date)
     local info = modules[name]
     if not info then
         warn("module '%s' was not properly identified", name)
-    elseif version then
+    elseif info.version then
         if not (info.date and date_to_int(info.date) > date_to_int(req_date))
         then
             warn("module '%s' required in version '%s'\n"
