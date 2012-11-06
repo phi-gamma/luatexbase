@@ -145,7 +145,7 @@ See the aforementioned source file(s) for copyright and licensing information.
 % number of the attribute associated to |\fooattr| assuming it was defined
 % using |\newluatexattribute\fooattr|, something that \luatex currently
 % doesn't support (you can get the current value of the associated attribute
-% as |tex.atrribute.fooattr|, but not the attribute number).
+% as |tex.attribute.fooattr|, but not the attribute number).
 %
 % There are several ways to work around this. For example, it is possible to
 % extract the number at any time from the |\meaning| of |\fooattr|.
@@ -158,7 +158,7 @@ See the aforementioned source file(s) for copyright and licensing information.
 %
 % Also, two Lua functions are provided that are analogous to the above \tex
 % macros (actually, the macros are wrappers around the functions):
-% |luatexbase.new_attributes|\parg{name} allocates a new attribute, without
+% |luatexbase.new_attribute|\parg{name} allocates a new attribute, without
 % defining a corresponding \tex control sequence (only an entry in
 % |luatexbase.attributes| is created. It usually returns the number of the
 % allocated attribute. If room is missing, it raises an error, unless the
