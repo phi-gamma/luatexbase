@@ -374,10 +374,16 @@ end
 %    \end{macrocode}
 %
 %    Combined searcher, using primarily the new kpse searcher, and the
-%    original as a fall-back.
+%    original as a fall-back. Starting from \luatex 0.75, Lua 5.2 is used. Among 
+%    the changes, |package.loaders| is renamed as |package.searchers|.
 %
 %    \begin{macrocode}
-local package_loader_two = package.loaders[2]
+local package_loader_two
+if package.searchers then
+  package_loader_two = package.searchers[2]
+else
+  package_loader_two = package.loaders[2]
+end
 local function load_module(mod)
   local file = find_module_file(mod)
   if not file then
@@ -403,7 +409,11 @@ end
 %    Finally install this combined loader as loader 2.
 %
 %    \begin{macrocode}
-package.loaders[2] = load_module
+if package.searchers then
+  package.searchers[2] = load_module
+else
+  package.loaders[2] = load_module
+end
 %</luamodule>
 %    \end{macrocode}
 %
