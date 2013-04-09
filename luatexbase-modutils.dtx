@@ -552,7 +552,7 @@ function require_module(name, req_date)
     local info = modules[name]
     if not info then
         warn("module '%s' was not properly identified", name)
-    elseif info.version then
+    elseif req_date and info.version then
         if not (info.date and date_to_int(info.date) > date_to_int(req_date))
         then
             warn("module '%s' required in version '%s'\n"
