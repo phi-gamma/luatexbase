@@ -733,7 +733,7 @@ function remove_from_callback (name, description)
     end
     table.remove(l, index)
     info("removing '%s'\nfrom '%s'", description, name)
-    if table.maxn(l) == 0 then
+    if #l == 0 then
         callbacklist[name] = nil
         if not lua_callbacks_defaults[name] then
             register_callback(name, nil)

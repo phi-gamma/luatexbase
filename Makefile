@@ -84,7 +84,7 @@ luatexbase.%.lua: %.lua
 
 $(UNPACKED_MCB): luatexbase-mcb.dtx
 	$(DO_TEX)
-	echo \\\\relax > $(TEST_MCB)
+	echo \\relax > $(TEST_MCB)
 
 $(UNPACKED_REGS): luatexbase-regs.dtx
 	$(DO_TEX)
