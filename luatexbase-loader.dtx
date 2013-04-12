@@ -379,11 +379,10 @@ end
 %
 %    \begin{macrocode}
 local package_loader_two
-if package.searchers then
-  package_loader_two = package.searchers[2]
-else
-  package_loader_two = package.loaders[2]
+if not package.searchers then
+  package.searchers = package.loaders
 end
+package_loader_two = package.searchers[2]
 local function load_module(mod)
   local file = find_module_file(mod)
   if not file then
@@ -409,11 +408,7 @@ end
 %    Finally install this combined loader as loader 2.
 %
 %    \begin{macrocode}
-if package.searchers then
-  package.searchers[2] = load_module
-else
-  package.loaders[2] = load_module
-end
+package.searchers[2] = load_module
 %</luamodule>
 %    \end{macrocode}
 %
