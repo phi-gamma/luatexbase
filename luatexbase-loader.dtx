@@ -353,7 +353,7 @@ end
 %
 %    \begin{macrocode}
 local find_file_lua
-if pcall('kpse.find_file', 'dummy', 'lua') then
+if pcall(kpse.find_file, 'dummy', 'lua') then
   find_file_lua = function (name)
     return kpse.find_file(name, 'lua') or find_file_lua_emul(name)
   end
