@@ -114,7 +114,7 @@ See the aforementioned source file(s) for copyright and licensing information.
 %
 % \pkdate{luatexbase-loader}{v0.4 2011-05-24}
 %
-% \maketitle
+% \maketitle 
 %
 % \begin{abstract}
 % Lua modules are loaded using the |require()| function which, similarly to
@@ -137,18 +137,14 @@ See the aforementioned source file(s) for copyright and licensing information.
 % system.
 % 
 % The aim of this package is to have a coherent behaviour between versions of
-% LuaTeX. The first versions did ensure backward compatibilty to \luatex 0.25
+% LuaTeX, and to get the loaded file's name printed in the output (\LaTeX
+% style). The first versions did ensure backward compatibilty to \luatex 0.25
 % but as \luatex development is quite fast, this version supports only \luatex
 % 0.45 and higher.
 %
 % More precisely, when asked for |foo.bar| (or |foo.bar.lua|), it first looks
 % for file |foo/bar| using Kpathsea with the format |lua|, and then for
-% |foo.bar|.
-%
-% As |oberdiek.luatex.lua| from |luatex.sty| also registers a loader, we
-% make a combined version of the new kpse searcher of this package and the 
-% function registered in |oberdiek.luatex.lua| (registered in 
-% |package.searchers[2]|) and register it in |package.searchers[2]|.
+% |foo.bar|, removing the possible extension.
 %
 %    \section{Implementation}
 %
@@ -281,6 +277,12 @@ See the aforementioned source file(s) for copyright and licensing information.
 module('luatexbase', package.seeall)
 %    \end{macrocode}
 %
+%    Just in case it's called from a \TeX Lua script...
+%
+%    \begin{macrocode}
+kpse.set_program_name("luatex")
+%    \end{macrocode}
+%
 %    Emulate (approximatively) kpse's lua format search. More precisely,
 %    combine the search path of |texmfscripts| and |tex| in order to
 %    approximate |LUAINPUTS|. But we need to handle suffixes ourselves.
@@ -316,9 +318,8 @@ local function basename(name)
 end
 %    \end{macrocode}
 %
-%    The main function. Currently it emulates the behaviour |x.y->x/y.lua|
-%    for compatibility with \luatex prior to 0.60, but this behaviour
-%    should be considered deprecated and will disapear in the next release. 
+%    The main function, emulating the behaviour of |packages.searchers[2]|,
+%    with a small improvement that eliminates the possible extension.
 %
 %    \begin{macrocode}
 local function find_module_file(mod)
@@ -328,8 +329,10 @@ end
 %    \end{macrocode}
 %
 %    Combined searcher, using primarily the new kpse searcher, and the
-%    original as a fall-back. Starting from \luatex 0.75, Lua 5.2 is used. Among 
+%    original as a fall-back. Starting from \luatex 0.75, Lua 5.2 is used. Among
 %    the changes, |package.loaders| is renamed as |package.searchers|.
+%
+%    The main improvement is thus the printing of the filename in the output.
 %
 %    \begin{macrocode}
 local package_loader_two
