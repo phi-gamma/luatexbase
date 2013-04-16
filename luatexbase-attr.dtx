@@ -351,10 +351,11 @@ module('luatexbase', package.seeall)
 attributes = {}
 %    \end{macrocode}
 %
-%    The allocaton function. Unlike other registers, allocate starting from 1.
-%    Some code (eg, font handling coming from Con\tex{}t) behaves strangely
-%    with \verb+\attribute0+ and since there is plenty of room here, it
-%    doesn't seem bad to ``loose'' one item in order to avoid this problem.
+%    The allocation function. Unlike other registers, allocate starting from 255.
+%    Some code (e.g., font handling coming from Con\tex{}t) behaves strangely
+%    with \verb+\attribute0+. What is more the font loader allocates its own
+%    attributes in the range from 127 to 254. Since there is plenty of room
+%    here, it doesn't seem bad to skep a few items in order to avoid clashes.
 %
 %    \begin{macrocode}
 local last_alloc = 255
