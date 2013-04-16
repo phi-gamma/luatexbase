@@ -378,7 +378,7 @@ See the aforementioned source file(s) for copyright and licensing information.
 %    supporting Lua module and make sure |luaescapestring| is available.
 %
 %    \begin{macrocode}
-\ifdefined\RequirePackage
+\ifx\csname\RequirePackage
   \RequirePackage{luatexbase-loader}
 \else
   \input luatexbase-loader.sty
