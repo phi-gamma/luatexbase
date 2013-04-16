@@ -357,7 +357,7 @@ attributes = {}
 %    doesn't seem bad to ``loose'' one item in order to avoid this problem.
 %
 %    \begin{macrocode}
-local last_alloc = 0
+local last_alloc = 255
 function new_attribute(name, silent)
     if last_alloc >= 65535 then
         if silent then
