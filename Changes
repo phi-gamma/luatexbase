@@ -1,6 +1,9 @@
                     Changes in the luatexbase package/bundle
 
 2013/04/13 v0.5
+    all
+        - input luatex.sty before doing anything, is luatex.sty
+          breaks if loaded after luatexbase
     mcb and loader
         - compatibility with Lua 5.2 (LuaTeX >= 0.74)
     loader
