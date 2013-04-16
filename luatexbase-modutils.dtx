@@ -378,10 +378,10 @@ See the aforementioned source file(s) for copyright and licensing information.
 %    supporting Lua module and make sure |luaescapestring| is available.
 %
 %    \begin{macrocode}
-\ifx\csname\RequirePackage
-  \RequirePackage{luatexbase-loader}
-\else
+\expandafter\ifx\csname RequirePackage\endcsname\relax
   \input luatexbase-loader.sty
+\else
+  \RequirePackage{luatexbase-loader}
 \fi
 \luatexbase@directlua{require('luatexbase.modutils')}
 \luatexbase@ensure@primitive{luaescapestring}
