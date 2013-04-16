@@ -12,6 +12,9 @@
         - dropping support for LuaTeX < 0.45.
         - small improvement to make x.y.lua look for x/y.lua, not 
           x/y/lua.
+    modutils
+        - fixing a bug printing "luatexbase-attr" in all documents
+          in plain TeX
 
 2011/00/24 v0.4
     cctb
