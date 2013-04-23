@@ -283,6 +283,17 @@ module('luatexbase', package.seeall)
 kpse.set_program_name("luatex")
 %    \end{macrocode}
 %
+%    In \LaTeX, it's traditional to print the included file paths. We don't want
+%    to do this for scripts using texlua... Currently there is no perfect check
+%    of texlua vs. luatex, so we check for the token table.
+%
+%    \begin{macrocode}
+local print_included_path = false
+if token then
+  print_included_path = true
+end
+%    \end{macrocode}
+%
 %    Emulate (approximatively) kpse's lua format search. More precisely,
 %    combine the search path of |texmfscripts| and |tex| in order to
 %    approximate |LUAINPUTS|. But we need to handle suffixes ourselves.
@@ -357,7 +368,9 @@ local function load_module(mod)
   if not loader then
     return "\n\t[luatexbase.loader] Loading error:\n\t"..error
   end
-  texio.write_nl("("..file..")")
+  if print_included_path then
+    texio.write_nl("("..file..")")
+  end
   return loader
 end
 %    \end{macrocode}

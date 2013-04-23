@@ -393,7 +393,7 @@ See the aforementioned source file(s) for copyright and licensing information.
 %
 %    \begin{macrocode}
 module('luatexbase', package.seeall)
-local err, warning, info = luatexbase.provides_module({
+local err, warning, info, log = luatexbase.provides_module({
     name          = "luatexbase-mcb",
     version       = 0.5,
     date          = "2013/04/13",
@@ -687,7 +687,7 @@ function add_to_callback (name,func,description,priority)
         warning("several functions in '%s',\n"
         .."only one will be active.", name)
     end
-    info("inserting '%s'\nat position %s in '%s'",
+    log("inserting '%s'\nat position %s in '%s'",
       description, priority, name)
 end
 %    \end{macrocode}
@@ -733,7 +733,7 @@ function remove_from_callback (name, description)
         return
     end
     table.remove(l, index)
-    info("removing '%s'\nfrom '%s'", description, name)
+    log("removing '%s'\nfrom '%s'", description, name)
     if #l == 0 then
         callbacklist[name] = nil
         if not lua_callbacks_defaults[name] then
@@ -756,11 +756,11 @@ function reset_callback (name, make_false)
         err("unable to reset '%s':\nis not a valid callback", name)
         return
     end
-    info("resetting callback '%s'", name)
+    log("resetting callback '%s'", name)
     callbacklist[name] = nil
     if not lua_callbacks_defaults[name] then
         if make_false == true then
-            info("setting '%s' to false", name)
+            log("setting '%s' to false", name)
             register_callback(name, false)
         else
             register_callback(name, nil)
@@ -823,7 +823,7 @@ function create_callback(name, ctype, default)
         err("unable to create callback '%s':\ntype '%s' undefined", name, ctype)
         return nil
     end
-    info("creating '%s' type %s", name, ctype)
+    log("creating '%s' type %s", name, ctype)
     lua_callbacks_defaults[name] = default
     callbacktypes[name] = ctype
 end
