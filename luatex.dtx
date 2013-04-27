@@ -227,6 +227,14 @@ See the aforementioned source file(s) for copyright and licensing information.
 \fi
 %    \end{macrocode}
 %
+%    We set |LuT@AllocAttribute| in order for the hacks in luatexbase-attr to
+%    work.
+%
+%    \begin{macrocode}
+\newcount\LuT@AllocAttribute
+\LuT@AllocAttribute=\m@ne
+%    \end{macrocode}
+%
 %    \subsection{Packages loading}
 %
 %    \begin{macrocode}

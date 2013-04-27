@@ -283,14 +283,16 @@ See the aforementioned source file(s) for copyright and licensing information.
 %    \subsubsection{Load supporting Lua module}
 %
 %    First load \pk{luatexbase-loader} (hence \pk{luatexbase-compat}), then
-%    the supporting Lua module.
+%    the supporting Lua module. We make sure luatex.sty is loaded.
 %
 %    \begin{macrocode}
 \begingroup\expandafter\expandafter\expandafter\endgroup
 \expandafter\ifx\csname RequirePackage\endcsname\relax
   \input luatexbase-loader.sty
+  \input luatex.sty
 \else
   \RequirePackage{luatexbase-loader}
+  \RequirePackage{luatex}
 \fi
 \luatexbase@directlua{require('luatexbase.attr')}
 %    \end{macrocode}
@@ -351,6 +353,23 @@ module('luatexbase', package.seeall)
 attributes = {}
 %    \end{macrocode}
 %
+%    There are currently two functions that create a new attribute.One is in
+%    |oberdiek| bundle, the other is this one. We will hack a little in order
+%    to make them compatible. The other function uses |LuT@AllocAttribute| as
+%    attribute counter, we will keep it in sync with ours. A possible problem
+%    might also appear: the other function starts attribute allocation at 0,
+%    which might break luaotfload. We output an error if a new attribute has
+%    already been allocated with number 0.
+%
+%    \begin{macrocode}
+local luatex_sty_counter = 'LuT@AllocAttribute'
+if tex.count[luatex_sty_counter] and tex.count[luatex_sty_counter] > -1 then
+  error("luatexbase error: attribute 0 has already been set by \newattribute"
+      .."macro from luatex.sty, not belonging to this package, this makes"
+      .."luaotfload unuseable. Please report to the maintainer of luatex.sty")
+end
+%    \end{macrocode}
+%
 %    The allocaton function. Unlike other registers, allocate starting from 1.
 %    Some code (eg, font handling coming from Con\tex{}t) behaves strangely
 %    with \verb+\attribute0+ and since there is plenty of room here, it
@@ -366,7 +385,14 @@ function new_attribute(name, silent)
             error("No room for a new \\attribute", 1)
         end
     end
+    local lsc = tex.count[luatex_sty_counter]
+    if lsc and lsc > last_alloc then
+      last_alloc = lsc
+    end
     last_alloc = last_alloc + 1
+    if lsc then
+      tex.setcount('global', luatex_sty_counter, last_alloc)
+    end
     attributes[name] = last_alloc
     unset_attribute(name)
     if not silent then
