@@ -142,7 +142,7 @@ See the aforementioned source file(s) for copyright and licensing information.
 %
 % \luatex provides an extremely interesting feature, named callbacks. It
 % allows to call some Lua functions at some points of the \TeX\ algorithm (a
-% \emph{callback}), like when \TeX\ breaks likes, puts vertical spaces, etc.
+% \emph{callback}), like when \TeX\ breaks lines, puts vertical spaces, etc.
 % The \luatex core offers a function called \texttt{callback.register} that
 % enables to register a function in a callback.
 %
@@ -157,7 +157,7 @@ See the aforementioned source file(s) for copyright and licensing information.
 % \begin{description}
 %   \item[simple] is for functions that don't return anything: they are called
 %     in order, all with the same argument;
-%   \item[data] is for functions receiving a piece of data of nay type
+%   \item[data] is for functions receiving a piece of data of any type
 %     except node list head (and possibly other arguments) and returning it
 %     (possibly modified): the functions are called in order, and each is
 %     passed the return value of the previous (and the other arguments
@@ -167,8 +167,8 @@ See the aforementioned source file(s) for copyright and licensing information.
 %     modified node list, or the boolean values |true| or |false|. The
 %     functions are chained the same way as for \emph{data} except that for
 %     the following. If
-%     one function returns |false|, then |false| is immediately return and the
-%     following functions are \emph{not} called. If one function returns
+%     one function returns |false|, then |false| is immediately returned and
+%     the following functions are \emph{not} called. If one function returns
 %     |true|, then the same head is passed to the next function. If all
 %     functions return |true|, then |true| is returned, otherwise the return
 %     value of the last function not returning |true| is used.
