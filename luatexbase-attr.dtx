@@ -363,10 +363,14 @@ attributes = {}
 %
 %    \begin{macrocode}
 local luatex_sty_counter = 'LuT@AllocAttribute'
-if tex.count[luatex_sty_counter] and tex.count[luatex_sty_counter] > -1 then
-  error("luatexbase error: attribute 0 has already been set by \newattribute"
-      .."macro from luatex.sty, not belonging to this package, this makes"
-      .."luaotfload unuseable. Please report to the maintainer of luatex.sty")
+if tex.count[luatex_sty_counter] then
+  if tex.count[luatex_sty_counter] > -1 then
+    error("luatexbase error: attribute 0 has already been set by \newattribute"
+        .."macro from luatex.sty, not belonging to this package, this makes"
+        .."luaotfload unuseable. Please report to the maintainer of luatex.sty")
+  else
+    tex.count[luatex_sty_counter] = 0
+  end
 end
 %    \end{macrocode}
 %
