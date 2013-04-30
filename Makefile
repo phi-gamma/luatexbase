@@ -1,7 +1,7 @@
 # Makefile for luatexbase
 
 NAME = luatexbase
-DTX = $(wildcard *.dtx)
+DTX = $(wildcard luatexbase*.dtx)
 DOC = $(patsubst %.dtx, %.pdf, $(DTX))
 DTXSTY = lltxb-dtxstyle.tex
 
@@ -28,6 +28,9 @@ UNPACKED_LUATEX = luatex.sty test-luatex1.tex test-luatex2.tex \
 UNPACKED = $(UNPACKED_MCB) $(UNPACKED_REGS) $(UNPACKED_ATTR) $(UNPACKED_CCTB) \
 		   $(UNPACKED_LOADER) $(UNPACKED_MODUTILS) $(UNPACKED_COMPAT) \
 		   $(UNPACKED_BASE) $(UNPACKED_LUATEX)
+UNPACKEDTL = $(UNPACKED_MCB) $(UNPACKED_REGS) $(UNPACKED_ATTR) $(UNPACKED_CCTB) \
+		   $(UNPACKED_LOADER) $(UNPACKED_MODUTILS) $(UNPACKED_COMPAT) \
+		   $(UNPACKED_BASE)
 COMPILED = $(DOC)
 GENERATED = $(COMPILED) $(UNPACKED)
 SOURCE = $(DTX) $(DTXSTY) README TODO Changes Makefile
@@ -38,8 +41,8 @@ TMP_LOADER = $(TEST_LOADER).tex
 TEST_MCB = test-mcb-aux.tex
 
 # Files grouped by installation location
-RUNFILES = $(filter-out test-%, $(UNPACKED))
-DOCFILES = $(DOC) $(filter test-%, $(UNPACKED)) README TODO Changes
+RUNFILES = $(filter-out test-%, $(UNPACKEDTL))
+DOCFILES = $(DOC) $(filter test-%, $(UNPACKEDTL)) README TODO Changes
 SRCFILES = $(DTX) Makefile
 
 # The following definitions should be equivalent
@@ -84,7 +87,7 @@ luatexbase.%.lua: %.lua
 
 $(UNPACKED_MCB): luatexbase-mcb.dtx
 	$(DO_TEX)
-	echo \\\\relax > $(TEST_MCB)
+	echo "\\\relax" > $(TEST_MCB)
 
 $(UNPACKED_REGS): luatexbase-regs.dtx
 	$(DO_TEX)

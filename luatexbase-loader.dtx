@@ -1,6 +1,6 @@
 % \iffalse meta-comment
 %
-% Copyright 2009, 2010 by Élie Roux <elie.roux@telecom-bretagne.eu>
+% Copyright 2009-2013 by Élie Roux <elie.roux@telecom-bretagne.eu>
 % Copyright 2010, 2011 by Manuel Pégourié-Gonnard <mpg@elzevir.fr>
 %
 % This work is under the CC0 license.
@@ -112,9 +112,9 @@ See the aforementioned source file(s) for copyright and licensing information.
 %   Grave accent  \`     Left brace    \{     Vertical bar  \|
 %   Right brace   \}     Tilde         \~}
 %
-% \pkdate{luatexbase-loader}{v0.4 2011-05-24}
+% \pkdate{luatexbase-loader}{v0.5 2013-04-13}
 %
-% \maketitle
+% \maketitle 
 %
 % \begin{abstract}
 % Lua modules are loaded using the |require()| function which, similarly to
@@ -133,27 +133,18 @@ See the aforementioned source file(s) for copyright and licensing information.
 % when the library is initialised (which is always the case in \tex mode,
 % unless explicitly disabled by the user). However, it did not respect the
 % Lua convention that |require("foo.bar")| should look for |foo/bar.lua| until
-% version 0.60. This package adds such behaviour to older versions of \luatex.
+% version 0.60. \luatex 0.74 ships with Lua 5.2 that has a different loading
+% system.
+% 
+% The aim of this package is to have a coherent behaviour between versions of
+% LuaTeX, and to get the loaded file's name printed in the output (\LaTeX
+% style). The first versions did ensure backward compatibilty to \luatex 0.25
+% but as \luatex development is quite fast, this version supports only \luatex
+% 0.45 and higher.
 %
-% More precisely, it implements a new kpse searcher that looks for file
-% |foo/bar| using Kpathsea with the format |lua| (that is, search along
-% |LUAINPUTS| and try the following extensions:  |.luc|, |.luctex|, |.texluc|,
-% |.lua|, |.luatex|, |.texlua|). If this search fails, it falls back to
-% |foo.bar| (along the same path with the same extensions).
-%
-% Also, older versions of \luatex, such as 0.25.4 (\texlive 2008), don't know
-% about the |lua| format for kpse searching. So, an emulator for this function
-% is provided. The emulator is not perfect, in particular it may find more
-% results than the normal |lua| format search.\footnote{And may also fail to
-% find the file in particular cases, see comments in the implementation for
-% details.} In order to ensure more homogeneous results across versions, this
-% emulator is used as a fall-back when the real |lua| format search doesn't
-% find any result.
-%
-% Finally, a combined version of this new kpse searcher and the original
-% function at |package.loaders[2]| (using first the new loader, then the old
-% one if the new doesn't return any result) is installed as
-% |package.loaders[2]|.
+% More precisely, when asked for |foo.bar| (or |foo.bar.lua|), it first looks
+% for file |foo/bar| using Kpathsea with the format |lua|, and then for
+% |foo.bar|, removing the possible extension.
 %
 %    \section{Implementation}
 %
@@ -217,7 +208,7 @@ See the aforementioned source file(s) for copyright and licensing information.
     \let\x\ProvidesPackage
   \fi
 \expandafter\endgroup
-\x{luatexbase-loader}[2011/05/24 v0.4 Lua module loader for LuaTeX]
+\x{luatexbase-loader}[2013/04/13 v0.5 Lua module loader for LuaTeX]
 %    \end{macrocode}
 %
 %    Make sure \luatex is used.
@@ -266,7 +257,7 @@ See the aforementioned source file(s) for copyright and licensing information.
 %    \begin{macrocode}
 \luatexbase@directlua{%
   local file = "luatexbase.loader.lua"
-  local path = assert(kpse.find_file(file, 'tex'),
+  local path = assert(kpse.find_file(file, 'lua'),
     "File '"..file.."' not found")
   texio.write_nl("("..path..")")
   dofile(path)}
@@ -286,13 +277,29 @@ See the aforementioned source file(s) for copyright and licensing information.
 module('luatexbase', package.seeall)
 %    \end{macrocode}
 %
+%    Just in case it's called from a \TeX Lua script...
+%
+%    \begin{macrocode}
+kpse.set_program_name("luatex")
+%    \end{macrocode}
+%
+%    In \LaTeX, it's traditional to print the included file paths. We don't want
+%    to do this for scripts using texlua... Currently there is no perfect check
+%    of texlua vs. luatex, so we check for the token table.
+%
+%    \begin{macrocode}
+local print_included_path = false
+if token then
+  print_included_path = true
+end
+%    \end{macrocode}
+%
 %    Emulate (approximatively) kpse's lua format search. More precisely,
 %    combine the search path of |texmfscripts| and |tex| in order to
 %    approximate |LUAINPUTS|. But we need to handle suffixes ourselves.
 %
 %    |lua_suffixes| is taken verbatim from Kpathsea's source
-%    (\file{tex-file.c}, constant |LUA_SUFFIXES|).\footnote{Unchanged since
-%    2007-07-06, last checked 2010-05-10.}
+%    (\file{tex-file.c}, constant |LUA_SUFFIXES|).\footnote{Last checked 2013-04-12.}
 %
 %    \begin{macrocode}
 local lua_suffixes = {
@@ -308,76 +315,42 @@ local function ends_with(suffix, name)
 end
 %    \end{macrocode}
 %
-%    The search function first builds the list of filenames to be search. For
-%    the lua format, kpse always adds a suffix if no (known) suffix is
-%    present, so we do the same.
+%    Auxiliary function for suffixes: returns the basename of a file if it end
+%    by one of the suffixes.
 %
 %    \begin{macrocode}
-local function find_file_lua_emul(name)
-  local search_list = {}
+local function basename(name)
   for _, suffix in ipairs(lua_suffixes) do
     if ends_with(suffix, name) then
-      search_list = { name }
-      break
-    else
-      table.insert(search_list, name..suffix)
+      return name:sub(1, -(suffix:len()+1))
     end
   end
-%    \end{macrocode}
-%
-%    Now look for each file in this list.
-%
-%    \begin{macrocode}
-  for _, search_name in ipairs(search_list) do
-    local f = kpse.find_file(search_name, 'texmfscripts')
-      or kpse.find_file(search_name, 'tex')
-%    \end{macrocode}
-%
-%    There is a problem with using the |tex| search format: kpse will try to
-%    add suffixes from the |TEX_SUFFIXES| list, which may lead to problems
-%    if a file like \meta{name}|.lua.tex| exists. We prevent that by checking if
-%    the file found ends with the required name. So \meta{name}|.lua| will
-%    still be hidden by \meta{name}.|lua.tex| but it seems less bad not to
-%    find it than to return an incorrect result.
-%
-%    \begin{macrocode}
-    if f and ends_with(search_name, f) then
-      return f
-    end
-  end
+  return name
 end
 %    \end{macrocode}
 %
-%    If lua search format is available, use it with emulation as a fall-back,
-%    or just use emulation.
-%
-%    \begin{macrocode}
-local find_file_lua
-if pcall('kpse.find_file', 'dummy', 'lua') then
-  find_file_lua = function (name)
-    return kpse.find_file(name, 'lua') or find_file_lua_emul(name)
-  end
-else
-  find_file_lua = function (name)
-    return find_file_lua_emul(name)
-  end
-end
-%    \end{macrocode}
-%
-%    Find the full path corresponding to a module name.
+%    The main function, emulating the behaviour of |packages.searchers[2]|,
+%    with a small improvement that eliminates the possible extension.
 %
 %    \begin{macrocode}
 local function find_module_file(mod)
-  return find_file_lua(mod:gsub('%.', '/'), 'lua')
-    or find_file_lua(mod, 'lua')
+  local compat = basename(mod):gsub('%.', '/')
+  return kpse.find_file(compat, 'lua') or kpse.find_file(mod, 'lua')
 end
 %    \end{macrocode}
 %
 %    Combined searcher, using primarily the new kpse searcher, and the
-%    original as a fall-back.
+%    original as a fall-back. Starting from \luatex 0.75, Lua 5.2 is used. Among
+%    the changes, |package.loaders| is renamed as |package.searchers|.
+%
+%    The main improvement is thus the printing of the filename in the output.
 %
 %    \begin{macrocode}
-local package_loader_two = package.loaders[2]
+local package_loader_two
+if not package.searchers then
+  package.searchers = package.loaders
+end
+package_loader_two = package.searchers[2]
 local function load_module(mod)
   local file = find_module_file(mod)
   if not file then
@@ -395,7 +368,9 @@ local function load_module(mod)
   if not loader then
     return "\n\t[luatexbase.loader] Loading error:\n\t"..error
   end
-  texio.write_nl("("..file..")")
+  if print_included_path then
+    texio.write_nl("("..file..")")
+  end
   return loader
 end
 %    \end{macrocode}
@@ -403,7 +378,7 @@ end
 %    Finally install this combined loader as loader 2.
 %
 %    \begin{macrocode}
-package.loaders[2] = load_module
+package.searchers[2] = load_module
 %</luamodule>
 %    \end{macrocode}
 %

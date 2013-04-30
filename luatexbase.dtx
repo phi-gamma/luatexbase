@@ -1,6 +1,6 @@
 % \iffalse meta-comment
 %
-% Copyright 2009, 2010 by Élie Roux <elie.roux@telecom-bretagne.eu>
+% Copyright 2009-2013 by Élie Roux <elie.roux@telecom-bretagne.eu>
 % Copyright 2010, 2011 by Manuel Pégourié-Gonnard <mpg@elzevir.fr>
 %
 % This work is under the CC0 license.
@@ -93,7 +93,7 @@ See the aforementioned source file(s) for copyright and licensing information.
 %   Grave accent  \`     Left brace    \{     Vertical bar  \|
 %   Right brace   \}     Tilde         \~}
 %
-% \pkdate{luatexbase}{v0.4 2011-05-24}
+% \pkdate{luatexbase}{v0.5 2013-04-13}
 %
 % \maketitle
 %
@@ -126,18 +126,17 @@ See the aforementioned source file(s) for copyright and licensing information.
 % change should happen in the future, except the removal of the deprecated
 % commands (currently only \cs{setcatcoderange}). It works with the Plain and
 % \latex formats adapted for \luatex as provided by \texlive and MiK\tex.
-% Currently the oldest version supported is 0.25.4 with formats from \texlive
-% 2008; the next release of this package will only support 0.40.6 and greater
-% with formats from \texlive 2009 and greater.
+% Currently the oldest version supported is 0.40.6 with formats from 
+% \texlive 2009 and greater.
 %
 % \subsection{History}
 %
 % The first package for managing \luatex's new resources was the \pk{luatex}
-% package by Heiko Oberdiek. Later, Élie Roux wrote \pk{luatextra} which
+% package by Heiko Oberdiek. Later, \'Elie Roux wrote \pk{luatextra} which
 % reprised many features of \pk{luatex} with little extensions to some of them
 % and added independant low-level features (currently found in the
 % \pk{modutils} and \pk{mcb} subpackages), as well as user-level things.
-% Later, \pk{luatexbase} was created by Manuel Pégourié-Gonnard by isolating
+% Later, \pk{luatexbase} was created by Manuel P\'egouri\'e-Gonnard by isolating
 % the general low-level features of \pk{luatextra}, and later expanding on
 % them.
 %
@@ -215,7 +214,7 @@ See the aforementioned source file(s) for copyright and licensing information.
     \let\x\ProvidesPackage
   \fi
 \expandafter\endgroup
-\x{luatexbase}[2011/05/24 v0.4 Module utilities for LuaTeX]
+\x{luatexbase}[2013/04/13 v0.5 Module utilities for LuaTeX]
 %    \end{macrocode}
 %
 %    Make sure \luatex is used.
@@ -241,6 +240,21 @@ See the aforementioned source file(s) for copyright and licensing information.
     (command `lualatex' or `luatex').^^J%
     Package loading has been stopped to prevent additional errors.}
   \expandafter\luatexbase@sty@endinput%
+\fi
+%    \end{macrocode}
+%
+%    %\subsection{luatex.sty compatibility}
+%
+%    Currently, |luatex.sty| has to be loaded before luatexbase, otherwise it
+%    raises an error, as the same names are used between luatexbase and luatex.
+%
+%    This is a quite strange situation, but we hope to clarify it.
+%
+%    \begin{macrocode}
+\expandafter\ifx\csname RequirePackage\endcsname\relax
+  \input luatex.sty
+\else
+  \RequirePackage{luatex}
 \fi
 %    \end{macrocode}
 %

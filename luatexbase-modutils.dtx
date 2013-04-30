@@ -1,6 +1,6 @@
 % \iffalse meta-comment
 %
-% Copyright 2009, 2010 by Élie Roux <elie.roux@telecom-bretagne.eu>
+% Copyright 2009-2013 by Élie Roux <elie.roux@telecom-bretagne.eu>
 % Copyright 2010, 2011 by Manuel Pégourié-Gonnard <mpg@elzevir.fr>
 %
 % This work is under the CC0 license.
@@ -111,7 +111,7 @@ See the aforementioned source file(s) for copyright and licensing information.
 %   Grave accent  \`     Left brace    \{     Vertical bar  \|
 %   Right brace   \}     Tilde         \~}
 %
-% \pkdate{luatexbase-modutils}{v0.4 2011-05-24}
+% \pkdate{luatexbase-modutils}{v0.5 2013-04-13}
 %
 % \maketitle
 %
@@ -345,7 +345,7 @@ See the aforementioned source file(s) for copyright and licensing information.
     \let\x\ProvidesPackage
   \fi
 \expandafter\endgroup
-\x{luatexbase-modutils}[2011/05/24 v0.4 Module utilities for LuaTeX]
+\x{luatexbase-modutils}[2013/04/13 v0.5 Module utilities for LuaTeX]
 %    \end{macrocode}
 %
 %    Make sure \luatex is used.
@@ -378,10 +378,10 @@ See the aforementioned source file(s) for copyright and licensing information.
 %    supporting Lua module and make sure |luaescapestring| is available.
 %
 %    \begin{macrocode}
-\ifdefined\RequirePackage
-  \RequirePackage{luatexbase-loader}
-\else
+\expandafter\ifx\csname RequirePackage\endcsname\relax
   \input luatexbase-loader.sty
+\else
+  \RequirePackage{luatexbase-loader}
 \fi
 \luatexbase@directlua{require('luatexbase.modutils')}
 \luatexbase@ensure@primitive{luaescapestring}
@@ -552,7 +552,7 @@ function require_module(name, req_date)
     local info = modules[name]
     if not info then
         warn("module '%s' was not properly identified", name)
-    elseif info.version then
+    elseif req_date and info.version then
         if not (info.date and date_to_int(info.date) > date_to_int(req_date))
         then
             warn("module '%s' required in version '%s'\n"

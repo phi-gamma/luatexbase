@@ -1,5 +1,27 @@
                     Changes in the luatexbase package/bundle
 
+2013/04/22 v0.6
+    loader
+        - do not output included file paths when called by texlua
+    mcb
+        - passing most of the term output to the log
+
+2013/04/13 v0.5
+    all
+        - input luatex.sty before doing anything, as luatex.sty
+          breaks if loaded after luatexbase
+    mcb and loader
+        - compatibility with Lua 5.2 (LuaTeX >= 0.74)
+    loader
+        - fix an important bug making the kpse lua loader never used,
+          it should make package searching a bit faster.
+        - dropping support for LuaTeX < 0.45.
+        - small improvement to make x.y.lua look for x/y.lua, not 
+          x/y/lua.
+    modutils
+        - fixing a bug printing "luatexbase-attr" in all documents
+          in plain TeX
+
 2011/00/24 v0.4
     cctb
         - implement catcode table stacks à la luatex.sty
