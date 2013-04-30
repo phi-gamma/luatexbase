@@ -344,7 +344,21 @@ See the aforementioned source file(s) for copyright and licensing information.
 %
 %    \begin{macrocode}
 %<*luamodule>
+--- locals
+local nodenew           = node.new
+local nodesubtype       = node.subtype
+local nodetype          = node.id
+local stringfind        = string.find
+local stringformat      = string.format
+local texiowrite_nl     = texio.write_nl
+local texiowrite        = texio.write
+--- luatex internal types
+local whatsit_t         = nodetype"whatsit"
+local user_defined_t    = nodesubtype"user_defined"
+--- module declaration (deprecated in 5.2)
 module('luatexbase', package.seeall)
+luatexbase       = luatexbase or { }
+local luatexbase = luatexbase
 %    \end{macrocode}
 %
 %    This table holds the values of the allocated attributes, indexed by name.
@@ -368,7 +382,7 @@ if tex.count[luatex_sty_counter] then
   if tex.count[luatex_sty_counter] > -1 then
     error("luatexbase error: attribute 0 has already been set by \newattribute"
         .."macro from luatex.sty, not belonging to this package, this makes"
-        .."luaotfload unuseable. Please report to the maintainer of luatex.sty")
+        .."luaotfload unusable. Please report to the maintainer of luatex.sty")
   else
     tex.count[luatex_sty_counter] = 0
   end
@@ -401,7 +415,7 @@ function new_attribute(name, silent)
     attributes[name] = last_alloc
     unset_attribute(name)
     if not silent then
-        texio.write_nl('log', string.format(
+        texiowrite_nl('log', string.format(
             'luatexbase.attributes[%q] = %d', name, last_alloc))
     end
     return last_alloc
@@ -415,6 +429,140 @@ local unset_value = (luatexbase.luatexversion < 37) and -1 or -2147483647
 function unset_attribute(name)
     tex.setattribute(attributes[name], unset_value)
 end
+%    \end{macrocode}
+%
+%    User whatsit allocation (experimental).
+%
+%    \begin{macrocode}
+--- cf. luatexref-t.pdf, sect. 8.1.4.25
+local prefixsep           = "-"  --- make this @ for latex junkies?
+local user_whatsits       = { }  --- name -> id
+local whatsit_ids         = { }  --- id   -> name
+local current_whatsit     = 0
+local anonymous_whatsits  = 0
+local anonymous_prefix    = "anon"
+%    \end{macrocode}
+%
+%    The whatsit allocation is split into two functions:
+%    \verb|new_user_whatsit_id| registers a new id (an integer)
+%    and returns it. It is up to the user what he actually does
+%    with the return value.
+%
+%    Registering whatsits without a name, though supported, is
+%    not exactly good style. In these cases we generate a name
+%    from a counter.
+%
+%    In addition to the whatsit name, it is possible and even
+%    encouraged to specify the name of the package that will be
+%    using the whatsit as the second argument.
+%
+%    \begin{macrocode}
+--- string -> string -> int
+new_user_whatsit_id = function (name, package)
+    if name then
+        if package then name = package .. prefixsep .. name end
+    else -- anonymous
+        anonymous_whatsits = anonymous_whatsits + 1
+        name = anonymous_prefix
+            .. prefixsep
+            .. tostring(anonymous_whatsits)
+    end
+    local id = user_whatsits[name]
+    if id then --- what to do now?
+      texiowrite_nl(stringformat(
+        "replacing whatsit %s (%d)", name, id))
+    else --- new id
+      current_whatsit     = current_whatsit + 1
+      id                  = current_whatsit
+    end
+    user_whatsits[name] = id
+    whatsit_ids[id]     = name
+    texiowrite_nl(stringformat(
+        "new user-defined whatsit %d (%s)", id, name))
+    return id
+end
+luatexbase.new_user_whatsit_id = new_user_whatsit_id
+%    \end{macrocode}
+%
+%    \verb|new_user_whatsit| first registers a new id and
+%    then also creates the corresponding whatsit of subtype “user defined”.
+%    Return values are said node and its id.
+%
+%    \begin{macrocode}
+--- string -> string -> (node_t -> int)
+new_user_whatsit = function (name, package)
+    local id    = new_user_whatsit_id(name, package)
+    local wi    = nodenew(whatsit_t, user_defined_t)
+    wi.user_id = id
+    return wi, id
+end
+luatexbase.new_user_whatsit = new_user_whatsit
+%    \end{macrocode}
+%
+%    If one knows the name of a whatsit, its corresponding id
+%    can be retrieved by means of \verb|get_user_whatsit_id|.
+%
+%    \begin{macrocode}
+--- string -> string -> int
+get_user_whatsit_id = function (name, package)
+    if package then name = package .. prefixsep .. name end
+    return user_whatsits[name]
+end
+luatexbase.get_user_whatsit_id = get_user_whatsit_id
+%    \end{macrocode}
+%
+%    The inverse lookup is also possible via \verb|get_user_whatsit_name|.
+%    Here it finally becomes obvious why it is beneficial to supply a package
+%    name -- it adds information about who created and might be relying on the
+%    whatsit in question.
+%
+%    \begin{macrocode}
+--- string -> string -> int
+get_user_whatsit_name = function (id)
+    return whatsit_ids[id]
+end
+luatexbase.get_user_whatsit_name = get_user_whatsit_name
+%    \end{macrocode}
+%
+%    For the curious as well as the cautious who are interesting in
+%    what they are dealing with, we add a function that outputs the
+%    current allocation status to the terminal.
+%
+%    \begin{macrocode}
+--- string -> unit
+dump_registered_whatsits = function (package)
+    if package then
+        texiowrite_nl("(user whatsit allocation stats for " .. package)
+    else
+        texiowrite_nl("(user whatsit allocation stats")
+    end
+    texiowrite_nl(stringformat(
+        " ((total %d)\n  (anonymous %d))",
+        current_whatsit, anonymous_whatsits))
+    texio.write_nl" ("
+    local whatsit_list = { }
+    for name, val in next, user_whatsits do
+        if package then --- restrict to matching prefix
+            if stringfind(name, "^"..package.."%"..prefixsep) then
+              whatsit_list[#whatsit_list+1] = stringformat("(%s %d)", name, val)
+            end
+        else
+            whatsit_list[#whatsit_list+1] = stringformat("(%s %d)", name, val)
+        end
+    end
+    texiowrite(table.concat(whatsit_list, "\n  "))
+    texiowrite"))"
+end
+luatexbase.dump_registered_whatsits = dump_registered_whatsits
+%    \end{macrocode}
+%    Lastly, we define a couple synonyms for convenience.
+%    \begin{macrocode}
+luatexbase.newattribute            = new_attribute
+luatexbase.newuserwhatsit          = new_user_whatsit
+luatexbase.newuserwhatsitid        = new_user_whatsit_id
+luatexbase.getuserwhatsitid        = get_user_whatsit_id
+luatexbase.getuserwhatsitname      = get_user_whatsit_name
+luatexbase.dumpregisteredwhatsits  = dump_registered_whatsits
 %    \end{macrocode}
 %
 %    \begin{macrocode}
