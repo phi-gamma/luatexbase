@@ -116,7 +116,7 @@ See the aforementioned source file(s) for copyright and licensing information.
 % \begin{abstract}
 % In addition to the registers existing in \tex and \etex, \luatex introduces
 % a new concept: attributes. This package takes care of attribute allocation
-% just like Plain TeX and LaTeX do for other registers, and also provides a
+% just like Plain \tex and \latex do for other registers, and also provides a
 % Lua interface.
 % \end{abstract}
 %
@@ -283,7 +283,7 @@ See the aforementioned source file(s) for copyright and licensing information.
 %    \subsubsection{Load supporting Lua module}
 %
 %    First load \pk{luatexbase-loader} (hence \pk{luatexbase-compat}), then
-%    the supporting Lua module. We make sure luatex.sty is loaded.
+%    the supporting Lua module. We make sure \verb|luatex.sty| is loaded.
 %
 %    \begin{macrocode}
 \begingroup\expandafter\expandafter\expandafter\endgroup
@@ -299,7 +299,7 @@ See the aforementioned source file(s) for copyright and licensing information.
 %
 %    \subsection{User macros}
 %
-%    The allocaton macro is merely a wrapper around the Lua function, but
+%    The allocation macro is merely a wrapper around the Lua function, but
 %    handles error and logging in \tex, for consistency with other allocation
 %    macros.
 %
@@ -353,13 +353,14 @@ module('luatexbase', package.seeall)
 attributes = {}
 %    \end{macrocode}
 %
-%    There are currently two functions that create a new attribute.One is in
-%    |oberdiek| bundle, the other is this one. We will hack a little in order
-%    to make them compatible. The other function uses |LuT@AllocAttribute| as
-%    attribute counter, we will keep it in sync with ours. A possible problem
-%    might also appear: the other function starts attribute allocation at 0,
-%    which might break luaotfload. We output an error if a new attribute has
-%    already been allocated with number 0.
+%    In the \luatex ecosystem there are currently two functions that create a
+%    new attribute.
+%    One is in |oberdiek| bundle, the other is this one. We will hack a little
+%    in order to make them compatible. The other function uses
+%    |LuT@AllocAttribute| as attribute counter, we will keep it in sync with
+%    ours. A possible problem might also appear: the other function starts
+%    attribute allocation at 0, which will break luaotfload. We output an
+%    error if a new attribute has already been allocated with number 0.
 %
 %    \begin{macrocode}
 local luatex_sty_counter = 'LuT@AllocAttribute'
@@ -374,10 +375,10 @@ if tex.count[luatex_sty_counter] then
 end
 %    \end{macrocode}
 %
-%    The allocaton function. Unlike other registers, allocate starting from 1.
-%    Some code (eg, font handling coming from Con\tex{}t) behaves strangely
-%    with \verb+\attribute0+ and since there is plenty of room here, it
-%    doesn't seem bad to ``loose'' one item in order to avoid this problem.
+%    The allocation function. Unlike other registers, allocate starting from 1.
+%    Some code (e.~g., font handling coming from Con\tex{}t) behaves strangely
+%    with \verb+\attribute0+ set, and since there is plenty of room here, it
+%    doesn't seem bad to ``lose'' one item in order to avoid this problem.
 %
 %    \begin{macrocode}
 local last_alloc = 0
