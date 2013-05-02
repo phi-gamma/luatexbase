@@ -350,15 +350,32 @@ local nodesubtype       = node.subtype
 local nodetype          = node.id
 local stringfind        = string.find
 local stringformat      = string.format
+local tableunpack       = unpack or table.unpack
 local texiowrite_nl     = texio.write_nl
 local texiowrite        = texio.write
 --- luatex internal types
 local whatsit_t         = nodetype"whatsit"
 local user_defined_t    = nodesubtype"user_defined"
-
+local unassociated      = "__unassociated"
 luatexbase              = luatexbase or { }
 local luatexbase        = luatexbase
-
+%    \end{macrocode}
+%
+%    We improvise a basic logging facility.
+%
+%    \begin{macrocode}
+local reporter = function (log, category, ...)
+    if log == true then
+        texiowrite_nl("log", "("..category..") ")
+        texiowrite("log", stringformat(...))
+    else
+        texiowrite_nl("("..category..") ")
+        texiowrite(stringformat(...))
+    end
+end
+local warning = function (...) reporter (false, "warning", ...) end
+----- info    = function (...) reporter (false, "info",    ...) end
+local log     = function (...) reporter (true,  "log",     ...) end
 %    \end{macrocode}
 %
 %    This table holds the values of the allocated attributes, indexed by name.
@@ -423,8 +440,7 @@ function new_attribute(name, silent)
     attributes[name] = last_alloc
     unset_attribute(name)
     if not silent then
-        texiowrite_nl('log', string.format(
-            'luatexbase.attributes[%q] = %d', name, last_alloc))
+        log('luatexbase.attributes[%q] = %d', name, last_alloc)
     end
     return last_alloc
 end
@@ -445,9 +461,10 @@ luatexbase.unset_attribute = unset_attribute
 %
 %    \begin{macrocode}
 --- cf. luatexref-t.pdf, sect. 8.1.4.25
-local prefixsep           = "-"  --- make this @ for latex junkies?
-local user_whatsits       = { }  --- name -> id
-local whatsit_ids         = { }  --- id   -> name
+local user_whatsits       = {    --- (package, (name, id hash)) hash
+    __unassociated = { },        --- those without package name
+}
+local whatsit_ids         = { }  --- (id, (name * package)) hash
 local current_whatsit     = 0
 local anonymous_whatsits  = 0
 local anonymous_prefix    = "anon"
@@ -470,25 +487,31 @@ local anonymous_prefix    = "anon"
 --- string -> string -> int
 local new_user_whatsit_id = function (name, package)
     if name then
-        if package then name = package .. prefixsep .. name end
+        if not package then
+            package = unassociated
+        end
     else -- anonymous
         anonymous_whatsits = anonymous_whatsits + 1
-        name = anonymous_prefix
-            .. prefixsep
-            .. tostring(anonymous_whatsits)
+        package = unassociated
+        name    = anonymous_prefix .. tostring(anonymous_whatsits)
     end
-    local id = user_whatsits[name]
-    if id then --- what to do now?
-      texiowrite_nl(stringformat(
-        "replacing whatsit %s (%d)", name, id))
+
+    local whatsitdata = user_whatsits[package]
+    if not whatsitdata then
+        whatsitdata             = { }
+        user_whatsits[package]  = whatsitdata
+    end
+
+    local id = whatsitdata[name]
+    if id then --- warning
+        warning("replacing whatsit %s:%s (%d)", package, name, id)
     else --- new id
-      current_whatsit     = current_whatsit + 1
-      id                  = current_whatsit
+        current_whatsit     = current_whatsit + 1
+        id                  = current_whatsit
+        whatsitdata[name]   = id
+        whatsit_ids[id]     = { name, package }
     end
-    user_whatsits[name] = id
-    whatsit_ids[id]     = name
-    texiowrite_nl(stringformat(
-        "new user-defined whatsit %d (%s)", id, name))
+    log("new user-defined whatsit %d (%s:%s)", id, package, name)
     return id
 end
 luatexbase.new_user_whatsit_id = new_user_whatsit_id
@@ -503,7 +526,7 @@ luatexbase.new_user_whatsit_id = new_user_whatsit_id
 local new_user_whatsit = function (name, package)
     local id    = new_user_whatsit_id(name, package)
     local wi    = nodenew(whatsit_t, user_defined_t)
-    wi.user_id = id
+    wi.user_id  = id
     return wi, id
 end
 luatexbase.new_user_whatsit = new_user_whatsit
@@ -515,8 +538,10 @@ luatexbase.new_user_whatsit = new_user_whatsit
 %    \begin{macrocode}
 --- string -> string -> int
 local get_user_whatsit_id = function (name, package)
-    if package then name = package .. prefixsep .. name end
-    return user_whatsits[name]
+    if not package then
+        package = unassociated
+    end
+    return user_whatsits[package][name]
 end
 luatexbase.get_user_whatsit_id = get_user_whatsit_id
 %    \end{macrocode}
@@ -524,12 +549,13 @@ luatexbase.get_user_whatsit_id = get_user_whatsit_id
 %    The inverse lookup is also possible via \verb|get_user_whatsit_name|.
 %    Here it finally becomes obvious why it is beneficial to supply a package
 %    name -- it adds information about who created and might be relying on the
-%    whatsit in question.
+%    whatsit in question. First return value is the whatsit name, the second
+%    the package identifier it was registered with.
 %
 %    \begin{macrocode}
---- string -> string -> int
+--- int -> (string, string)
 local get_user_whatsit_name = function (id)
-    return whatsit_ids[id]
+    return tableunpack(whatsit_ids[id])
 end
 luatexbase.get_user_whatsit_name = get_user_whatsit_name
 %    \end{macrocode}
@@ -540,26 +566,32 @@ luatexbase.get_user_whatsit_name = get_user_whatsit_name
 %
 %    \begin{macrocode}
 --- string -> unit
-local dump_registered_whatsits = function (package)
-    if package then
-        texiowrite_nl("(user whatsit allocation stats for " .. package)
+local dump_registered_whatsits = function (asked_package)
+    local whatsit_list = { }
+    if asked_package then
+        local whatsitdata = user_whatsits[asked_package]
+        if not whatsitdata then
+            error("(no user whatsits registered for package %s)",
+                  asked_package)
+            return
+        end
+        texiowrite_nl("(user whatsit allocation stats for " .. asked_package)
+        for name, id in next, whatsitdata do
+            whatsit_list[#whatsit_list+1] =
+                stringformat("(%s:%s %d)", asked_package, name, id)
+        end
     else
         texiowrite_nl("(user whatsit allocation stats")
-    end
-    texiowrite_nl(stringformat(
-        " ((total %d)\n  (anonymous %d))",
-        current_whatsit, anonymous_whatsits))
-    texio.write_nl" ("
-    local whatsit_list = { }
-    for name, val in next, user_whatsits do
-        if package then --- restrict to matching prefix
-            if stringfind(name, "^"..package.."%"..prefixsep) then
-              whatsit_list[#whatsit_list+1] = stringformat("(%s %d)", name, val)
+        texiowrite_nl(stringformat(" ((total %d)\n  (anonymous %d))",
+            current_whatsit, anonymous_whatsits))
+        for package, whatsitdata in next, user_whatsits do
+            for name, id in next, whatsitdata do
+                whatsit_list[#whatsit_list+1] =
+                    stringformat("(%s:%s %d)", package, name, id)
             end
-        else
-            whatsit_list[#whatsit_list+1] = stringformat("(%s %d)", name, val)
         end
     end
+    texiowrite_nl" ("
     texiowrite(table.concat(whatsit_list, "\n  "))
     texiowrite"))"
 end
