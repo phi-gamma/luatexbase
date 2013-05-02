@@ -649,15 +649,16 @@ See the aforementioned source file(s) for copyright and licensing information.
 %
 %    \begin{macrocode}
 %<*luamodule>
-luatexbase          = luatexbase or { }
-local luatexbase    = { }
+luatexbase                  = luatexbase or { }
+local luatexbase            = luatexbase
 %    \end{macrocode}
 %
 %    The number associated to a CS name is remembered in the |catcodetables|
 %    table.
 %
 %    \begin{macrocode}
-catcodetables = {}
+luatexbase.catcodetables    = luatexbase.catcodetables or { }
+local catcodetables         = luatexbase.catcodetables
 local function catcodetabledef_from_tex(name, number)
     catcodetables[name] = tonumber(number)
 end

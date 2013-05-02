@@ -405,6 +405,17 @@ local err, warning, info, log = luatexbase.provides_module({
 })
 %    \end{macrocode}
 %
+%    First we declare the function references for the entire scope.
+%
+%    \begin{macrocode}
+local add_to_callback
+local call_callback
+local create_callback
+local priority_in_callback
+local remove_from_callback
+local reset_callback
+%    \end{macrocode}
+%
 %    \subsubsection{Housekeeping}
 %
 %    The main table: keys are callback names, and values are the associated
@@ -628,7 +639,7 @@ local handlers = {
 %    Add a function to a callback. First check arguments.
 %
 %    \begin{macrocode}
-local function add_to_callback (name,func,description,priority)
+function add_to_callback (name,func,description,priority)
     if type(func) ~= "function" then
         return err("unable to add function:\nno proper function passed")
     end
@@ -697,7 +708,7 @@ luatexbase.add_to_callback = add_to_callback
 %    Remove a function from a callback. First check arguments.
 %
 %    \begin{macrocode}
-local function remove_from_callback (name, description)
+function remove_from_callback (name, description)
     if not name or name == "" then
         err("unable to remove function:\nno proper callback name passed")
         return
@@ -751,7 +762,7 @@ luatexbase.remove_from_callback = remove_from_callback
 %    callback handler unless the callback is user-defined.
 %
 %    \begin{macrocode}
-local function reset_callback (name, make_false)
+function reset_callback (name, make_false)
     if not name or name == "" then
         err("unable to reset:\nno proper callback name passed")
         return
@@ -777,7 +788,7 @@ luatexbase.reset_callback = reset_callback
 %    not in the list.
 %
 %    \begin{macrocode}
-local function priority_in_callback (name, description)
+function priority_in_callback (name, description)
     if not name or name == ""
             or not callbacktypes[name]
             or not description then
@@ -809,7 +820,7 @@ luatexbase.priority_in_callback = priority_in_callback
 %    callback must also call it, see next function.
 %
 %    \begin{macrocode}
-local function create_callback(name, ctype, default)
+function create_callback(name, ctype, default)
     if not name then
         err("unable to call callback:\nno proper name passed", name)
         return nil
@@ -839,7 +850,7 @@ luatexbase.create_callback = create_callback
 %    the \texttt{create} function.
 %
 %    \begin{macrocode}
-local function call_callback(name, ...)
+function call_callback(name, ...)
     if not name then
         err("unable to call callback:\nno proper name passed", name)
         return nil

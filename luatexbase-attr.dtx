@@ -356,15 +356,23 @@ local texiowrite        = texio.write
 local whatsit_t         = nodetype"whatsit"
 local user_defined_t    = nodesubtype"user_defined"
 
-luatexbase       = luatexbase or { }
-local luatexbase = luatexbase
+luatexbase              = luatexbase or { }
+local luatexbase        = luatexbase
 
 %    \end{macrocode}
 %
 %    This table holds the values of the allocated attributes, indexed by name.
 %
 %    \begin{macrocode}
-attributes = {}
+luatexbase.attributes   = luatexbase.attributes or { }
+local attributes        = luatexbase.attributes
+%    \end{macrocode}
+%
+%    Scoping: we use locals for the attribute functions.
+%
+%    \begin{macrocode}
+local new_attribute
+local unset_attribute
 %    \end{macrocode}
 %
 %    In the \luatex ecosystem there are currently two functions that create a
@@ -396,7 +404,7 @@ end
 %
 %    \begin{macrocode}
 local last_alloc = 0
-local function new_attribute(name, silent)
+function new_attribute(name, silent)
     if last_alloc >= 65535 then
         if silent then
             return -1
@@ -427,7 +435,7 @@ luatexbase.new_attribute = new_attribute
 %
 %    \begin{macrocode}
 local unset_value = (luatexbase.luatexversion < 37) and -1 or -2147483647
-local function unset_attribute(name)
+function unset_attribute(name)
     tex.setattribute(attributes[name], unset_value)
 end
 luatexbase.unset_attribute = unset_attribute
