@@ -561,8 +561,14 @@ luatexbase.get_user_whatsit_id = get_user_whatsit_id
 %    the package identifier it was registered with.
 %
 %    \begin{macrocode}
---- int -> (string, string)
-local get_user_whatsit_name = function (id)
+--- int | node -> (string, string)
+local get_user_whatsit_name = function (asked)
+    local id
+    if type(asked) == "number" then
+        id = asked
+    else --- node
+        id = asked.user_id
+    end
     return tableunpack(whatsit_ids[id])
 end
 luatexbase.get_user_whatsit_name = get_user_whatsit_name
