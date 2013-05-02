@@ -560,6 +560,9 @@ luatexbase.get_user_whatsit_id = get_user_whatsit_id
 %    whatsit in question. First return value is the whatsit name, the second
 %    the package identifier it was registered with.
 %
+%    We issue a warning and return empty strings in case the asked whatsit is
+%    unregistered.
+%
 %    \begin{macrocode}
 --- int | node -> (string, string)
 local get_user_whatsit_name = function (asked)
@@ -569,7 +572,12 @@ local get_user_whatsit_name = function (asked)
     else --- node
         id = asked.user_id
     end
-    return tableunpack(whatsit_ids[id])
+    local metadata = whatsit_ids[id]
+    if not metadata then -- unknown
+        warning("whatsit id %d unregistered; inconsistencies may arise", id)
+        return "", ""
+    end
+    return tableunpack(metadata)
 end
 luatexbase.get_user_whatsit_name = get_user_whatsit_name
 %    \end{macrocode}
