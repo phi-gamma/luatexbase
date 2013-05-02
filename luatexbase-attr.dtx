@@ -355,10 +355,10 @@ local texiowrite        = texio.write
 --- luatex internal types
 local whatsit_t         = nodetype"whatsit"
 local user_defined_t    = nodesubtype"user_defined"
---- module declaration (deprecated in 5.2)
-module('luatexbase', package.seeall)
+
 luatexbase       = luatexbase or { }
 local luatexbase = luatexbase
+
 %    \end{macrocode}
 %
 %    This table holds the values of the allocated attributes, indexed by name.
@@ -396,7 +396,7 @@ end
 %
 %    \begin{macrocode}
 local last_alloc = 0
-function new_attribute(name, silent)
+local function new_attribute(name, silent)
     if last_alloc >= 65535 then
         if silent then
             return -1
@@ -420,15 +420,17 @@ function new_attribute(name, silent)
     end
     return last_alloc
 end
+luatexbase.new_attribute = new_attribute
 %    \end{macrocode}
 %
 %    Unset an attribute the correct way depending on \luatex's version.
 %
 %    \begin{macrocode}
 local unset_value = (luatexbase.luatexversion < 37) and -1 or -2147483647
-function unset_attribute(name)
+local function unset_attribute(name)
     tex.setattribute(attributes[name], unset_value)
 end
+luatexbase.unset_attribute = unset_attribute
 %    \end{macrocode}
 %
 %    User whatsit allocation (experimental).
@@ -458,7 +460,7 @@ local anonymous_prefix    = "anon"
 %
 %    \begin{macrocode}
 --- string -> string -> int
-new_user_whatsit_id = function (name, package)
+local new_user_whatsit_id = function (name, package)
     if name then
         if package then name = package .. prefixsep .. name end
     else -- anonymous
@@ -490,7 +492,7 @@ luatexbase.new_user_whatsit_id = new_user_whatsit_id
 %
 %    \begin{macrocode}
 --- string -> string -> (node_t -> int)
-new_user_whatsit = function (name, package)
+local new_user_whatsit = function (name, package)
     local id    = new_user_whatsit_id(name, package)
     local wi    = nodenew(whatsit_t, user_defined_t)
     wi.user_id = id
@@ -504,7 +506,7 @@ luatexbase.new_user_whatsit = new_user_whatsit
 %
 %    \begin{macrocode}
 --- string -> string -> int
-get_user_whatsit_id = function (name, package)
+local get_user_whatsit_id = function (name, package)
     if package then name = package .. prefixsep .. name end
     return user_whatsits[name]
 end
@@ -518,7 +520,7 @@ luatexbase.get_user_whatsit_id = get_user_whatsit_id
 %
 %    \begin{macrocode}
 --- string -> string -> int
-get_user_whatsit_name = function (id)
+local get_user_whatsit_name = function (id)
     return whatsit_ids[id]
 end
 luatexbase.get_user_whatsit_name = get_user_whatsit_name
@@ -530,7 +532,7 @@ luatexbase.get_user_whatsit_name = get_user_whatsit_name
 %
 %    \begin{macrocode}
 --- string -> unit
-dump_registered_whatsits = function (package)
+local dump_registered_whatsits = function (package)
     if package then
         texiowrite_nl("(user whatsit allocation stats for " .. package)
     else

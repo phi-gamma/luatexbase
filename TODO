@@ -13,7 +13,6 @@ all
     or generalise use of qstest
 - add debug messages to be used in the test suite?
 - mark all occurences of version-dependent stuff in the code
-- quit using module() in favor of locals
 - support the syntax foo = require"foo" in modutils? How?
 
 compat
