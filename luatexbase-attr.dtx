@@ -492,6 +492,8 @@ local new_user_whatsit_id = function (name, package)
         end
     else -- anonymous
         anonymous_whatsits = anonymous_whatsits + 1
+        warning("defining anonymous user whatsit no. %d", anonymous_whatsits)
+        warning("dear package authors, please name your whatsits!")
         package = unassociated
         name    = anonymous_prefix .. tostring(anonymous_whatsits)
     end
