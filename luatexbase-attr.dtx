@@ -465,6 +465,7 @@ local user_whatsits       = {    --- (package, (name, id hash)) hash
     __unassociated = { },        --- those without package name
 }
 local whatsit_ids         = { }  --- (id, (name * package)) hash
+local whatsit_cap         = 2^53 --- Lua numbers are doubles
 local current_whatsit     = 0
 local anonymous_whatsits  = 0
 local anonymous_prefix    = "anon"
@@ -509,6 +510,11 @@ local new_user_whatsit_id = function (name, package)
         warning("replacing whatsit %s:%s (%d)", package, name, id)
     else --- new id
         current_whatsit     = current_whatsit + 1
+        if current_whatsit >= whatsit_cap then
+            warning("maximum of %d integral user whatsit ids reached",
+                whatsit_cap)
+            warning("further whatsit allocation may be inconsistent")
+        end
         id                  = current_whatsit
         whatsitdata[name]   = id
         whatsit_ids[id]     = { name, package }
