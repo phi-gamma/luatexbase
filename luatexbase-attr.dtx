@@ -575,7 +575,7 @@ local get_user_whatsit_name = function (asked)
     elseif type(asked) == "function" then
         --- node generator
         local n = asked()
-        id = n.id
+        id = n.user_id
     else --- node
         id = asked.user_id
     end
