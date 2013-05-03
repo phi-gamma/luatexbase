@@ -392,7 +392,8 @@ See the aforementioned source file(s) for copyright and licensing information.
 %    \subsubsection{Module identification}
 %
 %    \begin{macrocode}
-module('luatexbase', package.seeall)
+luatexbase          = luatexbase or { }
+local luatexbase    = luatexbase
 local err, warning, info, log = luatexbase.provides_module({
     name          = "luatexbase-mcb",
     version       = 0.5,
@@ -402,6 +403,17 @@ local err, warning, info, log = luatexbase.provides_module({
     copyright     = "Hans Hagen, Elie Roux, Manuel Pegourie-Gonnard and Philipp Gesang",
     license       = "CC0",
 })
+%    \end{macrocode}
+%
+%    First we declare the function references for the entire scope.
+%
+%    \begin{macrocode}
+local add_to_callback
+local call_callback
+local create_callback
+local priority_in_callback
+local remove_from_callback
+local reset_callback
 %    \end{macrocode}
 %
 %    \subsubsection{Housekeeping}
@@ -690,6 +702,7 @@ function add_to_callback (name,func,description,priority)
     log("inserting '%s'\nat position %s in '%s'",
       description, priority, name)
 end
+luatexbase.add_to_callback = add_to_callback
 %    \end{macrocode}
 %
 %    Remove a function from a callback. First check arguments.
@@ -742,6 +755,7 @@ function remove_from_callback (name, description)
     end
     return
 end
+luatexbase.remove_from_callback = remove_from_callback
 %    \end{macrocode}
 %
 %    Remove all the functions registered in a callback. Unregisters the
@@ -767,6 +781,7 @@ function reset_callback (name, make_false)
         end
     end
 end
+luatexbase.reset_callback = reset_callback
 %    \end{macrocode}
 %
 %    Get a function's priority in a callback list, or false if the function is
@@ -788,6 +803,7 @@ function priority_in_callback (name, description)
     end
     return false
 end
+luatexbase.priority_in_callback = priority_in_callback
 %    \end{macrocode}
 %
 %    \subsubsection{Public functions for user-defined callbacks}
@@ -827,6 +843,7 @@ function create_callback(name, ctype, default)
     lua_callbacks_defaults[name] = default
     callbacktypes[name] = ctype
 end
+luatexbase.create_callback = create_callback
 %    \end{macrocode}
 %
 %    This function calls a callback. It can only call a callback created by
@@ -855,6 +872,7 @@ function call_callback(name, ...)
     end
     return f(...)
 end
+luatexbase.call_callback = call_callback
 %    \end{macrocode}
 %
 %    That's all folks!

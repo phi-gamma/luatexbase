@@ -274,7 +274,8 @@ See the aforementioned source file(s) for copyright and licensing information.
 %
 %    \begin{macrocode}
 %<*luamodule>
-module('luatexbase', package.seeall)
+luatexbase          = luatexbase or { }
+local luatexbase    = luatexbase
 %    \end{macrocode}
 %
 %    Just in case it's called from a \TeX Lua script...

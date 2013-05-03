@@ -116,7 +116,7 @@ See the aforementioned source file(s) for copyright and licensing information.
 % \begin{abstract}
 % In addition to the registers existing in \tex and \etex, \luatex introduces
 % a new concept: attributes. This package takes care of attribute allocation
-% just like Plain TeX and LaTeX do for other registers, and also provides a
+% just like Plain \tex and \latex do for other registers, and also provides a
 % Lua interface.
 % \end{abstract}
 %
@@ -283,7 +283,7 @@ See the aforementioned source file(s) for copyright and licensing information.
 %    \subsubsection{Load supporting Lua module}
 %
 %    First load \pk{luatexbase-loader} (hence \pk{luatexbase-compat}), then
-%    the supporting Lua module. We make sure luatex.sty is loaded.
+%    the supporting Lua module. We make sure \verb|luatex.sty| is loaded.
 %
 %    \begin{macrocode}
 \begingroup\expandafter\expandafter\expandafter\endgroup
@@ -299,7 +299,7 @@ See the aforementioned source file(s) for copyright and licensing information.
 %
 %    \subsection{User macros}
 %
-%    The allocaton macro is merely a wrapper around the Lua function, but
+%    The allocation macro is merely a wrapper around the Lua function, but
 %    handles error and logging in \tex, for consistency with other allocation
 %    macros.
 %
@@ -344,22 +344,62 @@ See the aforementioned source file(s) for copyright and licensing information.
 %
 %    \begin{macrocode}
 %<*luamodule>
-module('luatexbase', package.seeall)
+--- locals
+local nodenew           = node.new
+local nodesubtype       = node.subtype
+local nodetype          = node.id
+local stringfind        = string.find
+local stringformat      = string.format
+local tableunpack       = unpack or table.unpack
+local texiowrite_nl     = texio.write_nl
+local texiowrite        = texio.write
+--- luatex internal types
+local whatsit_t         = nodetype"whatsit"
+local user_defined_t    = nodesubtype"user_defined"
+local unassociated      = "__unassociated"
+luatexbase              = luatexbase or { }
+local luatexbase        = luatexbase
+%    \end{macrocode}
+%
+%    We improvise a basic logging facility.
+%
+%    \begin{macrocode}
+local reporter = function (log, category, ...)
+    if log == true then
+        texiowrite_nl("log", "("..category..") ")
+        texiowrite("log", stringformat(...))
+    else
+        texiowrite_nl("("..category..") ")
+        texiowrite(stringformat(...))
+    end
+end
+local warning = function (...) reporter (false, "warning", ...) end
+----- info    = function (...) reporter (false, "info",    ...) end
+local log     = function (...) reporter (true,  "log",     ...) end
 %    \end{macrocode}
 %
 %    This table holds the values of the allocated attributes, indexed by name.
 %
 %    \begin{macrocode}
-attributes = {}
+luatexbase.attributes   = luatexbase.attributes or { }
+local attributes        = luatexbase.attributes
 %    \end{macrocode}
 %
-%    There are currently two functions that create a new attribute.One is in
-%    |oberdiek| bundle, the other is this one. We will hack a little in order
-%    to make them compatible. The other function uses |LuT@AllocAttribute| as
-%    attribute counter, we will keep it in sync with ours. A possible problem
-%    might also appear: the other function starts attribute allocation at 0,
-%    which might break luaotfload. We output an error if a new attribute has
-%    already been allocated with number 0.
+%    Scoping: we use locals for the attribute functions.
+%
+%    \begin{macrocode}
+local new_attribute
+local unset_attribute
+%    \end{macrocode}
+%
+%    In the \luatex ecosystem there are currently two functions that create a
+%    new attribute.
+%    One is in |oberdiek| bundle, the other is this one. We will hack a little
+%    in order to make them compatible. The other function uses
+%    |LuT@AllocAttribute| as attribute counter, we will keep it in sync with
+%    ours. A possible problem might also appear: the other function starts
+%    attribute allocation at 0, which will break luaotfload. We output an
+%    error if a new attribute has already been allocated with number 0.
 %
 %    \begin{macrocode}
 local luatex_sty_counter = 'LuT@AllocAttribute'
@@ -367,17 +407,17 @@ if tex.count[luatex_sty_counter] then
   if tex.count[luatex_sty_counter] > -1 then
     error("luatexbase error: attribute 0 has already been set by \newattribute"
         .."macro from luatex.sty, not belonging to this package, this makes"
-        .."luaotfload unuseable. Please report to the maintainer of luatex.sty")
+        .."luaotfload unusable. Please report to the maintainer of luatex.sty")
   else
     tex.count[luatex_sty_counter] = 0
   end
 end
 %    \end{macrocode}
 %
-%    The allocaton function. Unlike other registers, allocate starting from 1.
-%    Some code (eg, font handling coming from Con\tex{}t) behaves strangely
-%    with \verb+\attribute0+ and since there is plenty of room here, it
-%    doesn't seem bad to ``loose'' one item in order to avoid this problem.
+%    The allocation function. Unlike other registers, allocate starting from 1.
+%    Some code (e.~g., font handling coming from Con\tex{}t) behaves strangely
+%    with \verb+\attribute0+ set, and since there is plenty of room here, it
+%    doesn't seem bad to ``lose'' one item in order to avoid this problem.
 %
 %    \begin{macrocode}
 local last_alloc = 0
@@ -400,11 +440,11 @@ function new_attribute(name, silent)
     attributes[name] = last_alloc
     unset_attribute(name)
     if not silent then
-        texio.write_nl('log', string.format(
-            'luatexbase.attributes[%q] = %d', name, last_alloc))
+        log('luatexbase.attributes[%q] = %d', name, last_alloc)
     end
     return last_alloc
 end
+luatexbase.new_attribute = new_attribute
 %    \end{macrocode}
 %
 %    Unset an attribute the correct way depending on \luatex's version.
@@ -414,6 +454,179 @@ local unset_value = (luatexbase.luatexversion < 37) and -1 or -2147483647
 function unset_attribute(name)
     tex.setattribute(attributes[name], unset_value)
 end
+luatexbase.unset_attribute = unset_attribute
+%    \end{macrocode}
+%
+%    User whatsit allocation (experimental).
+%
+%    \begin{macrocode}
+--- cf. luatexref-t.pdf, sect. 8.1.4.25
+local user_whatsits       = {    --- (package, (name, id hash)) hash
+    __unassociated = { },        --- those without package name
+}
+local whatsit_ids         = { }  --- (id, (name * package)) hash
+local whatsit_cap         = 2^53 --- Lua numbers are doubles
+local current_whatsit     = 0
+local anonymous_whatsits  = 0
+local anonymous_prefix    = "anon"
+%    \end{macrocode}
+%
+%    The whatsit allocation is split into two functions:
+%    \verb|new_user_whatsit_id| registers a new id (an integer)
+%    and returns it. It is up to the user what he actually does
+%    with the return value.
+%
+%    Registering whatsits without a name, though supported, is
+%    not exactly good style. In these cases we generate a name
+%    from a counter.
+%
+%    In addition to the whatsit name, it is possible and even
+%    encouraged to specify the name of the package that will be
+%    using the whatsit as the second argument.
+%
+%    \begin{macrocode}
+--- string -> string -> int
+local new_user_whatsit_id = function (name, package)
+    if name then
+        if not package then
+            package = unassociated
+        end
+    else -- anonymous
+        anonymous_whatsits = anonymous_whatsits + 1
+        warning("defining anonymous user whatsit no. %d", anonymous_whatsits)
+        warning("dear package authors, please name your whatsits!")
+        package = unassociated
+        name    = anonymous_prefix .. tostring(anonymous_whatsits)
+    end
+
+    local whatsitdata = user_whatsits[package]
+    if not whatsitdata then
+        whatsitdata             = { }
+        user_whatsits[package]  = whatsitdata
+    end
+
+    local id = whatsitdata[name]
+    if id then --- warning
+        warning("replacing whatsit %s:%s (%d)", package, name, id)
+    else --- new id
+        current_whatsit     = current_whatsit + 1
+        if current_whatsit >= whatsit_cap then
+            warning("maximum of %d integral user whatsit ids reached",
+                whatsit_cap)
+            warning("further whatsit allocation may be inconsistent")
+        end
+        id                  = current_whatsit
+        whatsitdata[name]   = id
+        whatsit_ids[id]     = { name, package }
+    end
+    log("new user-defined whatsit %d (%s:%s)", id, package, name)
+    return id
+end
+luatexbase.new_user_whatsit_id = new_user_whatsit_id
+%    \end{macrocode}
+%
+%    \verb|new_user_whatsit| first registers a new id and
+%    then also creates the corresponding whatsit of subtype “user defined”.
+%    Return values are said node and its id.
+%
+%    \begin{macrocode}
+--- string -> string -> (node_t -> int)
+local new_user_whatsit = function (name, package)
+    local id    = new_user_whatsit_id(name, package)
+    local wi    = nodenew(whatsit_t, user_defined_t)
+    wi.user_id  = id
+    return wi, id
+end
+luatexbase.new_user_whatsit = new_user_whatsit
+%    \end{macrocode}
+%
+%    If one knows the name of a whatsit, its corresponding id
+%    can be retrieved by means of \verb|get_user_whatsit_id|.
+%
+%    \begin{macrocode}
+--- string -> string -> int
+local get_user_whatsit_id = function (name, package)
+    if not package then
+        package = unassociated
+    end
+    return user_whatsits[package][name]
+end
+luatexbase.get_user_whatsit_id = get_user_whatsit_id
+%    \end{macrocode}
+%
+%    The inverse lookup is also possible via \verb|get_user_whatsit_name|.
+%    Here it finally becomes obvious why it is beneficial to supply a package
+%    name -- it adds information about who created and might be relying on the
+%    whatsit in question. First return value is the whatsit name, the second
+%    the package identifier it was registered with.
+%
+%    We issue a warning and return empty strings in case the asked whatsit is
+%    unregistered.
+%
+%    \begin{macrocode}
+--- int | node -> (string, string)
+local get_user_whatsit_name = function (asked)
+    local id
+    if type(asked) == "number" then
+        id = asked
+    else --- node
+        id = asked.user_id
+    end
+    local metadata = whatsit_ids[id]
+    if not metadata then -- unknown
+        warning("whatsit id %d unregistered; inconsistencies may arise", id)
+        return "", ""
+    end
+    return tableunpack(metadata)
+end
+luatexbase.get_user_whatsit_name = get_user_whatsit_name
+%    \end{macrocode}
+%
+%    For the curious as well as the cautious who are interesting in
+%    what they are dealing with, we add a function that outputs the
+%    current allocation status to the terminal.
+%
+%    \begin{macrocode}
+--- string -> unit
+local dump_registered_whatsits = function (asked_package)
+    local whatsit_list = { }
+    if asked_package then
+        local whatsitdata = user_whatsits[asked_package]
+        if not whatsitdata then
+            error("(no user whatsits registered for package %s)",
+                  asked_package)
+            return
+        end
+        texiowrite_nl("(user whatsit allocation stats for " .. asked_package)
+        for name, id in next, whatsitdata do
+            whatsit_list[#whatsit_list+1] =
+                stringformat("(%s:%s %d)", asked_package, name, id)
+        end
+    else
+        texiowrite_nl("(user whatsit allocation stats")
+        texiowrite_nl(stringformat(" ((total %d)\n  (anonymous %d))",
+            current_whatsit, anonymous_whatsits))
+        for package, whatsitdata in next, user_whatsits do
+            for name, id in next, whatsitdata do
+                whatsit_list[#whatsit_list+1] =
+                    stringformat("(%s:%s %d)", package, name, id)
+            end
+        end
+    end
+    texiowrite_nl" ("
+    texiowrite(table.concat(whatsit_list, "\n  "))
+    texiowrite"))"
+end
+luatexbase.dump_registered_whatsits = dump_registered_whatsits
+%    \end{macrocode}
+%    Lastly, we define a couple synonyms for convenience.
+%    \begin{macrocode}
+luatexbase.newattribute            = new_attribute
+luatexbase.newuserwhatsit          = new_user_whatsit
+luatexbase.newuserwhatsitid        = new_user_whatsit_id
+luatexbase.getuserwhatsitid        = get_user_whatsit_id
+luatexbase.getuserwhatsitname      = get_user_whatsit_name
+luatexbase.dumpregisteredwhatsits  = dump_registered_whatsits
 %    \end{macrocode}
 %
 %    \begin{macrocode}
