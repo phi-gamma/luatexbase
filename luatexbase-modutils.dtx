@@ -229,6 +229,14 @@ See the aforementioned source file(s) for copyright and licensing information.
 % standard Lua function, so you may want to avoid overwriting it, hence the
 % use of |err| in the above example.)
 %
+% \begin{qcode}
+% local module_info = luatexbase.get_module_info(\meta{name})
+% local version     = luatexbase.get_module_version(\meta{name})
+% local is_loaded   = luatexbase.is_module_loaded(\meta{name})
+% \end{qcode}
+% These functions check for the availability or version of a module, and can
+% even return a copy of the |module_info| table.
+%
 % \subsection{Templates}
 %
 % Let me emphasize again that, while |luatexbase.require_module()| is meant to
@@ -587,6 +595,73 @@ end
 luatexbase.provides_module = provides_module
 %    \end{macrocode}
 %
+%    \subsubsection{module availability and version checking}
+%
+%    A simple table copy function.
+%
+%    \begin{macrocode}
+local fastcopy = table.fastcopy or function(old)
+    if old then
+        local new = { }
+        for k,v in next, old do
+            if type(v) == "table" then
+                new[k] = fastcopy(v)
+            else
+                new[k] = v
+            end
+        end
+        local mt = getmetatable(old)
+        if mt then
+            setmetatable(new,mt)
+        end
+        return new
+    else
+        return { }
+    end
+end
+%    \end{macrocode}
+%
+%    Gives the table of the infos on a module, as given in |provides_module|.
+%
+%    \begin{macrocode}
+local function get_module_info(name)
+    local module_table = modules[name]
+    if not module_table then 
+      return nil 
+    else
+      return fastcopy(module_table)
+    end
+end
+luatexbase.get_module_info = get_module_info
+%    \end{macrocode}
+%
+%    Gives the version of a module, or nil if the module is not loaded.
+%
+%    \begin{macrocode}
+function get_module_version(name)
+    local module_table = modules[name]
+    if not module_table then 
+      return nil 
+    else
+      return module_table.version
+    end
+end
+luatexbase.get_module_version = get_module_version
+%    \end{macrocode}
+%
+%    Returns true if the module is loaded, false otherwise.
+%
+%    \begin{macrocode}
+function is_module_loaded(name)
+    if modules[name] then
+        return true
+    else
+        return false
+    end
+end
+luatexbase.is_module_loaded = is_module_loaded
+%    \end{macrocode}
+%
 %    \begin{macrocode}
 %</luamodule>
 %    \end{macrocode}
@@ -605,6 +680,13 @@ local err, warn, info, log = luatexbase.provides_module {
 }
 info('It works!\nOh, rly?\nYeah rly!')
 log("I'm a one-line info.")
+info("1 = "..luatexbase.get_module_version('test-modutils'))
+if is_module_loaded('test-modutils') then
+  info("ok!")
+else
+  err("problem!")
+end
+info("2000/01/01 = "..luatexbase.get_module_info('test-modutils').date)
 %</testdummy>
 %    \end{macrocode}
 %
