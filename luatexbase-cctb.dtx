@@ -649,17 +649,20 @@ See the aforementioned source file(s) for copyright and licensing information.
 %
 %    \begin{macrocode}
 %<*luamodule>
-module('luatexbase', package.seeall)
+luatexbase                  = luatexbase or { }
+local luatexbase            = luatexbase
 %    \end{macrocode}
 %
 %    The number associated to a CS name is remembered in the |catcodetables|
 %    table.
 %
 %    \begin{macrocode}
-catcodetables = {}
-function catcodetabledef_from_tex(name, number)
+luatexbase.catcodetables    = luatexbase.catcodetables or { }
+local catcodetables         = luatexbase.catcodetables
+local function catcodetabledef_from_tex(name, number)
     catcodetables[name] = tonumber(number)
 end
+luatexbase.catcodetabledef_from_tex = catcodetabledef_from_tex
 %    \end{macrocode}
 %
 %    The next function creates some shortcuts for better readability in lua
@@ -667,7 +670,7 @@ end
 %    |luatexbase.catcodetables.CatcodeTableLaTeX|.
 %
 %    \begin{macrocode}
-function catcodetable_do_shortcuts()
+local function catcodetable_do_shortcuts()
     local cat = catcodetables
     cat['latex']                = cat.CatcodeTableLaTeX
     cat['latex-package']        = cat.CatcodeTableLaTeXAtLetter
@@ -678,6 +681,7 @@ function catcodetable_do_shortcuts()
     cat['string']               = cat.CatcodeTableString
     cat['other']                = cat.CatcodeTableOther
 end
+luatexbase.catcodetable_do_shortcuts = catcodetable_do_shortcuts
 %    \end{macrocode}
 %
 %    \begin{macrocode}
