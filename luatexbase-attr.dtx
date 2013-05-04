@@ -345,7 +345,8 @@ See the aforementioned source file(s) for copyright and licensing information.
 %    \begin{macrocode}
 %<*luamodule>
 --- locals
-local nodenew           = node.new
+local copynode          = node.copy
+local newnode           = node.new
 local nodesubtype       = node.subtype
 local nodetype          = node.id
 local stringfind        = string.find
@@ -525,19 +526,21 @@ end
 luatexbase.new_user_whatsit_id = new_user_whatsit_id
 %    \end{macrocode}
 %
-%    \verb|new_user_whatsit| first registers a new id and
-%    then also creates the corresponding whatsit of subtype “user defined”.
-%    Return values are said node and its id.
+%    \verb|new_user_whatsit| first registers a new id and then also
+%    creates the corresponding whatsit of subtype “user defined”.
+%    We return a nullary function that delivers copies of the whatsit.
 %
 %    \begin{macrocode}
---- string -> string -> (node_t -> int)
+--- string -> string -> (unit -> node_t, int)
 local new_user_whatsit = function (name, package)
-    local id    = new_user_whatsit_id(name, package)
-    local wi    = nodenew(whatsit_t, user_defined_t)
-    wi.user_id  = id
-    return wi, id
+    local id         = new_user_whatsit_id(name, package)
+    local whatsit    = newnode(whatsit_t, user_defined_t)
+    whatsit.user_id  = id
+    --- unit -> node_t
+    return function ( ) return copynode(whatsit) end, id
 end
-luatexbase.new_user_whatsit = new_user_whatsit
+luatexbase.new_user_whatsit         = new_user_whatsit
+luatexbase.new_user_whatsit_factory = new_user_whatsit --- for Stephan
 %    \end{macrocode}
 %
 %    If one knows the name of a whatsit, its corresponding id
@@ -564,11 +567,15 @@ luatexbase.get_user_whatsit_id = get_user_whatsit_id
 %    unregistered.
 %
 %    \begin{macrocode}
---- int | node -> (string, string)
+--- int | fun | node -> (string, string)
 local get_user_whatsit_name = function (asked)
     local id
     if type(asked) == "number" then
         id = asked
+    elseif type(asked) == "function" then
+        --- node generator
+        local n = asked()
+        id = n.user_id
     else --- node
         id = asked.user_id
     end
@@ -613,9 +620,20 @@ local dump_registered_whatsits = function (asked_package)
             end
         end
     end
+
     texiowrite_nl" ("
-    texiowrite(table.concat(whatsit_list, "\n  "))
-    texiowrite"))"
+    --- in an attempt to be clever the texio.write* functions
+    --- mess up line breaking, so concatenation is unusable ...
+    local first = true
+    for i=1, #whatsit_list do
+        if first then 
+            first = false
+        else -- indent
+            texiowrite_nl"  "
+        end
+        texiowrite(whatsit_list[i])
+    end
+    texiowrite"))\n"
 end
 luatexbase.dump_registered_whatsits = dump_registered_whatsits
 %    \end{macrocode}
@@ -623,6 +641,7 @@ luatexbase.dump_registered_whatsits = dump_registered_whatsits
 %    \begin{macrocode}
 luatexbase.newattribute            = new_attribute
 luatexbase.newuserwhatsit          = new_user_whatsit
+luatexbase.newuserwhatsitfactory   = new_user_whatsit_factory
 luatexbase.newuserwhatsitid        = new_user_whatsit_id
 luatexbase.getuserwhatsitid        = get_user_whatsit_id
 luatexbase.getuserwhatsitname      = get_user_whatsit_name
