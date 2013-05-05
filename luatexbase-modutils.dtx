@@ -468,6 +468,7 @@ See the aforementioned source file(s) for copyright and licensing information.
 %<*luamodule>
 luatexbase          = luatexbase or { }
 local luatexbase    = luatexbase
+local string_gsub   = string.gsub
 %    \end{macrocode}
 %
 %    \subsection{Internal functions and data}
@@ -484,7 +485,8 @@ local modules = modules or {}
 %
 %    \begin{macrocode}
 local function date_to_int(date)
-    local numbers = string.gsub(date, "(%d+)/(%d+)/(%d+)", "%1%2%3")
+    if date == '' then return -1 end
+    local numbers = string_gsub(date, "(%d+)/(%d+)/(%d+)", "%1%2%3")
     return tonumber(numbers)
 end
 %    \end{macrocode}
@@ -634,7 +636,8 @@ end
 luatexbase.get_module_info = get_module_info
 %    \end{macrocode}
 %
-%    Gives the version of a module, or nil if the module is not loaded.
+%    Gives the version of a module, nil if the module is not loaded and empty
+%    string if the module did not set its date.
 %
 %    \begin{macrocode}
 function get_module_version(name)
@@ -646,6 +649,37 @@ function get_module_version(name)
     end
 end
 luatexbase.get_module_version = get_module_version
+%    \end{macrocode}
+%
+%    Gives the date string of a module, nil if the module is not loaded and 
+%    empty string of the modules did not set its date.
+%
+%    \begin{macrocode}
+function get_module_date(name)
+    local module_table = modules[name]
+    if not module_table then 
+      return nil 
+    else
+      return module_table.date
+    end
+end
+luatexbase.get_module_date = get_module_date
+%    \end{macrocode}
+%
+%    Gives the date number of a module, for date comparison, nil if the 
+%    module is not loaded and -1 if the module did not set its date. The number
+%    is formated as |yyyymmdd|.
+%
+%    \begin{macrocode}
+function get_module_date_int(name)
+    local module_table = modules[name]
+    if not module_table then 
+      return nil 
+    else
+      return module_table.date and date_to_int(module_table.date)
+    end
+end
+luatexbase.get_module_date_int = get_module_date_int
 %    \end{macrocode}
 %
 %    Returns true if the module is loaded, false otherwise.
@@ -677,6 +711,12 @@ local err, warn, info, log = luatexbase.provides_module {
   version     = 1,
   description = 'dummy test package',
 }
+luatexbase.provides_module {
+  name        = 'test-modutils2',
+  date        = '',
+  version     = 1,
+  description = 'dummy test package',
+}
 info('It works!\nOh, rly?\nYeah rly!')
 log("I'm a one-line info.")
 info("1 = "..luatexbase.get_module_version('test-modutils'))
@@ -686,6 +726,8 @@ else
   err("problem!")
 end
 info("2000/01/01 = "..luatexbase.get_module_info('test-modutils').date)
+info("20000101 = "..luatexbase.get_module_date_int('test-modutils'))
+info("-1 = "..luatexbase.get_module_date_int('test-modutils2'))
 %</testdummy>
 %    \end{macrocode}
 %
