@@ -8,10 +8,13 @@ if desired:
 – luatexbase-compat: compatibility helpers;
 – luatexbase-loader: Lua module loading;
 – luatexbase-regs: allocation of registers and the like;
-– luatexbase-attr: attribute allocation;
+– luatexbase-attr: attribute and whatsit node allocation;
 – luatexbase-cctb: catcode table allocation;
 – luatexbase-modutils: Lua module declaration; and
-- luatexbase-mcb: callbacks extensions.
+– luatexbase-mcb: callbacks extensions.
+
+The development takes place on https://github.com/lualatex/luatexbase.
+
 
 Installation
 ------------
@@ -19,20 +22,15 @@ Installation
 Here are the recommended installation methods (preferred first).
 
 1. If you are using TeX Live 2010 or later, use 'tlmgr install luatexbase'.
-If your are using MiKTeX, use the MiKTeX Package Manager.
-Alternatively, try you Linux distribution's package management system.
+   If your are using MiKTeX, use the MiKTeX Package Manager.
+   Alternatively, try you Linux distribution's package management system.
 
-2. a. Grab luatexbase.tds.zip on the CTAN.
-   b. Unzip it at the root of one or your TDS trees.
-   c. You may need to update some filename database after this, see your TeX
-      distribution's manual for details. (Hint: with TeX Live, run 'mktexlsr';
-      with MikTeX, look for "Refresh FNDB" in the MikTeX menu.)
-
-3. a. Grab the sources from CTAN or github.
+2. a. Grab the sources from CTAN or github.
    b. Run 'make install TEXMFROOT=/path/to/texmf'.
       (Warning: 'make install' without giving a TEXMFROOT will
        put files in './texmf', which is probably not what you want.)
    c. See 2c.
+
 
 License
 -------

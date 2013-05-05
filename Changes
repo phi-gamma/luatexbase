@@ -1,6 +1,13 @@
                     Changes in the luatexbase package/bundle
 
-2013/04/22 v0.6
+2013/05/04 v0.6
+    attr
+        - hack to make luatexbase and luatex.sty compatible for attribute
+          allocation (same thing should be done for catcodetables)
+        - adding whatsit nodes allocation functions (see doc)
+    modutils
+        - adding functions to check the availability and version of a module
+        - fixing small error in module date requirement
     loader
         - do not output included file paths when called by texlua
     mcb
