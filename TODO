@@ -29,6 +29,7 @@ cctb
 ----
 
 - support for unicode-letters?
+- make the functions compatible with luatex.sty
 
 mcb
 ---
@@ -38,7 +39,7 @@ mcb
 - provide a list()?
 - allow temporary disabling of callbacks
 - do something with open_read_file etc
-- make callback.register = luatexbase_add_to_callback
+- make callback.register = luatexbase_add_to_callback?
 - check if there are functions in the callbacks before luatexbase is loaded
   and import them
 

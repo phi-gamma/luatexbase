@@ -1,6 +1,8 @@
                     Changes in the luatexbase package/bundle
 
 2013/05/04 v0.6
+    all
+        - move away from the module() function (deprecated in Lua 5.2)
     attr
         - hack to make luatexbase and luatex.sty compatible for attribute
           allocation (same thing should be done for catcodetables)
@@ -8,6 +10,7 @@
     modutils
         - adding functions to check the availability and version of a module
         - fixing small error in module date requirement
+        - update documentation to reflect the move from module()
     loader
         - do not output included file paths when called by texlua
     mcb
