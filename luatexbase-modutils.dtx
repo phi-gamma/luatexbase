@@ -144,17 +144,10 @@ See the aforementioned source file(s) for copyright and licensing information.
 %
 % \medskip
 %
-% It is important to notice that Lua's standard function |module()| is
-% completely orthogonal with the present package. It has nothing to do with
-% identification and deals only with namespaces: more precisely, it
-% modifies the current environment. So, you should continue to
-% use it normally regardless of whether you chose to use this package's
-% features for identification.
-%
-% It is recommended to always use |module()| or any other method that ensure
-% the global name space remains clean. For example, you may heavily use the
-% |local| keyword and explicitly qualify the name of every non-local symbol.
-% Chapter 15 of \href{http://www.lua.org/pil/}{Programming in Lua, 1st ed.}
+% It is important to note that Lua's unction |module()| is deprecated in
+% Lua 5.2 and should be avoided. For examples of good practices for creating 
+% modules, see section~\ref{template}. Chapter 15 
+% of \href{http://www.lua.org/pil/15.html}{Programming in Lua, 3rd ed.}
 % discusses various methods for managing packages.
 %
 % \subsection{\tex macros}
@@ -232,18 +225,14 @@ See the aforementioned source file(s) for copyright and licensing information.
 % \begin{qcode}
 % local module_info = luatexbase.get_module_info(\meta{name})
 % local version     = luatexbase.get_module_version(\meta{name})
+% local date        = luatexbase.get_module_date(\meta{name})
+% local date_int    = luatexbase.get_module_date_int(\meta{name})
 % local is_loaded   = luatexbase.is_module_loaded(\meta{name})
 % \end{qcode}
 % These functions check for the availability or version of a module, and can
 % even return a copy of the |module_info| table.
 %
-% \subsection{Templates}
-%
-% Let me emphasize again that, while |luatexbase.require_module()| is meant to
-% be used as a replacement for |require()|, the function
-% |luatexbase.provides_module()| \emph{is not} a replacement for |module()|:
-% they just don't do the same thing (declaring information vs changing the
-% current name space).
+% \subsection{Templates}\label{template}
 %
 % Now, here is a module header template showing all the recommended elements:
 % \begin{verbatim}
