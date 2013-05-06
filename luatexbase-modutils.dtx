@@ -590,7 +590,8 @@ luatexbase.provides_module = provides_module
 %    A simple table copy function.
 %
 %    \begin{macrocode}
-local fastcopy = table.fastcopy or function(old)
+local fastcopy
+fastcopy = table.fastcopy or function(old)
     if old then
         local new = { }
         for k,v in next, old do
