@@ -7,7 +7,7 @@
     attr
         - hack to make luatexbase and luatex.sty compatible for attribute
           allocation (same thing should be done for catcodetables)
-        - adding whatsit nodes allocation functions (see doc)
+        - adding user-defined whatsit node allocation functions (see doc)
     modutils
         - adding functions to check the availability and version of a module
         - fixing small error in module date requirement
