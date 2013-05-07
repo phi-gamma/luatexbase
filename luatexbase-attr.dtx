@@ -529,10 +529,24 @@ local new_user_whatsit = function (name, package)
     local whatsit    = newnode(whatsit_t, user_defined_t)
     whatsit.user_id  = id
     --- unit -> node_t
-    return function ( ) return copynode(whatsit) end, id
+    local generator = function (proto)
+        local res
+        if proto then
+            local proto_id = proto.user_id
+            if proto_id ~= id then --- mismatch
+                warning("overriding user_id %d of whatsit prototype (now: %d)",
+                        proto.user_id, id)
+            end
+            res = copynode(proto)
+            res.user_id = id
+        else
+            res = copynode(whatsit)
+        end
+        return res
+    end
+    return generator, id
 end
 luatexbase.new_user_whatsit         = new_user_whatsit
-luatexbase.new_user_whatsit_factory = new_user_whatsit --- for Stephan
 %    \end{macrocode}
 %
 %    If one knows the name of a user whatsit, its corresponding id
