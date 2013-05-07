@@ -539,7 +539,10 @@ local new_user_whatsit = function (name, package)
     --- unit -> node_t
     local generator = function (proto)
         local res
-        if proto then
+        if  proto
+        and proto.id      == whatsit_t
+        and proto.subtype == user_defined_t
+        then
             local proto_id = proto.user_id
             if proto_id ~= id then --- mismatch
                 warning("overriding user_id %d of whatsit prototype (now: %d)",
