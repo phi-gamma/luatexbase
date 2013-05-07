@@ -33,7 +33,7 @@ UNPACKEDTL = $(UNPACKED_MCB) $(UNPACKED_REGS) $(UNPACKED_ATTR) $(UNPACKED_CCTB) 
 		   $(UNPACKED_BASE)
 COMPILED = $(DOC)
 GENERATED = $(COMPILED) $(UNPACKED)
-SOURCE = $(DTX) $(DTXSTY) README TODO Changes Makefile
+SOURCE = $(DTX) $(DTXSTY) README TODO NEWS Makefile
 
 # used for check
 TEST_LOADER = test-loader
@@ -42,7 +42,7 @@ TEST_MCB = test-mcb-aux.tex
 
 # Files grouped by installation location
 RUNFILES = $(filter-out test-%, $(UNPACKEDTL))
-DOCFILES = $(DOC) $(filter test-%, $(UNPACKEDTL)) README TODO Changes
+DOCFILES = $(DOC) $(filter test-%, $(UNPACKEDTL)) README TODO NEWS
 SRCFILES = $(DTX) Makefile
 
 # The following definitions should be equivalent
