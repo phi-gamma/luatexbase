@@ -2,6 +2,7 @@
 %
 % Copyright 2009, 2010 by Élie Roux <elie.roux@telecom-bretagne.eu>
 % Copyright 2010, 2011 by Manuel Pégourié-Gonnard <mpg@elzevir.fr>
+% Copyright 2013 by Philipp Gesang <philipp.gesang@alumni.uni-heidelberg.de>
 %
 % This work is under the CC0 license.
 %
@@ -109,7 +110,7 @@ See the aforementioned source file(s) for copyright and licensing information.
 %   Grave accent  \`     Left brace    \{     Vertical bar  \|
 %   Right brace   \}     Tilde         \~}
 %
-% \pkdate{luatexbase-attr}{v0.4 2011-05-24}
+% \pkdate{luatexbase-attr}{v0.6 2013-05-11}
 %
 % \maketitle
 %
@@ -230,7 +231,7 @@ See the aforementioned source file(s) for copyright and licensing information.
     \let\x\ProvidesPackage
   \fi
 \expandafter\endgroup
-\x{luatexbase-attr}[2011/05/24 v0.4 Attributes allocation for LuaTeX]
+\x{luatexbase-attr}[2013/05/11 v0.6 Attributes allocation for LuaTeX]
 %    \end{macrocode}
 %
 %    Make sure \luatex is used.
@@ -261,14 +262,17 @@ See the aforementioned source file(s) for copyright and licensing information.
 %
 %    \subsubsection{Primitives needed}
 %
-%    Load \pk{luatexbase-compat}.
+%    First load \pk{luatexbase-modutils} (hence \pk{luatexbase-loader} 
+%    and \pk{luatexbase-compat}), and make sure \pk{luatex.sty} is loaded too.
 %
 %    \begin{macrocode}
 \begingroup\expandafter\expandafter\expandafter\endgroup
 \expandafter\ifx\csname RequirePackage\endcsname\relax
-  \input luatexbase-compat.sty
+  \input luatexbase-modutils.sty
+  \input luatex.sty
 \else
-  \RequirePackage{luatexbase-compat}
+  \RequirePackage{luatexbase-modutils}
+  \RequirePackage{luatex}
 \fi
 %    \end{macrocode}
 %
@@ -282,18 +286,7 @@ See the aforementioned source file(s) for copyright and licensing information.
 %
 %    \subsubsection{Load supporting Lua module}
 %
-%    First load \pk{luatexbase-loader} (hence \pk{luatexbase-compat}), then
-%    the supporting Lua module. We make sure \verb|luatex.sty| is loaded.
-%
 %    \begin{macrocode}
-\begingroup\expandafter\expandafter\expandafter\endgroup
-\expandafter\ifx\csname RequirePackage\endcsname\relax
-  \input luatexbase-loader.sty
-  \input luatex.sty
-\else
-  \RequirePackage{luatexbase-loader}
-  \RequirePackage{luatex}
-\fi
 \luatexbase@directlua{require('luatexbase.attr')}
 %    \end{macrocode}
 %
@@ -360,23 +353,15 @@ local user_defined_t    = nodesubtype"user_defined"
 local unassociated      = "__unassociated"
 luatexbase              = luatexbase or { }
 local luatexbase        = luatexbase
-%    \end{macrocode}
-%
-%    We improvise a basic logging facility.
-%
-%    \begin{macrocode}
-local reporter = function (log, category, ...)
-    if log == true then
-        texiowrite_nl("log", "("..category..") ")
-        texiowrite("log", stringformat(...))
-    else
-        texiowrite_nl("("..category..") ")
-        texiowrite(stringformat(...))
-    end
-end
-local warning = function (...) reporter (false, "warning", ...) end
------ info    = function (...) reporter (false, "info",    ...) end
-local log     = function (...) reporter (true,  "log",     ...) end
+local err, warning, info, log = luatexbase.provides_module({
+    name          = "luatexbase-attr",
+    version       = 0.6,
+    date          = "2013/05/11",
+    description   = "Attributes allocation for LuaTeX",
+    author        = "Elie Roux, Manuel Pegourie-Gonnard and Philipp Gesang",
+    copyright     = "Elie Roux, Manuel Pegourie-Gonnard and Philipp Gesang",
+    license       = "CC0",
+})
 %    \end{macrocode}
 %
 %    This table holds the values of the allocated attributes, indexed by name.

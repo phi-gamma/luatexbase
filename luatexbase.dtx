@@ -93,7 +93,7 @@ See the aforementioned source file(s) for copyright and licensing information.
 %   Grave accent  \`     Left brace    \{     Vertical bar  \|
 %   Right brace   \}     Tilde         \~}
 %
-% \pkdate{luatexbase}{v0.6 2013-05-04}
+% \pkdate{luatexbase}{v0.6 2013-05-11}
 %
 % \maketitle
 %
@@ -214,7 +214,7 @@ See the aforementioned source file(s) for copyright and licensing information.
     \let\x\ProvidesPackage
   \fi
 \expandafter\endgroup
-\x{luatexbase}[2013/05/04 v0.6 Module utilities for LuaTeX]
+\x{luatexbase}[2013/05/11 v0.6 Resource management for the LuaTeX macro programmer]
 %    \end{macrocode}
 %
 %    Make sure \luatex is used.
@@ -264,20 +264,20 @@ See the aforementioned source file(s) for copyright and licensing information.
 \begingroup\expandafter\expandafter\expandafter\endgroup
 \expandafter\ifx\csname RequirePackage\endcsname\relax
   \input luatexbase-compat.sty
+  \input luatexbase-modutils.sty
   \input luatexbase-loader.sty
   \input luatexbase-regs.sty
   \input luatexbase-attr.sty
   \input luatexbase-cctb.sty
   \input luatexbase-mcb.sty
-  \input luatexbase-modutils.sty
 \else
   \RequirePackage{luatexbase-compat}
+  \RequirePackage{luatexbase-modutils}
   \RequirePackage{luatexbase-loader}
   \RequirePackage{luatexbase-regs}
   \RequirePackage{luatexbase-attr}
   \RequirePackage{luatexbase-cctb}
   \RequirePackage{luatexbase-mcb}
-  \RequirePackage{luatexbase-modutils}
 \fi
 %    \end{macrocode}
 %

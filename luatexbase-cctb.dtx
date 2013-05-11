@@ -109,7 +109,7 @@ See the aforementioned source file(s) for copyright and licensing information.
 %   Grave accent  \`     Left brace    \{     Vertical bar  \|
 %   Right brace   \}     Tilde         \~}
 %
-% \pkdate{luatexbase-cctb}{v0.4 2011-05-24}
+% \pkdate{luatexbase-cctb}{v0.6 2013-05-11}
 %
 % \maketitle
 %
@@ -325,7 +325,7 @@ See the aforementioned source file(s) for copyright and licensing information.
     \let\x\ProvidesPackage
   \fi
 \expandafter\endgroup
-\x{luatexbase-cctb}[2011/05/24 v0.4 Catcodetable allocation for LuaTeX]
+\x{luatexbase-cctb}[2013/05/11 v0.6 Catcodetable allocation for LuaTeX]
 %    \end{macrocode}
 %
 %    Make sure \luatex is used.
@@ -356,15 +356,15 @@ See the aforementioned source file(s) for copyright and licensing information.
 %
 %    \subsubsection{Load supporting Lua module}
 %
-%    First load \pk{luatexbase-loader} (hence \pk{luatexbase-compat}), then
-%    the supporting Lua module.
+%    First load \pk{luatexbase-modutils} (hence \pk{luatexbase-loader} 
+%    and \pk{luatexbase-compat}), then the supporting Lua module.
 %
 %    \begin{macrocode}
 \begingroup\expandafter\expandafter\expandafter\endgroup
 \expandafter\ifx\csname RequirePackage\endcsname\relax
-  \input luatexbase-loader.sty
+  \input luatexbase-modutils.sty
 \else
-  \RequirePackage{luatexbase-loader}
+  \RequirePackage{luatexbase-modutils}
 \fi
 \luatexbase@directlua{require('luatexbase.cctb')}
 %    \end{macrocode}
@@ -651,6 +651,15 @@ See the aforementioned source file(s) for copyright and licensing information.
 %<*luamodule>
 luatexbase                  = luatexbase or { }
 local luatexbase            = luatexbase
+luatexbase.provides_module({
+    name          = "luatexbase-cctb",
+    version       = 0.6,
+    date          = "2013/05/11",
+    description   = "Catcodetable allocation for LuaTeX",
+    author        = "Heiko Oberdiek, Elie Roux and Manuel Pegourie-Gonnard",
+    copyright     = "Heiko Oberdiek, Elie Roux and Manuel Pegourie-Gonnard",
+    license       = "CC0",
+})
 %    \end{macrocode}
 %
 %    The number associated to a CS name is remembered in the |catcodetables|
