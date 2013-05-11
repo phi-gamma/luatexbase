@@ -1,8 +1,9 @@
                     Changes in the luatexbase package/bundle
 
-2013/05/04 v0.6
+2013/05/11 v0.6
     all
         - move away from the module() function (deprecated in Lua 5.2)
+        - attr, loader and cctb now use provides_module
     attr
         - hack to make luatexbase and luatex.sty compatible for attribute
           allocation (same thing should be done for catcodetables)
@@ -32,7 +33,7 @@
         - fixing a bug printing "luatexbase-attr" in all documents
           in plain TeX
 
-2011/00/24 v0.4
+2011/05/24 v0.4
     cctb
         - implement catcode table stacks à la luatex.sty
         - fix \CatcodeTableLaTeX(Package): 10 (newline aka ^^J) was catcoded

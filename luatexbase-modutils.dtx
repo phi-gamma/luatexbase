@@ -111,7 +111,7 @@ See the aforementioned source file(s) for copyright and licensing information.
 %   Grave accent  \`     Left brace    \{     Vertical bar  \|
 %   Right brace   \}     Tilde         \~}
 %
-% \pkdate{luatexbase-modutils}{v0.6 2013-05-04}
+% \pkdate{luatexbase-modutils}{v0.6 2013-05-11}
 %
 % \maketitle
 %
@@ -343,7 +343,7 @@ See the aforementioned source file(s) for copyright and licensing information.
     \let\x\ProvidesPackage
   \fi
 \expandafter\endgroup
-\x{luatexbase-modutils}[2013/04/13 v0.5 Module utilities for LuaTeX]
+\x{luatexbase-modutils}[2013/05/11 v0.6 Module utilities for LuaTeX]
 %    \end{macrocode}
 %
 %    Make sure \luatex is used.
@@ -683,6 +683,17 @@ function is_module_loaded(name)
     end
 end
 luatexbase.is_module_loaded = is_module_loaded
+%    \end{macrocode}
+%
+%    We provide the module, for version checking.
+%
+%    \begin{macrocode}
+provides_module({
+  name        = 'luatexbase-modutils',
+  date        = '2013/05/11',
+  version     = 0.6,
+  description = 'Module utilities for LuaTeX',
+})
 %    \end{macrocode}
 %
 %    \begin{macrocode}
