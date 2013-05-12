@@ -443,7 +443,11 @@ end
 luatexbase.unset_attribute = unset_attribute
 %    \end{macrocode}
 %
-%    User whatsit allocation (experimental).
+%   Allocation of user-defined whatsit nodes (experimental).
+%   User-defined whatsit nodes (or user whatsits) are ignored by the
+%   \luatex engine. They can thus be used to store information in
+%   node lists without doing any harm. User whatsits can be
+%   distinguished by an id that is stored in node field |user_id|.
 %
 %    \begin{macrocode}
 --- cf. luatexref-t.pdf, sect. 8.1.4.25
@@ -457,18 +461,18 @@ local anonymous_whatsits  = 0
 local anonymous_prefix    = "anon"
 %    \end{macrocode}
 %
-%    The whatsit allocation is split into two functions:
+%    User whatsit allocation is split into two functions:
 %    \verb|new_user_whatsit_id| registers a new id (an integer)
 %    and returns it. It is up to the user what he actually does
 %    with the return value.
 %
-%    Registering whatsits without a name, though supported, is
+%    Registering user whatsits without a name, though supported, is
 %    not exactly good style. In these cases we generate a name
 %    from a counter.
 %
-%    In addition to the whatsit name, it is possible and even
+%    In addition to the user whatsit name, it is possible and even
 %    encouraged to specify the name of the package that will be
-%    using the whatsit as the second argument.
+%    using the user whatsit as the second argument.
 %
 %    \begin{macrocode}
 --- string -> string -> int
@@ -512,7 +516,7 @@ luatexbase.new_user_whatsit_id = new_user_whatsit_id
 %    \end{macrocode}
 %
 %    \verb|new_user_whatsit| first registers a new id and then also
-%    creates the corresponding whatsit of subtype “user defined”.
+%    creates the corresponding whatsit node of subtype “user-defined”.
 %    We return a nullary function that delivers copies of the whatsit.
 %
 %    \begin{macrocode}
@@ -528,7 +532,7 @@ luatexbase.new_user_whatsit         = new_user_whatsit
 luatexbase.new_user_whatsit_factory = new_user_whatsit --- for Stephan
 %    \end{macrocode}
 %
-%    If one knows the name of a whatsit, its corresponding id
+%    If one knows the name of a user whatsit, its corresponding id
 %    can be retrieved by means of \verb|get_user_whatsit_id|.
 %
 %    \begin{macrocode}
@@ -545,11 +549,11 @@ luatexbase.get_user_whatsit_id = get_user_whatsit_id
 %    The inverse lookup is also possible via \verb|get_user_whatsit_name|.
 %    Here it finally becomes obvious why it is beneficial to supply a package
 %    name -- it adds information about who created and might be relying on the
-%    whatsit in question. First return value is the whatsit name, the second
-%    the package identifier it was registered with.
+%    user whatsit in question. First return value is the user whatsit name, the
+%    second the package identifier it was registered with.
 %
-%    We issue a warning and return empty strings in case the asked whatsit is
-%    unregistered.
+%    We issue a warning and return empty strings in case the argument
+%    doesn't correspond to a registered user whatsit id.
 %
 %    \begin{macrocode}
 --- int | fun | node -> (string, string)
