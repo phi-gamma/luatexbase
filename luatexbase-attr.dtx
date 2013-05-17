@@ -434,6 +434,8 @@ luatexbase.new_attribute = new_attribute
 %    \end{macrocode}
 %
 %    Unset an attribute the correct way depending on \luatex's version.
+%    The constant \verb+unset_value+ can be retrieved by calling
+%    \verb+get_unset_value()+ to apply to nodes.
 %
 %    \begin{macrocode}
 local unset_value = (luatexbase.luatexversion < 37) and -1 or -2147483647
@@ -441,6 +443,7 @@ function unset_attribute(name)
     tex.setattribute(attributes[name], unset_value)
 end
 luatexbase.unset_attribute = unset_attribute
+luatexbase.get_unset_value = function () return unset_value end
 %    \end{macrocode}
 %
 %   Allocation of user-defined whatsit nodes (experimental).
