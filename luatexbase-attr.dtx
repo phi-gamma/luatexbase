@@ -535,7 +535,7 @@ local new_user_whatsit = function (req, package)
         id              = new_user_whatsit_id(req, package)
         whatsit         = newnode(whatsit_t, user_defined_t)
         whatsit.user_id = id
-    else -- node
+    elseif req.id == whatsit_t and req.subtype == user_defined_t then
         id      = req.user_id
         whatsit = copynode(req)
         if not whatsit_ids[id] then
