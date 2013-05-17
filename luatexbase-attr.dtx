@@ -522,6 +522,11 @@ luatexbase.new_user_whatsit_id = new_user_whatsit_id
 %    creates the corresponding whatsit node of subtype “user-defined”.
 %    We return a nullary function that delivers copies of the whatsit.
 %
+%    Alternatively, the first argument can be a whatsit node that
+%    will then be used as prototype. Note that in this case a
+%    \emph{copy} of the prototype will be stored in the closure,
+%    eliminating side-effects.
+%
 %    \begin{macrocode}
 --- (string | node_t) -> string -> ((unit -> node_t) * int)
 local new_user_whatsit = function (req, package)
