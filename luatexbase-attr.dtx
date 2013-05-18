@@ -262,7 +262,7 @@ See the aforementioned source file(s) for copyright and licensing information.
 %
 %    \subsubsection{Primitives needed}
 %
-%    First load \pk{luatexbase-modutils} (hence \pk{luatexbase-loader} 
+%    First load \pk{luatexbase-modutils} (hence \pk{luatexbase-loader}
 %    and \pk{luatexbase-compat}), and make sure \pk{luatex.sty} is loaded too.
 %
 %    \begin{macrocode}
@@ -522,17 +522,30 @@ luatexbase.new_user_whatsit_id = new_user_whatsit_id
 %    creates the corresponding whatsit node of subtype “user-defined”.
 %    We return a nullary function that delivers copies of the whatsit.
 %
+%    Alternatively, the first argument can be a whatsit node that
+%    will then be used as prototype. Note that in this case a
+%    \emph{copy} of the prototype will be stored in the closure,
+%    eliminating side-effects.
+%
 %    \begin{macrocode}
---- string -> string -> (unit -> node_t, int)
-local new_user_whatsit = function (name, package)
-    local id         = new_user_whatsit_id(name, package)
-    local whatsit    = newnode(whatsit_t, user_defined_t)
-    whatsit.user_id  = id
-    --- unit -> node_t
-    return function ( ) return copynode(whatsit) end, id
+--- (string | node_t) -> string -> ((unit -> node_t) * int)
+local new_user_whatsit = function (req, package)
+    local id, whatsit
+    if type(req) == "string" then
+        id              = new_user_whatsit_id(req, package)
+        whatsit         = newnode(whatsit_t, user_defined_t)
+        whatsit.user_id = id
+    elseif req.id == whatsit_t and req.subtype == user_defined_t then
+        id      = req.user_id
+        whatsit = copynode(req)
+        if not whatsit_ids[id] then
+            warning("whatsit id %d unregistered; "
+                    .. "inconsistencies may arise", id)
+        end
+    end
+    return function () return copynode(whatsit) end, id
 end
 luatexbase.new_user_whatsit         = new_user_whatsit
-luatexbase.new_user_whatsit_factory = new_user_whatsit --- for Stephan
 %    \end{macrocode}
 %
 %    If one knows the name of a user whatsit, its corresponding id
@@ -618,7 +631,7 @@ local dump_registered_whatsits = function (asked_package)
     --- mess up line breaking, so concatenation is unusable ...
     local first = true
     for i=1, #whatsit_list do
-        if first then 
+        if first then
             first = false
         else -- indent
             texiowrite_nl"  "
@@ -633,7 +646,6 @@ luatexbase.dump_registered_whatsits = dump_registered_whatsits
 %    \begin{macrocode}
 luatexbase.newattribute            = new_attribute
 luatexbase.newuserwhatsit          = new_user_whatsit
-luatexbase.newuserwhatsitfactory   = new_user_whatsit_factory
 luatexbase.newuserwhatsitid        = new_user_whatsit_id
 luatexbase.getuserwhatsitid        = get_user_whatsit_id
 luatexbase.getuserwhatsitname      = get_user_whatsit_name
