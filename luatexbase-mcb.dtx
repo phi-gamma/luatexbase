@@ -626,12 +626,10 @@ end
 %    \begin{macrocode}
 local function simplehandler (name)
     return function(...)
-        local ret = true
+        local ret
         for _, f in ipairs(callbacklist[name]) do
             ret = f.func(...)
             if ret == false then
-                log("function '%s' returned false in callback '%s'",
-                    f.description, name)
                 return false
             end
         end
