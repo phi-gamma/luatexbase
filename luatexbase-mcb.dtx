@@ -572,7 +572,7 @@ local function listhandler (name)
         for _, f in ipairs(callbacklist[name]) do
             ret = f.func(head, ...)
             if ret == false then
-                warning("function '%s' returned false\nin callback '%s'",
+                log("function '%s' returned false\nin callback '%s'",
                     f.description, name)
                 break
             end
