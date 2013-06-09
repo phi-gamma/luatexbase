@@ -988,7 +988,7 @@ end
 %    \begin{macrocode}
 function add_hyphenate()
     luatexbase.add_to_callback('hyphenate', function(head, tail)
-            texio.write_nl("I'm a dummy hyphenate")
+            texio.write_nl("I'm a dummy (false) hyphenate") return false
         end,
         'dummy hyphenate')
     luatexbase.add_to_callback('hyphenate', function(head, tail)
