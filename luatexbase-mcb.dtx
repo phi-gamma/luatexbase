@@ -925,6 +925,39 @@ luatexbase.is_active_callback = function (name, description)
 end
 %    \end{macrocode}
 %
+%    |callback_descriptions| returns a table containing all
+%    descriptions of the functions registered for a given callback in
+%    the order of their priority.
+%
+%    The function raises an error if the callback name is missing or
+%    invalid.
+%    If there is no function registered for the callback, an empty
+%    table is returned.
+%
+%    \begin{macrocode}
+--- string -> string list option
+luatexbase.callback_descriptions = function (name)
+    if not name then
+        err ("unable to check for callback:\nno proper name passed")
+        return
+    elseif not callbacktypes [name] then
+        err ("unable to check for callback %q:\nis not a valid callback", name)
+        return
+    end
+    local lst        = callbacklist [name]
+    local registered = { }
+    if lst then
+        for i = 1, #lst do
+            local itm = lst [i]
+            if i then
+                registered [i] = itm.description
+            end
+        end
+    end
+    return registered
+end
+%    \end{macrocode}
+%
 %    That's all folks!
 %
 %    \begin{macrocode}
