@@ -862,7 +862,7 @@ luatexbase.create_callback = create_callback
 %    \end{macrocode}
 %
 %    This function calls a callback. It can only call a callback created by
-%    the \texttt{create} function.
+%    the |create_callback| function.
 %
 %    \begin{macrocode}
 function call_callback(name, ...)
@@ -888,6 +888,41 @@ function call_callback(name, ...)
     return f(...)
 end
 luatexbase.call_callback = call_callback
+%    \end{macrocode}
+%
+%    |is_active_callback| checks the activation state of a given
+%    callback function. It is passed the description of the function
+%    and the name of the callback it was registered under.
+%
+%    The function raises an error if passed an invalid callback name
+%    or if the name or the description is missing.
+%    The return value is |true| iff the callback function is
+%    registered, |false| otherwise.
+%
+%    \begin{macrocode}
+--- string -> string -> bool
+luatexbase.is_active_callback = function (name, description)
+    if not name then
+        err ("unable to check for callback:\nno proper name passed")
+        return false
+    elseif not callbacktypes [name] then
+        err ("unable to check for callback %q:\nis not a valid callback", name)
+        return false
+    elseif not description then
+        err ("unable to check for callback %q:\nno description given", name)
+        return false
+    end
+    local lst = callbacklist [name]
+    if not lst then --- callback inactive, no functions registered
+        return false
+    end
+    for _, v in next, lst do
+        if v.description == description then --- success
+            return true
+        end
+    end
+    return false
+end
 %    \end{macrocode}
 %
 %    That's all folks!
