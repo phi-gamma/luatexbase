@@ -391,9 +391,9 @@ local unset_attribute
 local luatex_sty_counter = 'LuT@AllocAttribute'
 if tex.count[luatex_sty_counter] then
   if tex.count[luatex_sty_counter] > -1 then
-    error("luatexbase error: attribute 0 has already been set by \newattribute"
-        .."macro from luatex.sty, not belonging to this package, this makes"
-        .."luaotfload unusable. Please report to the maintainer of luatex.sty")
+    error("luatexbase error: Attribute 0 has already been set by the \\newattribute "
+        .."macro from luatex.sty, not belonging to this package. This makes "
+        .."luaotfload unusable. Please report to the maintainer of luatex.sty.")
   else
     tex.count[luatex_sty_counter] = 0
   end
