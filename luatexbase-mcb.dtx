@@ -948,13 +948,16 @@ local function sample(head,...)
     return head, true
 end
 local prio = luatexbase.priority_in_callback
+local is_active = luatexbase.is_active_callback
 msg("\n*********\n* Testing management functions\n*********")
 luatexbase.add_to_callback("hpack_filter", sample, "sample one", 1)
 luatexbase.add_to_callback("hpack_filter", sample, "sample two", 2)
 luatexbase.add_to_callback("hpack_filter", sample, "sample three", 1)
 assert(prio("hpack_filter", "sample three"))
+assert(is_active("hpack_filter", "sample three") == true)
 luatexbase.remove_from_callback("hpack_filter", "sample three")
 assert(not prio("hpack_filter", "sample three"))
+assert(is_active("hpack_filter", "sample three") == false)
 luatexbase.reset_callback("hpack_filter")
 assert(not prio("hpack_filter", "sample one"))
 %    \end{macrocode}
