@@ -1,6 +1,6 @@
                     Changes in the luatexbase package/bundle
 
-2013/11/29 v0.7
+2013/12/31 v0.6a
     mcb
         - minor changes and more coherent behaviour
         - refreshing the list of callbacks
