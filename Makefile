@@ -157,8 +157,8 @@ $(CTAN_ZIP): $(SOURCE) $(COMPILED) $(TDS_ZIP)
 	@echo "Making $@ for CTAN upload."
 	@$(RM) -rf -- $@ ./luatexbase
 	@mkdir ./luatexbase
-	@cp $^ ./luatexbase/
-	@zip -r9 $@ luatexbase/ >/dev/null
+	@cp $(filter-out $(TDS_ZIP),$^) ./luatexbase/
+	@zip -r9 $@ luatexbase/ $(TDS_ZIP) >/dev/null
 
 $(TDS_ZIP): TEXMFROOT=./tmp-texmf
 $(TDS_ZIP): $(ALL_FILES)
