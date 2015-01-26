@@ -307,7 +307,10 @@ See the aforementioned source file(s) for copyright and licensing information.
     \wlog{\string#1=\string\luatexattribute\the\allocationnumber}%
   \else
     \errmessage{No room for a new \string\attribute}%
-  \fi}
+  \fi
+  \global\unsetluatexattribute#1% if you move this line up a little, bad
+  % things happen, see #20
+  }
 %    \end{macrocode}
 %
 %    Helper macro |\unsetluatexattribute|.
@@ -424,7 +427,6 @@ function new_attribute(name, silent)
       tex.setcount('global', luatex_sty_counter, last_alloc)
     end
     attributes[name] = last_alloc
-    unset_attribute(name)
     if not silent then
         log('luatexbase.attributes[%q] = %d', name, last_alloc)
     end
