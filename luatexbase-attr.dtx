@@ -301,7 +301,7 @@ See the aforementioned source file(s) for copyright and licensing information.
   \begingroup\escapechar\m@ne \expandafter\expandafter\expandafter
   \endgroup                   \expandafter\expandafter\expandafter
   \allocationnumber           \luatexbase@directlua{tex.write(
-    luatexbase.new_attribute("\luatexluaescapestring{\string#1}", true))}%
+    luatexbase.new_attribute("\luatexluaescapestring{\string#1}", true))}\relax%
   \ifnum\allocationnumber>\m@ne
     \global\luatexattributedef#1=\allocationnumber
     \wlog{\string#1=\string\luatexattribute\the\allocationnumber}%
