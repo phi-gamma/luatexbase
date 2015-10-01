@@ -1,36 +1,19 @@
                   The luatexbase generic package for LuaTeX
 
 
-This package provides resource management for the LuaTeX macro programmer.
-It is composed of the following sub-packages, which can be used independantly
-if desired:
+NOTE
+----
+This repository contains the **Original** implementation of luatexbase.
+It is kept here for the record and for checking compatibility of
+newer implementations.
 
-– luatexbase-compat: compatibility helpers;
-– luatexbase-loader: Lua module loading;
-– luatexbase-regs: allocation of registers and the like;
-– luatexbase-attr: attribute and whatsit node allocation;
-– luatexbase-cctb: catcode table allocation;
-– luatexbase-modutils: Lua module declaration; and
-– luatexbase-mcb: callbacks extensions.
+Most of the functionality is now provided in the core LaTeX format
+(releases from 2015/10/01) or, for plain TeX, in the file ltuatex.tex.
 
-The development takes place on https://github.com/lualatex/luatexbase.
-
-
-Installation
-------------
-
-Here are the recommended installation methods (preferred first).
-
-1. If you are using TeX Live 2010 or later, use 'tlmgr install luatexbase'.
-   If your are using MiKTeX, use the MiKTeX Package Manager.
-   Alternatively, try you Linux distribution's package management system.
-
-2. a. Grab the sources from CTAN or github.
-   b. Run 'make install TEXMFROOT=/path/to/texmf'.
-      (Warning: 'make install' without giving a TEXMFROOT will
-       put files in './texmf', which is probably not what you want.)
-   c. See 2c.
-
+A luatexbase package based on the new ltluatex code providing the
+luatexbase interfaces is available from ctan and with development
+sources at
+https://github.com/josephwright/ltluatexsupp
 
 License
 -------
